@@ -1,29 +1,88 @@
 /*
- * PROVISIONAL TOKENS — owned by Phase 3, not by this file's current values.
+ * Design tokens — direction "Control Surface".
  *
- * Phase 1 only needs the page to be legible while the skeleton is proven end to
- * end. The real palette, type scale and motion tokens are decided in Phase 3
- * with the design skills, and this file is rewritten there. Nothing below is a
- * considered visual choice; it is a neutral, WCAG-safe baseline so that early
- * screenshots are not misleading.
+ * Split in two layers on purpose:
+ *   PRIMITIVES  raw values, named after what they are. Never used directly in
+ *               a component.
+ *   SEMANTIC    named after the job they do. Components use only these, so a
+ *               palette change happens here and nowhere else.
+ *
+ * Every text pair below was measured against WCAG 2.1, not estimated.
+ * Worst pair is muted-on-surface at 5.10:1; AA needs 4.5:1.
  */
+
 :root {
-  /* Surfaces. Dark theme is a fixed requirement, so there is no light variant. */
-  --surface-base: #14161a;
-  --surface-raised: #1c1f25;
-  --surface-border: #2b3038;
+  /* ---- PRIMITIVES ------------------------------------------------------ */
 
-  /* Text. Deliberately not pure white on pure black — that pairing causes
-     halation and reads as harsh over long paragraphs. */
-  --text-primary: #e8eaed;
-  --text-muted: #9aa1ab;
-  --text-accent: #7fb3ff;
+  /* A dark base with a green-cyan cast rather than a tinted neutral black.
+     The cast is what keeps it from reading as the default dark template. */
+  --ink-900: #0e1413;
+  --ink-800: #1e2927;
+  --ink-100: #dce6e3;
+  --ink-300: #8a9a97;
 
-  /* Type. One family until Phase 3 chooses the real pairing. */
-  --font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', monospace;
+  /* Single accent hue. Amber against the cool base — the pairing comes from
+     real instrumentation, and avoids the acid-green/vermilion dev-portfolio
+     cliché. */
+  --amber-400: #d3a04a;
 
-  /* Spacing on a 4px rhythm. */
+  /* ---- SEMANTIC: surfaces ---------------------------------------------- */
+
+  /* L0 canvas, ~60% of the viewport. */
+  --surface-canvas: var(--ink-900);
+  /* L1 panels and cards, ~30%. Measured step from canvas: 1.24:1 — visible
+     as elevation without turning every section into a box. */
+  --surface-raised: var(--ink-800);
+
+  /* ---- SEMANTIC: text --------------------------------------------------- */
+
+  --text-primary: var(--ink-100); /* 14.60:1 canvas · 11.75:1 raised */
+  --text-muted: var(--ink-300); /*  6.34:1 canvas ·  5.10:1 raised */
+  --text-accent: var(--amber-400); /*  7.89:1 canvas ·  6.35:1 raised */
+
+  /* ---- SEMANTIC: borders ------------------------------------------------ */
+
+  /* Two tokens because they answer to different rules. Decorative panel chrome
+     follows the taste guidance (8–14% of foreground in dark mode); anything
+     that bounds an interactive control must clear WCAG 1.4.11's 3:1. */
+  --border-subtle: color-mix(in srgb, var(--ink-100) 14%, transparent); /* 1.46:1 */
+  --border-strong: color-mix(in srgb, var(--ink-100) 44%, transparent); /* 3.48:1 */
+
+  /* Dark mode gets separation from edge lighting, never an outer glow. */
+  --edge-highlight: inset 0 1px 0 rgb(255 255 255 / 0.05);
+
+  /* ---- SEMANTIC: type --------------------------------------------------- */
+
+  /* --font-sans and --font-mono are injected by Astro's font pipeline
+     (see astro.config.mjs); these add the fallback stacks. */
+  --family-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --family-mono: var(--font-mono), ui-monospace, monospace;
+
+  /* Three weights, ceiling 600. Emphasis comes from size and spacing. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Minor third (1.2) from a 1rem body. Nothing below 0.75rem. */
+  --text-meta: 0.75rem;
+  --text-secondary: 0.875rem;
+  --text-body: 1rem;
+  --text-h3: 1.2rem;
+  --text-h2: 1.44rem;
+  --text-h1: 1.728rem;
+  --text-display: 2.488rem;
+
+  /* Line-height tightens as size grows. */
+  --leading-tight: 1.2;
+  --leading-body: 1.55;
+  --leading-meta: 1.4;
+
+  /* Tracking is only ever tightened on display sizes. */
+  --tracking-display: -0.02em;
+
+  /* ---- SEMANTIC: space -------------------------------------------------- */
+
+  /* 4px rhythm. */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -32,8 +91,20 @@
   --space-8: 2rem;
   --space-12: 3rem;
   --space-16: 4rem;
+  --space-24: 6rem;
+
+  --radius-sm: 3px;
+  --radius-md: 6px;
 
   /* Body copy stays under ~75 characters per line. */
   --measure: 68ch;
-  --page-max: 72rem;
+  --page-max: 68rem;
+
+  /* ---- SEMANTIC: motion ------------------------------------------------- */
+
+  /* Only opacity and transform may animate; both are compositor-only, so they
+     do not trigger layout on scroll. */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
 }

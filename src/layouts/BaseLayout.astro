@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 
 interface Props {
@@ -21,6 +22,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href={canonical} />
+
+    {/* Emits the self-hosted @font-face rules. Deliberately not preloaded:
+        `preload` covers every variant of a family, which here is six files
+        competing with the text that drives LCP. Astro emits metric-matched
+        fallbacks, so the real face swaps in without shifting layout. */}
+    <Font cssVariable="--font-sans" />
+    <Font cssVariable="--font-mono" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
