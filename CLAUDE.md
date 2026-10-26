@@ -42,6 +42,15 @@ docs/
 - **Nu inventa conținut.** Unde lipsesc texte reale, pune placeholder vizibil `TODO(conținut): …`.
 - **Folosește skill-ul `frontend-design`** pentru orice decizie vizuală (tipografie, layout, culori, componente).
 
+## Limba
+- **Interfața și conținutul sunt în engleză.** Tudor are IELTS C1; engleza deschide și piața
+  internațională, și pe cea locală (recrutorii tech din București citesc engleză), pe când româna
+  o închide pe prima. `<html lang="en">` — un cititor de ecran își ia pronunția de acolo.
+- `docs/ARHITECTURA.md` rămâne în **română**, fiind explicația pentru Tudor.
+- Marcajele `TODO(conținut)` rămân în română: sunt note către Tudor, nu conținut de site.
+- Subsetul de font `latin-ext` se păstrează chiar dacă site-ul e în engleză — se descarcă doar
+  dacă pagina conține caractere din el, deci nu costă nimic, și acoperă numele românești.
+
 ## Date personale — nu negociabil
 - **Numărul de telefon nu ajunge niciodată pe site, în repo sau în CV-ul descărcabil.** Repo-ul și
   site-ul sunt publice; un număr publicat e indexat de Google și recoltat de boți în câteva săptămâni.
