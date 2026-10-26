@@ -250,3 +250,32 @@ Primul test de focus a dat 0/13 — dar testul era greșit, nu codul: al doilea
 argument al lui `getComputedStyle` e pentru pseudo-*elemente* (`::before`), nu
 pseudo-*clase* (`:focus-visible`). Corectat, citind outline-ul elementului
 chiar focalizat.
+
+---
+
+## Faza 4b — URL-ul real și pagina 404
+
+### Site-ul e live
+
+`https://portfolio.tudorifrim606.workers.dev`
+
+Deploy-ul automat din git funcționează: fiecare push pe `main` declanșează un
+build pe Cloudflare, iar în dashboard apare „Build in progress".
+
+### De ce `site:` din config conta
+
+Astro construiește din el linkurile **canonice** (care îi spun Google care e
+adresa oficială a paginii) și **Open Graph** (previzualizarea când trimiți
+linkul pe LinkedIn). Un placeholder greșit nu dă eroare la build — eșuează
+tăcut, și afli abia când cineva dă click pe un preview rupt.
+
+### Pagina 404 lipsea, deși configul o cerea
+
+`wrangler.jsonc` are `not_found_handling: "404-page"`, adică „pentru o adresă
+necunoscută, servește `/404.html`". Dar Astro nu generează așa ceva automat —
+fișierul trebuie să existe ca `src/pages/404.astro`. Nu exista, deci o adresă
+greșită ar fi întors un răspuns gol.
+
+Textul respectă regula din skill-ul `errors`: **nu dă vina pe cititor.**
+„This page doesn't exist" descrie starea sistemului; „ai greșit adresa" ar fi
+o acuzație. Și oferă o ieșire (două linkuri), nu doar un diagnostic.

@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+// Cloudflare serves this file for any unmatched path because wrangler.jsonc
+// sets not_found_handling to "404-page". Without the file, an unknown URL
+// would return an empty response.
+//
+// Copy follows the errors rule: no blame, under two sentences, and a recovery
+// step rather than a diagnosis. "This page doesn't exist" states the system's
+// condition; "you typed the wrong address" would accuse the reader.
+---
+
+<BaseLayout
+  title="Page not found — Tudor-Andrei Ifrim"
+  description="That page doesn't exist. The work and contact details are on the home page."
+>
+  <SiteHeader />
+
+  <section class="notfound">
+    <h1>This page doesn't exist</h1>
+    <p>
+      The link may be out of date. The work and contact details are on the home
+      page.
+    </p>
+    <p class="actions">
+      <a class="action" href="/#work">See the work</a>
+      <a class="action" href="/#contact">Get in touch</a>
+    </p>
+  </section>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .notfound {
+    padding-block: var(--space-16) var(--space-24);
+  }
+
+  h1 {
+    margin-block: 0 var(--space-4);
+    font-size: var(--text-h1);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    max-width: none;
+    margin-top: var(--space-8);
+  }
+
+  /* Bounds an interactive control, so it uses the token that clears the 3:1
+     WCAG requires for non-text UI, not the decorative hairline. */
+  .action {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .action:hover {
+    border-color: var(--text-accent);
+  }
+</style>
