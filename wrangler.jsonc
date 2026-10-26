@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "portfolio",
+
+  // Pin the Workers runtime behaviour to a known date. Bumping this opts into
+  // newer platform defaults, so it changes only deliberately.
+  "compatibility_date": "2026-10-26",
+
+  // Static assets only: Astro has already produced finished HTML in dist/, so
+  // there is no Worker script. Cloudflare serves the files directly.
+  "assets": {
+    "directory": "./dist",
+
+    // Serve /about as /about/index.html and send unknown paths to a 404 page
+    // rather than silently returning the homepage with a 200.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

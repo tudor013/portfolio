@@ -19,3 +19,6 @@ dist/
 # Source media that is too large to version.
 # Only the generated, optimised frames under public/media/ are committed.
 raw/
+
+# Wrangler local state
+.wrangler/
