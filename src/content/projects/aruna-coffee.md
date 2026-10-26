@@ -19,9 +19,8 @@ problem: >-
   directly online, by single order or by subscription, with delivery to the
   door.
 results: >-
-  TODO(conținut): confirmă formularea. „Over 100 kg of coffee sold per month"
-  — dar e vânzarea afacerii sau cea prin site? Pe un portofoliu de developer,
-  un rezultat atribuit site-ului trebuie să fie chiar al site-ului.
+  The business sells over 100 kg of coffee a month through the online shop I
+  built.
 order: 10
 draft: false
 links: []

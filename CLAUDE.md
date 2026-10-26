@@ -82,8 +82,19 @@ fundalurile scrubbing, pentru că e personal (poza și numele lui), e deasupra f
 pentru că fundalurile decorative sunt exact lucrul pe care cititorul e instruit să-l ignore.
 
 Se implementează cât mai ușor posibil (canvas 2D sau Three.js vanilla înainte de orice stivă
-React), se măsoară cu Lighthouse **înainte și după**, iar decizia finală se ia pe cifre, nu pe
-impresie. Dacă pragul cade sub 90, Tudor decide conștient dacă îl coboară.
+React), se măsoară cu Lighthouse **înainte și după**, iar decizia finală se ia pe cifre.
+
+### Decizia lui Tudor asupra conflictului (desktop-first, două moduri)
+- **Ne axăm pe desktop.** Versiunea de mobil se regândește separat, mai târziu.
+- **Două moduri de rulare:** unul cu animații complete, unul redus, pentru când e prea solicitant.
+  Comutatorul se leagă de `prefers-reduced-motion` **și** de o alegere explicită a vizitatorului,
+  memorată local.
+- **Constrângerea care rămâne:** „desktop-first" înseamnă că *animațiile* sunt opționale pe mobil,
+  **nu** că mobilul are voie să fie rupt. Conținutul, navigarea și lizibilitatea rămân complete la
+  375px — asta e deja valabil și nu costă nimic de menținut. Recrutorii deschid linkuri de pe
+  telefon; un site rupt acolo nu mai ajunge la varianta de desktop.
+- Pragul Performance ≥ 90 se măsoară în **modul redus**. Modul complet are buget separat, iar dacă
+  nu îl atinge, asta e o alegere asumată, nu o scăpare.
 
 Fără JavaScript, badge-ul se degradează la o imagine statică — conținutul rămâne complet.
 
