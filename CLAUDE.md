@@ -42,6 +42,14 @@ docs/
 - **Nu inventa conținut.** Unde lipsesc texte reale, pune placeholder vizibil `TODO(conținut): …`.
 - **Folosește skill-ul `frontend-design`** pentru orice decizie vizuală (tipografie, layout, culori, componente).
 
+## Date personale — nu negociabil
+- **Numărul de telefon nu ajunge niciodată pe site, în repo sau în CV-ul descărcabil.** Repo-ul și
+  site-ul sunt publice; un număr publicat e indexat de Google și recoltat de boți în câteva săptămâni.
+- Contactul public = **email + LinkedIn**, atât. Versiunea de CV cu telefon se trimite direct la
+  aplicare, nu se găzduiește.
+- Regula se aplică și când numărul apare într-un fișier sursă (CV, document trimis în chat):
+  se omite la generare, nu se copiază.
+
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).
 
