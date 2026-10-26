@@ -1,0 +1,67 @@
+---
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import { CATEGORY_LABELS } from '../../content.config';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// One static page per published project. Astro calls this at build time, so
+// adding a Markdown file is all it takes to get a new page.
+export const getStaticPaths: GetStaticPaths = async () => {
+  const projects = await getCollection('projects');
+  return projects
+    .filter((project) => !project.data.draft)
+    .map((project) => ({
+      params: { slug: project.id },
+      props: { project },
+    }));
+};
+
+// Declaring Props is what gives Astro.props its type; without it `project`
+// is `unknown` and every field access below silently becomes `any`.
+type Props = { project: CollectionEntry<'projects'> };
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const data = project.data;
+---
+
+<BaseLayout title={`${data.title} — Tudor Ifrim`} description={data.problem}>
+  <article>
+    <a href="/">← Toate proiectele</a>
+
+    <h1>{data.title}</h1>
+    <p>{CATEGORY_LABELS[data.category]} · {data.year}</p>
+
+    <h2>Problema</h2>
+    <p>{data.problem}</p>
+
+    <h2>Rolul meu</h2>
+    <p>{data.role}</p>
+
+    <h2>Tehnologii</h2>
+    <ul>
+      {data.stack.map((tool) => <li>{tool}</li>)}
+    </ul>
+
+    <h2>Rezultat</h2>
+    <p>{data.results}</p>
+
+    {
+      data.links.length > 0 && (
+        <>
+          <h2>Linkuri</h2>
+          <ul>
+            {data.links.map((link) => (
+              <li>
+                <a href={link.url}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    <Content />
+  </article>
+</BaseLayout>

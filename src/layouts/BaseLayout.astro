@@ -1,0 +1,42 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  /** Page title, used for <title> and as the Open Graph title. */
+  title: string;
+  /** One sentence; shows in search results and in LinkedIn link previews. */
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+// Astro.site comes from `site` in astro.config.mjs. Open Graph requires
+// absolute URLs, so relative paths would silently produce broken previews.
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- TODO(conținut): og:image — 1200×630 preview card for LinkedIn. -->
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Sari la conținut</a>
+    <main id="main" class="page">
+      <slot />
+    </main>
+  </body>
+</html>

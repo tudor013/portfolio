@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import { CATEGORIES, CATEGORY_LABELS } from '../content.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Drafts are excluded at build time so an unfinished case study cannot ship.
+const published = (await getCollection('projects')).filter((p) => !p.data.draft);
+
+// Group once here rather than filtering inside the template three times.
+const byCategory = CATEGORIES.map((category) => ({
+  category,
+  label: CATEGORY_LABELS[category],
+  projects: published
+    .filter((p) => p.data.category === category)
+    .sort((a, b) => a.data.order - b.data.order || b.data.year - a.data.year),
+}));
+---
+
+<BaseLayout
+  title="Tudor Ifrim — Software Developer"
+  description="TODO(conținut): o propoziție care spune ce rol cauți și de ce te merită."
+>
+  <!-- Phase 4 replaces this with the real Hero component. -->
+  <header>
+    <h1>Tudor Ifrim</h1>
+    <p>TODO(conținut): propoziția de poziționare — cine ești și ce rol cauți.</p>
+    <p>
+      <a href="https://github.com/tudor013">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/tudor-ifrim-697b0b26a/">LinkedIn</a>
+    </p>
+  </header>
+
+  {
+    byCategory.map(({ category, label, projects }) => (
+      <section aria-labelledby={`cat-${category}`}>
+        <h2 id={`cat-${category}`}>{label}</h2>
+
+        {projects.length === 0 ? (
+          <p>TODO(conținut): niciun proiect în această categorie încă.</p>
+        ) : (
+          <ul>
+            {projects.map((project) => (
+              <li>
+                <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+                <span> — {project.data.year}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    ))
+  }
+</BaseLayout>
