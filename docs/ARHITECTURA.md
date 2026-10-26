@@ -171,3 +171,82 @@ apar componentele.
 - build → 4 pagini, 8 fișiere woff2 emise, 0 cereri către domenii externe
 - captură Playwright la 1440px și 375px → **0px overflow orizontal** pe ambele
 - fontul calculat în browser e IBM Plex Sans, nu un fallback
+
+---
+
+## Faza 4 — Componentele și paginile
+
+### Tiparele, numite înainte de cod
+
+Skill-ul `page-patterns` cere ca tiparul paginii să fie **numit explicit
+înainte** de a scrie markup, ca să nu iasă pagini care amestecă trei lucruri.
+Cele două rute ale noastre:
+
+| Rută | Tipar | Structura |
+|---|---|---|
+| `/` | **Home / landing** | nav → hero → secțiuni de lucru → contact → footer |
+| `/projects/<slug>` | **Case study** | nav → metadata → poveste → footer |
+
+Pagina principală **nu** e „portfolio index", deși are o grilă de proiecte.
+Treaba ei e „explică cine e Tudor și de ce merită angajat", nu „răsfoiește
+lucrări" — iar tiparul se alege după treaba utilizatorului, nu după ce
+componente conține.
+
+### Componentele
+
+| Componentă | Rolul |
+|---|---|
+| `SiteHeader` | Doar orientare: două destinații. Mai multe linkuri ar îngreuna găsirea celor care contează. |
+| `Hero` | O promisiune, două acțiuni. Conține singurul moment „curajos" din pagină. |
+| `SignalTrace` | Graficul din hero. **Primește date; nu le inventează.** |
+| `SkillCategory` | O categorie: titlu, număr de proiecte, descriere, grilă. |
+| `ProjectCard` | Un panou L1. Rezultatul e pus **primul**, pentru că asta caută un angajator. |
+| `ContactCta` | Repetă acțiunea din hero la finalul paginii. |
+| `SiteFooter` | Legal + sursa pe GitHub. Fără al treilea pitch. |
+
+### De ce `SignalTrace` nu desenează nimic acum
+
+Componenta e gata și funcțională, dar primește `points={[]}`, deci hero-ul nu
+o afișează. Două motive, amândouă intenționate:
+
+1. **Un grafic inventat ar fi o minciună.** Toată pagina argumentează „dovezi,
+   nu adjective". O curbă decorativă care se preface că e un rezultat
+   contrazice exact asta.
+2. **O cutie goală arată ca un bug.** Ocupa cel mai valoros spațiu din pagină
+   fără să spună nimic.
+
+Când îmi dai seria reală — output-ul simulării bursiere sau ritmul tău de
+commituri — se completează `TRACE` în `Hero.astro` și graficul apare singur.
+
+### Regula 60-30-10, acum respectată
+
+La Faza 3 suprafața structurală era 0% — doar text pe fundal. Acum panourile
+(carduri, placa de date, blocul de contact) dau cei ~30%, fundalul ~60%, iar
+chihlimbarul apare **doar** pe elemente interactive: linkuri, butoane,
+inelul de focus. Niciodată ca fundal.
+
+### Patru probleme găsite la captură și reparate
+
+1. **Footer-ul scria „Built with Astro;source on GitHub"** — lipsea spațiul
+   înainte de link.
+2. **`**text**` din Markdown ieșea la greutate 700.** Browserele desenează
+   `<strong>` la bold implicit, peste plafonul de 600 din contract. Rezolvat
+   cu o regulă explicită în `global.css`.
+3. **Hero-ul afișa o cutie goală** (vezi mai sus).
+4. **Gaura dintre hero și prima secțiune** era prea mare.
+
+### Verificat în browser, nu presupus
+
+| Verificare | Rezultat |
+|---|---|
+| greutăți de font folosite | 400, 500, 600 — plafon respectat |
+| cel mai mic text | 12px — podeaua respectată |
+| `<strong>` calculat | 600 |
+| `.figure` calculat | IBM Plex Mono |
+| overflow orizontal la 1440px / 375px | 0px |
+| inele de focus la navigare cu Tab | **13/13** |
+
+Primul test de focus a dat 0/13 — dar testul era greșit, nu codul: al doilea
+argument al lui `getComputedStyle` e pentru pseudo-*elemente* (`::before`), nu
+pseudo-*clase* (`:focus-visible`). Corectat, citind outline-ul elementului
+chiar focalizat.

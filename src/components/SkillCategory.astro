@@ -1,0 +1,91 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  id: string;
+  label: string;
+  /** One line on what this category covers, in Tudor's own terms. */
+  blurb: string;
+  projects: CollectionEntry<'projects'>[];
+  /** The primary category gets more room; the others support it. */
+  primary?: boolean;
+}
+
+const { id, label, blurb, projects, primary = false } = Astro.props;
+---
+
+<section class:list={['category', { 'category--primary': primary }]} aria-labelledby={id}>
+  <div class="head">
+    <h2 id={id}>{label}</h2>
+    {/* The count is information, not decoration: it says how deep the
+        evidence goes before anyone scrolls. */}
+    <span class="figure meta">
+      {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+    </span>
+  </div>
+
+  <p class="blurb">{blurb}</p>
+
+  {
+    projects.length === 0 ? (
+      /* The empty state keeps the section's frame rather than replacing it. */
+      <p class="empty">TODO(conținut): niciun proiect în această categorie încă.</p>
+    ) : (
+      <ul class="grid">
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </ul>
+    )
+  }
+</section>
+
+<style>
+  .category {
+    padding-block: var(--space-12);
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  h2 {
+    margin: 0;
+  }
+
+  /* The primary category is set one step larger. Hierarchy comes from size,
+     never from a heavier weight. */
+  .category--primary h2 {
+    font-size: var(--text-h1);
+  }
+
+  .blurb {
+    margin-block: var(--space-4) var(--space-8);
+    color: var(--text-muted);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .empty {
+    padding: var(--space-8);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    max-width: none;
+  }
+</style>

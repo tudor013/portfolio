@@ -1,0 +1,91 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, year, role, stack, results } = project.data;
+---
+
+<li class="card">
+  <h3>
+    <a href={`/projects/${project.id}/`}>{title}</a>
+  </h3>
+
+  <p class="result">{results}</p>
+
+  <p class="role meta">{role}</p>
+
+  <div class="foot">
+    <ul class="stack meta" aria-label="Tools used">
+      {stack.map((tool) => <li>{tool}</li>)}
+    </ul>
+    <span class="figure meta">{year}</span>
+  </div>
+</li>
+
+<style>
+  /* An L1 panel: subtle border first, edge highlight second, no outer glow. */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--edge-highlight);
+    transition: border-color var(--duration-base) var(--ease-out);
+  }
+
+  .card:hover {
+    border-color: var(--border-strong);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: var(--text-h3);
+  }
+
+  h3 a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .card:hover h3 a {
+    color: var(--text-accent);
+  }
+
+  /* The outcome leads, because it is the thing an employer is scanning for. */
+  .result {
+    margin: 0;
+    max-width: none;
+  }
+
+  .role {
+    margin: 0;
+    max-width: none;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

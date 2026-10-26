@@ -121,3 +121,11 @@ a {
   margin: var(--space-6) 0 0;
   padding: 0;
 }
+
+/* Markdown emphasis becomes <strong>, which browsers draw at 700. The type
+   contract caps weight at 600 and gets emphasis from size and colour instead,
+   so the default is overridden rather than left to the user agent. */
+strong,
+b {
+  font-weight: var(--weight-semibold);
+}

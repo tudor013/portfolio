@@ -1,0 +1,86 @@
+---
+import SignalTrace from './SignalTrace.astro';
+
+// One promise, two actions — the landing-hero job. The signal trace carries
+// the page's single bold moment so everything below it can stay quiet.
+
+/** TODO(conținut): the real series — simulation output or commit cadence. */
+const TRACE: number[] = [];
+const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
+---
+
+<section class="hero">
+  <h1>Tudor-Andrei Ifrim</h1>
+
+  <p class="promise">
+    TODO(conținut): o propoziție — ce rol cauți și ce te face potrivit. Ex:
+    „Junior software developer drawn to systems whose behaviour emerges from
+    interacting parts."
+  </p>
+
+  <p class="actions">
+    <a class="action action--primary" href="#work">See the work</a>
+    <a class="action" href="#contact">Get in touch</a>
+  </p>
+
+  {/* TODO(conținut): pass the real series and the trace appears. Rendering
+      it empty would put a dead box in the most valuable space on the page,
+      and inventing a curve would fake the evidence the page argues from. */}
+  {TRACE.length > 1 && (
+    <SignalTrace points={TRACE} label="Signal trace" caption={TRACE_CAPTION} />
+  )}
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-16) var(--space-12);
+  }
+
+  h1 {
+    margin-block: 0 var(--space-6);
+    font-size: var(--text-display);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .promise {
+    font-size: var(--text-h3);
+    color: var(--text-muted);
+    max-width: 54ch;
+    margin-block: 0 var(--space-8);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    max-width: none;
+    margin-block: 0 var(--space-12);
+  }
+
+  /* Borders here bound an interactive control, so they use the token that
+     clears the 3:1 required for non-text UI — not the decorative hairline. */
+  .action {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .action:hover {
+    border-color: var(--text-accent);
+  }
+
+  .action--primary {
+    border-color: var(--text-accent);
+    color: var(--text-accent);
+  }
+
+  @media (max-width: 30rem) {
+    h1 {
+      font-size: var(--text-h1);
+    }
+  }
+</style>

@@ -4,6 +4,8 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import { CATEGORY_LABELS } from '../../content.config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
 
 // One static page per published project. Astro calls this at build time, so
 // adding a Markdown file is all it takes to get a new page.
@@ -26,42 +28,110 @@ const { Content } = await render(project);
 const data = project.data;
 ---
 
-<BaseLayout title={`${data.title} — Tudor Ifrim`} description={data.problem}>
-  <article>
-    <a href="/">← Toate proiectele</a>
+<BaseLayout title={`${data.title} — Tudor-Andrei Ifrim`} description={data.problem}>
+  <SiteHeader />
+
+  <article class="case">
+    <p class="back"><a href="/#work">Back to the work</a></p>
 
     <h1>{data.title}</h1>
-    <p>{CATEGORY_LABELS[data.category]} · {data.year}</p>
 
-    <h2>Problema</h2>
-    <p>{data.problem}</p>
+    {/* Metadata first: the reader decides in seconds whether this is
+        relevant to the role they are hiring for. */}
+    <dl class="facts">
+      <div>
+        <dt class="meta">Category</dt>
+        <dd>{CATEGORY_LABELS[data.category]}</dd>
+      </div>
+      <div>
+        <dt class="meta">Year</dt>
+        <dd class="figure">{data.year}</dd>
+      </div>
+      <div>
+        <dt class="meta">My role</dt>
+        <dd>{data.role}</dd>
+      </div>
+      <div>
+        <dt class="meta">Stack</dt>
+        <dd>{data.stack.join(', ')}</dd>
+      </div>
+    </dl>
 
-    <h2>Rolul meu</h2>
-    <p>{data.role}</p>
+    <section class="summary">
+      <h2>The problem</h2>
+      <p>{data.problem}</p>
 
-    <h2>Tehnologii</h2>
-    <ul>
-      {data.stack.map((tool) => <li>{tool}</li>)}
-    </ul>
-
-    <h2>Rezultat</h2>
-    <p>{data.results}</p>
+      <h2>Outcome</h2>
+      <p>{data.results}</p>
+    </section>
 
     {
       data.links.length > 0 && (
-        <>
-          <h2>Linkuri</h2>
-          <ul>
+        <section aria-labelledby="links-heading">
+          <h2 id="links-heading">Links</h2>
+          <ul class="links">
             {data.links.map((link) => (
               <li>
                 <a href={link.url}>{link.label}</a>
               </li>
             ))}
           </ul>
-        </>
+        </section>
       )
     }
 
-    <Content />
+    <div class="story">
+      <Content />
+    </div>
   </article>
+
+  <SiteFooter />
 </BaseLayout>
+
+<style>
+  .case {
+    padding-block: var(--space-12);
+  }
+
+  .back {
+    margin-block: 0 var(--space-8);
+  }
+
+  h1 {
+    margin-block: 0 var(--space-8);
+    font-size: var(--text-h1);
+  }
+
+  /* An L1 panel holding the facts, so they read as a plate on an instrument
+     rather than as loose text on the canvas. */
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-6);
+    margin: 0 0 var(--space-12);
+    padding: var(--space-6);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--edge-highlight);
+  }
+
+  .facts dt {
+    margin-bottom: var(--space-1);
+  }
+
+  .facts dd {
+    margin: 0;
+  }
+
+  /* Prose stays inside a comfortable measure even though the facts plate
+     above it spans the full column. */
+  .summary,
+  .story {
+    max-width: var(--measure);
+  }
+
+  .links {
+    padding-left: var(--space-4);
+  }
+</style>

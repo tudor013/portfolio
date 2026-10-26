@@ -1,0 +1,23 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <p class="meta">
+    <span class="figure">{year}</span> Tudor-Andrei Ifrim. Built with Astro.{' '}
+    <a href="https://github.com/tudor013/portfolio">Source on GitHub</a>.
+  </p>
+</footer>
+
+<style>
+  .foot {
+    margin-top: var(--space-24);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  p {
+    margin: 0;
+    max-width: none;
+  }
+</style>
