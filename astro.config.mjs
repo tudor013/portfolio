@@ -35,9 +35,10 @@ export default defineConfig({
   // JavaScript disabled and can be served by any host for free.
   output: 'static',
 
-  // TODO(conținut): replace with the real deployed origin once Cloudflare
-  // reports it. Astro builds canonical and Open Graph URLs from this.
-  site: 'https://portfolio.pages.dev',
+  // The deployed origin. Astro builds canonical and Open Graph URLs from
+  // this, so a wrong value silently produces broken link previews rather
+  // than a build error.
+  site: 'https://portfolio.tudorifrim606.workers.dev',
 
   // Fonts are committed to the repo rather than fetched from Google at build
   // time. The build then has no network dependency, so it cannot fail or stall
