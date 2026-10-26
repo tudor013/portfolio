@@ -59,6 +59,34 @@ docs/
 - Regula se aplică și când numărul apare într-un fișier sursă (CV, document trimis în chat):
   se omite la generare, nu se copiază.
 
+## Landing page — experiență immersivă (cerut explicit de Tudor)
+Tudor a cerut de două ori, explicit, să nu se piardă:
+1. **Badge de corporație cu lanyard**, în dreapta landing page-ului, vizibil la intrarea pe site,
+   cu poza lui, arătând ca un ecuson autentic, **interactiv** (de tras/legănat).
+2. **Scroll immersiv** cu animații prin video scrubbing pe fundaluri, care te duc treptat prin pagină.
+3. Părerea lui despre starea actuală: „site-ul arată destul de urât" — restrângerea vizuală e
+   corectă ca direcție, dar fără conținut și fără momentul immersiv citește ca gol.
+
+### Conflictul care trebuie rezolvat, nu ignorat
+Aceste trei cerințe se bat cap în cap cu pragurile din secțiunea „Calitate" de mai jos
+(**Performance ≥ 90 pe mobil**, **site funcțional fără JavaScript**):
+
+| Element | Cost tipic | Efect |
+|---|---|---|
+| Badge cu fizică (react-three-fiber + three + rapier) | ~500 KB JS gzipped | singur poate coborî Performance sub 90 pe mobil |
+| Cadre pentru video scrubbing | 5–8 MB imagini | consum de date și decodare pe telefon |
+| Embed Spline | câțiva MB runtime | același efect |
+
+**Regula de lucru:** un singur moment „curajos" pe pagină. Badge-ul are prioritate față de
+fundalurile scrubbing, pentru că e personal (poza și numele lui), e deasupra fold-ului, și
+pentru că fundalurile decorative sunt exact lucrul pe care cititorul e instruit să-l ignore.
+
+Se implementează cât mai ușor posibil (canvas 2D sau Three.js vanilla înainte de orice stivă
+React), se măsoară cu Lighthouse **înainte și după**, iar decizia finală se ia pe cifre, nu pe
+impresie. Dacă pragul cade sub 90, Tudor decide conștient dacă îl coboară.
+
+Fără JavaScript, badge-ul se degradează la o imagine statică — conținutul rămâne complet.
+
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).
 
