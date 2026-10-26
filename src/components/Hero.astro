@@ -1,5 +1,6 @@
 ---
 import SignalTrace from './SignalTrace.astro';
+import IdBadge from './IdBadge.astro';
 
 // One promise, two actions — the landing-hero job. The signal trace carries
 // the page's single bold moment so everything below it can stay quiet.
@@ -10,7 +11,8 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
 ---
 
 <section class="hero">
-  <h1>Tudor-Andrei Ifrim</h1>
+  <div class="intro">
+    <h1>Tudor-Andrei Ifrim</h1>
 
   <p class="promise">
     TODO(conținut): o propoziție — ce rol cauți și ce te face potrivit. Ex:
@@ -27,13 +29,30 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
       it empty would put a dead box in the most valuable space on the page,
       and inventing a curve would fake the evidence the page argues from. */}
   {TRACE.length > 1 && (
-    <SignalTrace points={TRACE} label="Signal trace" caption={TRACE_CAPTION} />
-  )}
+      <SignalTrace points={TRACE} label="Signal trace" caption={TRACE_CAPTION} />
+    )}
+  </div>
+
+  <IdBadge />
 </section>
 
 <style>
   .hero {
+    display: grid;
+    /* The badge keeps its intrinsic width; the text takes what is left. */
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-12);
+    align-items: start;
     padding-block: var(--space-16) var(--space-12);
+  }
+
+  /* Below the two-column threshold the badge moves under the text rather than
+     squeezing it. Desktop is the priority, but narrow must still work. */
+  @media (max-width: 60rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: start;
+    }
   }
 
   h1 {

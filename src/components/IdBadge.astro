@@ -1,0 +1,159 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/tudor.png';
+
+// A credential hanging from a lanyard, drawn as DOM rather than canvas or
+// WebGL. Everything legible here is real text, so it survives with scripting
+// off, can be selected and translated, and reaches assistive technology.
+---
+
+<div class="badge" data-badge>
+  <svg class="rope" viewBox="0 0 300 440" aria-hidden="true" preserveAspectRatio="none">
+    {/* The static d is what renders before (or without) the script: a strap
+        hanging straight down. The simulation overwrites it each frame. */}
+    <path data-strap d="M150,0 L150,185" />
+  </svg>
+
+  <div class="card" data-card>
+    <span class="clip" aria-hidden="true"></span>
+    <span class="punch" aria-hidden="true"></span>
+
+    <Image
+      src={portrait}
+      alt="Tudor-Andrei Ifrim"
+      width={220}
+      height={220}
+      class="portrait"
+      loading="eager"
+    />
+
+    <p class="name">Tudor-Andrei Ifrim</p>
+    <p class="role">Software Developer</p>
+
+    <p class="id figure">ID 2028&middot;CSIE</p>
+  </div>
+</div>
+
+<style>
+  .badge {
+    position: relative;
+    width: 300px;
+    height: 440px;
+    /* Keeps a dragged badge from selecting the text around it. */
+    user-select: none;
+  }
+
+  .rope {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .rope path {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 11;
+    stroke-linecap: butt;
+    stroke-linejoin: round;
+  }
+
+  .card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 190px;
+    /* Rotation happens about the point the strap holds. */
+    transform-origin: 50% 0;
+    /* Static placement for the no-script and reduced-motion cases. The
+       simulation replaces this transform once it starts. */
+    transform: translate(55px, 185px) rotate(-3deg);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-6) var(--space-4) var(--space-4);
+
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--edge-highlight);
+  }
+
+  /* Only offer the grab cursor once the simulation is actually running. */
+  .badge[data-live] .card {
+    cursor: grab;
+  }
+  .badge[data-dragging] .card {
+    cursor: grabbing;
+  }
+
+  .clip {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    width: 30px;
+    height: 24px;
+    margin-left: -15px;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px 3px 5px 5px;
+    background: var(--surface-canvas);
+    box-shadow: var(--edge-highlight);
+  }
+
+  .punch {
+    width: 46px;
+    height: 7px;
+    margin-bottom: var(--space-3);
+    border-radius: 999px;
+    background: var(--surface-canvas);
+    box-shadow: inset 0 1px 0 rgb(0 0 0 / 0.4);
+  }
+
+  .portrait {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+
+  .name {
+    margin: var(--space-3) 0 0;
+    max-width: none;
+    font-size: var(--text-secondary);
+    font-weight: var(--weight-semibold);
+    text-align: center;
+    line-height: var(--leading-tight);
+  }
+
+  .role {
+    margin: 0;
+    max-width: none;
+    font-size: var(--text-meta);
+    color: var(--text-muted);
+  }
+
+  .id {
+    margin: var(--space-3) 0 0;
+    max-width: none;
+    width: 100%;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-subtle);
+    font-size: var(--text-meta);
+    color: var(--text-accent);
+    text-align: center;
+  }
+</style>
+
+<script>
+  import { initBadge } from '../scripts/badge';
+
+  const root = document.querySelector<HTMLElement>('[data-badge]');
+  // Someone who asked their system to reduce motion gets the badge exactly as
+  // it renders without scripting: present, readable, still.
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (root && !still) initBadge(root);
+</script>

@@ -279,3 +279,76 @@ greșită ar fi întors un răspuns gol.
 Textul respectă regula din skill-ul `errors`: **nu dă vina pe cititor.**
 „This page doesn't exist" descrie starea sistemului; „ai greșit adresa" ar fi
 o acuzație. Și oferă o ieșire (două linkuri), nu doar un diagnostic.
+
+---
+
+## Faza 5 — Badge-ul cu lanyard
+
+### De ce NU am folosit Three.js
+
+Implementarea obișnuită a acestui efect (cea care circulă pe net) folosește
+React + three.js + un motor de fizică rapier compilat în WebAssembly.
+Înseamnă aproximativ **o jumătate de megabyte** descărcați înainte ca badge-ul
+să deseneze un singur pixel — pe un site care are prag Performance ≥ 90.
+
+Varianta de aici: **integrare Verlet pe elemente DOM**. Aproximativ 140 de
+linii de TypeScript, **zero dependențe**.
+
+### Cum funcționează fizica Verlet, pe scurt
+
+Fizica clasică reține *poziția* și *viteza*. Verlet reține **poziția curentă
+și cea anterioară**, iar viteza rezultă din diferența dintre ele:
+
+```
+viteză = poziție_curentă − poziție_anterioară
+```
+
+Pare un truc, dar are un avantaj mare: ca să „fixezi" un punct, îi muți pur și
+simplu poziția. Viteza se ajustează singură. De asta trasul cu mouse-ul
+funcționează fără cod special — doar așezi ultimul punct pe cursor.
+
+Fiecare cadru face două lucruri:
+
+1. **Inerție + gravitație** — fiecare punct își continuă mișcarea și cade.
+2. **Relaxare** — de 8 ori la rând, fiecare segment e readus la lungimea lui
+   corectă, împingând ambele capete câte jumătate din eroare. După 8 treceri,
+   lanțul arată ca o bandă, nu ca un elastic.
+
+Punctul de sus e fixat (clema din perete). Cardul atârnă de ultimul punct, iar
+unghiul lui se ia din ultimul segment — de asta se înclină odată cu banda, în
+loc să rămână drept.
+
+### De ce cardul e HTML, nu desen
+
+Numele, rolul și ID-ul sunt **text real**. Pot fi selectate, traduse de
+browser și citite de un cititor de ecran. Pe o pânză `<canvas>` sau WebGL ar
+fi fost pixeli — invizibile pentru oricine folosește tehnologii asistive.
+
+### Cele trei stări
+
+| Situație | Ce se întâmplă |
+|---|---|
+| Normal | Banda se leagănă, cardul se poate trage cu mouse-ul |
+| `prefers-reduced-motion` | Simularea **nu pornește deloc** — card static, complet lizibil |
+| Fără JavaScript | Identic cu cazul de mai sus: CSS-ul desenează banda și cardul |
+
+Poziția statică e scrisă direct în CSS și în atributul `d` al traseului SVG,
+iar simularea o suprascrie doar dacă pornește. Nu există moment în care
+pagina arată ruptă.
+
+### Verificat în browser
+
+| Verificare | Rezultat |
+|---|---|
+| simularea pornește | da |
+| traseul funiei se animă | da, 15 segmente |
+| trasul mișcă efectiv cardul | da |
+| reduced-motion: rămâne nemișcat | da |
+| reduced-motion: rămâne vizibil | da |
+| fără JS: textul cardului | „Tudor-Andrei Ifrim / Software Developer / ID 2028·CSIE" |
+| fără JS: poza | vizibilă |
+
+### De știut
+
+Poza sursă e **200×200**. La dimensiunea afișată (110px) e în regulă, dar nu
+suportă mărire. Dacă badge-ul crește, trebuie o versiune mai mare.
