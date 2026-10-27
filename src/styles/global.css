@@ -132,3 +132,43 @@ strong,
 b {
   font-weight: var(--weight-semibold);
 }
+
+/* Reveal-on-scroll, written so the failure mode is "no animation" rather than
+   "no content": elements are visible by default and the attribute only ever
+   plays an animation on top. Nothing waits to be revealed. */
+[data-reveal='in'] {
+  animation: reveal-fade 260ms var(--ease-out) both;
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='in'] {
+    animation: none;
+  }
+}
+
+/* Liquid glass, used on the two panels that sit over the scroll light rather
+   than on every surface. The border is what keeps text and edges legible when
+   the light passes underneath. */
+.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--glass-sheen), var(--shadow-soft);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-fill-opaque);
+  }
+}

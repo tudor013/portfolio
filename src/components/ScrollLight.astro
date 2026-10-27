@@ -31,6 +31,10 @@
       transparent 68%
     );
 
+    /* Opacity and transform are the two properties the compositor can change
+       without re-running layout or paint, which is why the light brightens by
+       fading rather than by recolouring the gradient. */
+    opacity: var(--light-strength, 1);
     transform: translate3d(0, calc(var(--light-y) * 1px), 0);
     will-change: transform;
   }
@@ -40,6 +44,7 @@
   @media (prefers-reduced-motion: reduce) {
     .light::before {
       transform: none;
+      opacity: 1;
       will-change: auto;
     }
   }

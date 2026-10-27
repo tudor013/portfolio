@@ -5,6 +5,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import Hero from '../components/Hero.astro';
 import SkillCategory from '../components/SkillCategory.astro';
+import Profile from '../components/Profile.astro';
+import Skills from '../components/Skills.astro';
+import Experience from '../components/Experience.astro';
 import ContactCta from '../components/ContactCta.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 
@@ -37,6 +40,12 @@ const sections = CATEGORIES.map((category) => ({
   <SiteHeader />
   <Hero />
 
+  <div id="profile">
+    <Profile />
+  </div>
+
+  <Skills />
+
   <div id="work">
     {
       sections.map(({ category, label, blurb, projects }) => (
@@ -50,6 +59,8 @@ const sections = CATEGORIES.map((category) => ({
       ))
     }
   </div>
+
+  <Experience />
 
   <div id="contact">
     <ContactCta />

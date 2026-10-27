@@ -57,11 +57,26 @@
   --shadow-soft: 0 1px 2px rgb(15 23 36 / 0.04), 0 4px 16px rgb(15 23 36 / 0.05);
   --shadow-lift: 0 2px 4px rgb(15 23 36 / 0.05), 0 12px 32px rgb(15 23 36 / 0.07);
 
+  /* ---- SEMANTIC: liquid glass ------------------------------------------ */
+
+  /* Used sparingly — the navigation bar and two panels. Glass is banned as a
+     default by the taste rules precisely because it is usually applied to
+     everything; the exception here is earned by the scroll light, which the
+     glass is there to refract. Each surface needs a border that clears 3:1
+     against whatever shows through, and an opaque fallback. */
+  --glass-fill: rgb(255 255 255 / 0.72);
+  --glass-fill-opaque: #fbfcfe;
+  --glass-blur: saturate(1.6) blur(14px);
+  --glass-border: rgb(15 23 36 / 0.14);
+  /* The hairline of light along a glass panel's top edge. */
+  --glass-sheen: inset 0 1px 0 rgb(255 255 255 / 0.9);
+
   /* ---- SEMANTIC: the scroll light --------------------------------------- */
 
   /* Set by scroll-light.ts; the fallback keeps the glow where it sits at the
      top of the page, so the design is complete before the script runs. */
   --light-y: 0;
+  --light-strength: 1;
   --light-tint: 21 73 166;
 
   /* ---- SEMANTIC: type --------------------------------------------------- */

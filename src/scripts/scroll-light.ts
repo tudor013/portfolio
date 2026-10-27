@@ -21,6 +21,15 @@ export function initScrollLight(target: HTMLElement): () => void {
     // The lamp travels about two thirds of the viewport, so it leads the
     // reader down the page instead of sitting locked behind the text.
     target.style.setProperty('--light-y', String(progress * window.innerHeight * 0.66));
+
+    // It also brightens toward the middle of the page and fades at both ends,
+    // which gives the scroll a shape rather than a constant wash.
+    const arc = 0.72 + Math.sin(progress * Math.PI) * 0.45;
+    target.style.setProperty('--light-strength', arc.toFixed(3));
+
+    // One listener feeds the reading-progress rule in the header too, rather
+    // than adding a second scroll handler for two pixels of bar.
+    target.style.setProperty('--read-progress', progress.toFixed(4));
   }
 
   function onScroll() {

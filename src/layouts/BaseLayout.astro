@@ -50,3 +50,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </main>
   </body>
 </html>
+
+<script>
+  import { initReveal } from '../scripts/reveal';
+
+  // Cards and timeline rows only. Fading in whole sections is the pattern that
+  // reads as generated, and it delays the text a reader came for.
+  initReveal('.grid > li, .timeline > li');
+</script>

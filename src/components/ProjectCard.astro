@@ -37,11 +37,24 @@ const { title, year, role, stack, results } = project.data;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-soft);
-    transition: border-color var(--duration-base) var(--ease-out);
+    transition:
+      border-color var(--duration-base) var(--ease-out),
+      box-shadow var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
   }
 
-  .card:hover {
+  .card:hover,
+  .card:focus-within {
     border-color: var(--border-strong);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover,
+    .card:focus-within {
+      transform: none;
+    }
   }
 
   h3 {

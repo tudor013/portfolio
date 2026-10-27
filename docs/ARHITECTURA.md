@@ -471,3 +471,68 @@ Testul trecea, produsul era mort.
 Un test care întreabă *„s-a schimbat ceva?"* nu e același lucru cu unul care
 întreabă *„se vede?"*. Acum se măsoară amplitudinea în pixeli, nu existența
 schimbării.
+
+---
+
+## Faza 7 — Brieful de front-end
+
+Brieful cerea structură nouă (profil, competențe, experiență), navigație
+sticky cu scroll-spy, liquid glass, glow legat de scroll și microinteracțiuni.
+Două puncte din el contraziceau decizii luate de Tudor cu o oră înainte —
+tema întunecată și limba română. Le-a confirmat pe ale lui: **light + albastru,
+engleză**. Restul brieful-ui s-a aplicat integral.
+
+### Componente noi
+
+| Fișier | Rol |
+|---|---|
+| `components/Profile.astro` | Paragraful „ce fel de probleme rezolv", pe panou de sticlă |
+| `components/Skills.astro` | Competențe pe 4 grupe. **Fără bare de progres** — un procent lângă o competență e precizie inventată |
+| `components/Experience.astro` | Cronologie: roluri + studii, direct din CV |
+| `scripts/nav-spy.ts` | Marchează secțiunea curentă |
+| `scripts/reveal.ts` | Animația de apariție |
+
+### Scroll-spy: de ce `IntersectionObserver` și nu scroll
+
+Varianta naivă ascultă `scroll` și recalculează pozițiile tuturor secțiunilor
+la fiecare eveniment. `IntersectionObserver` lasă browserul să facă geometria
+în afara firului principal și te anunță **doar când** o secțiune chiar trece
+pragul. Între acele momente, citirea paginii costă zero.
+
+### Liquid glass pe fundal deschis
+
+Sticla e interzisă ca default de regulile de gust, tocmai pentru că e aplicată
+de obicei peste tot. Aici e folosită în **trei locuri**: bara de navigație,
+panoul de profil, blocul de contact — adică exact suprafețele peste care trece
+lumina, ca să aibă ce refracta.
+
+Fiecare are contur vizibil și **fallback opac** prin `@supports not
+(backdrop-filter)`. Fără asta, pe un browser fără blur ar rămâne o bandă
+translucidă cu text ilizibil peste ea.
+
+### Animația de apariție: o greșeală gravă, prinsă prin măsurare
+
+Prima implementare punea elementele la `opacity: 0` și le dezvăluia la
+intrarea în viewport. Testul pe cinci scenarii:
+
+| situație | conținut invizibil |
+|---|---|
+| la încărcare, fără scroll | **10/10** |
+| derulare normală | 0/10 |
+| link direct `#experience` | 0/10 |
+| **salt instant la final** | **7/10** |
+| fără JavaScript | 0/10 |
+
+Un vizitator care dă un flick rapid până jos vedea **7 din 10 proiecte
+goale**. Elementele care n-au avut niciun cadru în banda observatorului nu se
+declanșau niciodată.
+
+**Soluția: animația e aditivă.** Elementele sunt vizibile implicit; intrarea în
+viewport doar *pornește* o animație care pleacă din transparent. Dacă
+observatorul nu se declanșează niciodată, elementul era deja corect.
+
+Modul de eșec a devenit „fără animație" în loc de „fără conținut". Pe un
+portofoliu, diferența asta e totul.
+
+După rescriere: **0/10 invizibil în toate cele cinci scenarii**, iar cele 10
+elemente încă își joacă animația la derulare normală.

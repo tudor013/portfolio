@@ -1,25 +1,77 @@
 ---
-// Wayfinding only. A portfolio has two destinations worth naming; cramming
-// more in would make the one that matters harder to find.
+// Wayfinding and one action. A portfolio has few destinations worth naming,
+// and crowding them makes the one that matters harder to find.
+const SECTIONS = [
+  { id: 'profile', label: 'Profile' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'work', label: 'Work' },
+  { id: 'experience', label: 'Experience' },
+];
 ---
 
-<header class="bar">
-  <a class="wordmark" href="/">Tudor-Andrei Ifrim</a>
-  <nav aria-label="Main">
-    <a href="/#work">Work</a>
-    <a href="/#contact">Contact</a>
+<header class="bar" data-header>
+  {/* Progress across the page. Decorative, so it is hidden from assistive
+      technology — the document outline already conveys position. */}
+  <div class="progress" aria-hidden="true"></div>
+
+  <a class="wordmark" href="#top">Tudor-Andrei Ifrim</a>
+
+  <nav aria-label="Sections">
+    <ul>
+      {
+        SECTIONS.map((section) => (
+          <li>
+            <a href={`#${section.id}`} data-spy={section.id}>
+              {section.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </nav>
+
+  <a class="cta" href="#contact">Get in touch</a>
 </header>
 
 <style>
   .bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4) var(--space-6);
-    align-items: baseline;
+    gap: var(--space-3) var(--space-6);
+    align-items: center;
     justify-content: space-between;
-    padding-bottom: var(--space-8);
-    border-bottom: 1px solid var(--border-subtle);
+
+    margin-inline: calc(var(--space-4) * -1);
+    padding: var(--space-3) var(--space-4);
+
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--glass-sheen);
+  }
+
+  /* Where the blur is unavailable the panel becomes opaque rather than a
+     washed-out translucent band with unreadable text over it. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .bar {
+      background: var(--glass-fill-opaque);
+    }
+  }
+
+  .progress {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 2px;
+    width: 100%;
+    background: var(--text-accent);
+    transform: scaleX(var(--read-progress, 0));
+    transform-origin: 0 50%;
   }
 
   .wordmark {
@@ -28,8 +80,73 @@
     text-decoration: none;
   }
 
-  nav {
+  nav ul {
     display: flex;
-    gap: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-5, 1.25rem) var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    color: var(--text-muted);
+    font-size: var(--text-secondary);
+    text-decoration: none;
+    padding-block: var(--space-1);
+    border-bottom: 2px solid transparent;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
+  }
+
+  nav a:hover {
+    color: var(--text-primary);
+  }
+
+  /* The active section is marked by colour and a rule, never by colour alone. */
+  nav a[aria-current='true'] {
+    color: var(--text-accent);
+    border-bottom-color: var(--text-accent);
+  }
+
+  .cta {
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--text-secondary);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .cta:hover {
+    border-color: var(--text-accent);
+    color: var(--text-accent);
+  }
+
+  /* Narrow screens drop the section list; the wordmark and the one action
+     stay, which is what a thumb needs. */
+  @media (max-width: 46rem) {
+    nav {
+      order: 3;
+      width: 100%;
+    }
+    nav ul {
+      gap: var(--space-4);
+    }
+    nav a {
+      font-size: var(--text-meta);
+    }
   }
 </style>
+
+<script>
+  import { initNavSpy } from '../scripts/nav-spy';
+
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-spy]');
+  if (links.length) initNavSpy(links);
+</script>

@@ -23,10 +23,18 @@ const GITHUB = 'https://github.com/tudor013';
 <style>
   .contact {
     padding: var(--space-12) var(--space-8);
-    background: var(--surface-raised);
-    border: 1px solid var(--border-subtle);
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--glass-sheen), var(--shadow-soft);
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .contact {
+      background: var(--glass-fill-opaque);
+    }
   }
 
   h2 {
