@@ -1125,3 +1125,25 @@ separat.
   orizontal, la 1440 și la 390. Inspectorul dă pe ea 2 FAIL-uri care țin de pagina interioară,
   nu de câmp: nu are imagini, iar o pagină desenată pe canvas nu are elemente care să „se
   miște” în sensul lui. Paginile interioare n-au fost redesenate încă.
+
+## Faza 15 — Piața într-un ecran, schema fără detalii, link spre Spline
+
+- **Simularea NetLogo încape acum într-un singur ecran.** Titlul e o treaptă mai mic, iar cele
+  patru slidere stau pe două coloane. Ținta de 44px rămâne pe slider, nu pe eticheta de
+  deasupra. Rândul cu sursa (Chen, Zheng și Tan) a urcat sub paragraf, iar graficul ia
+  înălțimea care rămâne. Am măsurat la 1850×935, 1536×754, 1440×900 și 1366×768: conținutul
+  încape peste tot.
+- **Schema albastră nu mai are detaliile** (cele zece tabele, cele 13 chei, cele trei reguli).
+  Sub PASAGERI rămân doar „A seat sold once” și propoziția despre baza de date, plus linkul
+  spre pagina Software. Scena e mai simplă: întâi apar tabelele, apoi se desenează cheile, iar
+  la final schema stă completă sub titlu (`schema-scene.ts`). Fiindcă blocul de titlu e mai
+  mic, scena rămâne fixată și pe ecrane mai scunde: la 1536×754 (un ecran 1920×1080 cu
+  scalarea Windows la 125%), textul din tabele are 16px.
+- **„Drawn before it was built”** are acum linkul „See the scene live in Spline”, spre scena
+  publicată de tine. Se deschide în tab nou și nu se încarcă în pagină: runtime-ul Spline are
+  câțiva MB, iar cadrele de alături arată deja scena. Paginile de proiect îl încarcă la cerere,
+  prin `SplineScene`.
+
+Verificare: `astro check` dă 0 erori, `taste-skill lint` dă 0 FAIL, iar `inspect` dă 0 FAIL, cu
+aceleași 4 avertismente justificate. La patru lățimi nu apare scroll orizontal, consola e curată,
+fără JavaScript tot textul se vede, iar ordinea din tastatură e neschimbată.

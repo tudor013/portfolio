@@ -2,7 +2,8 @@
 /**
  * Chapter one, Software. The page turns into a blueprint and Tudor's airline
  * schema is drawn on it as the reader scrolls: the tables arrive at the places
- * he put them, the foreign keys draw in, and the scene stops on three rules.
+ * he put them and the foreign keys draw in; the title and one sentence sit
+ * under PASAGERI.
  *
  * The finished drawing is what renders without a script, under reduced
  * motion and on narrow screens; schema-scene.ts only animates towards it.
@@ -10,7 +11,6 @@
 import {
   TABLES,
   RELATIONS,
-  RULES,
   TABLE_WIDTH,
   HEADER,
   ROW,
@@ -45,22 +45,6 @@ const description =
         </p>
       </div>
 
-      <ol class="captions">
-        <li data-caption="tables">
-          <strong>Ten tables,</strong> at the places I put them in drawDB.
-        </li>
-        <li data-caption="keys">
-          <strong>Thirteen foreign keys</strong> tie a ticket to its booking, its
-          flight and its passenger.
-        </li>
-        {
-          RULES.map((rule) => (
-            <li data-caption={rule.id}>
-              <strong>{rule.title}</strong> {rule.text}
-            </li>
-          ))
-        }
-      </ol>
 
       <a class="go" href="/software/">All software work</a>
     </div>
@@ -146,19 +130,7 @@ const description =
     gap: var(--space-4);
   }
 
-  .captions {
-    display: grid;
-    gap: var(--space-4);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    color: var(--field-muted);
-  }
 
-  .captions strong {
-    color: var(--field-ink);
-    font-weight: var(--weight-strong);
-  }
 
   .go {
     justify-self: start;
@@ -276,24 +248,6 @@ const description =
     font-size: clamp(2rem, 0.9rem + 2.4vw, 3.5rem);
   }
 
-  /* One statement at a time: the captions share one cell and cross over. */
-  .schema.is-live .captions {
-    grid-template-areas: 'caption';
-  }
-
-  .schema.is-live .captions li {
-    grid-area: caption;
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-      opacity var(--t-ui) ease,
-      transform var(--t-ui) var(--ease-out);
-  }
-
-  .schema.is-live .captions li.is-current {
-    opacity: 1;
-    transform: none;
-  }
 
   .schema.is-live .table,
   .schema.is-live .relations path {

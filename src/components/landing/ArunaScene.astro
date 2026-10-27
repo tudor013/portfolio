@@ -14,6 +14,9 @@ import swan from '../../assets/landing/aruna-3-swan.webp';
 import cup from '../../assets/landing/aruna-2-cup.webp';
 import product from '../../assets/landing/aruna-4-product.webp';
 
+/** The retrofuturist background, published from Spline by Tudor. */
+const SPLINE_URL = 'https://my.spline.design/retrofuturismbganimation-qZwVlCDGNASAGtQbOTX19rfb/';
+
 const FRAMES = [
   {
     src: wordmark,
@@ -52,7 +55,15 @@ const FRAMES = [
           The business sells over 100 kg of coffee a month through the shop.
         </p>
       </div>
-      <a class="go" href="/design/">All design work</a>
+      <p class="links">
+        {/* The live scene, as Tudor published it. It opens in a new tab rather
+            than loading here: the Spline runtime is several megabytes, and the
+            stills beside this text already show the scene. */}
+        <a class="go" href={SPLINE_URL} target="_blank" rel="noopener">
+          See the scene live in Spline<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+        <a class="go" href="/design/">All design work</a>
+      </p>
     </div>
 
     <ol class="frames">
@@ -109,8 +120,11 @@ const FRAMES = [
     font-weight: var(--weight-strong);
   }
 
-  .go {
-    justify-self: start;
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-8);
+    max-width: none;
   }
 
   /* Finished composition: two by two, captions under the pictures. */
