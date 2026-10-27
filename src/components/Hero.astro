@@ -31,16 +31,25 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
     )}
   </div>
 
-  <IdBadge />
+  <div class="badge-slot">
+    <IdBadge />
+  </div>
 </section>
 
 <style>
+  .intro {
+    align-self: center;
+  }
+
   .hero {
     display: grid;
     /* The badge keeps its intrinsic width; the text takes what is left. */
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-12);
-    align-items: center;
+    /* The badge column starts at the top of the content area so the lanyard
+       hangs from just under the header; the text stays optically centred
+       against it. */
+    align-items: start;
     padding-block: var(--space-16) var(--space-12);
   }
 
@@ -97,6 +106,18 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
   .action--primary {
     border-color: var(--text-accent);
     color: var(--text-accent);
+  }
+
+  /* Pulls the badge up through the hero's own top padding, so the strap
+     begins immediately below the header rather than part-way down the page. */
+  .badge-slot {
+    margin-top: calc(var(--space-16) * -1);
+  }
+
+  @media (max-width: 60rem) {
+    .badge-slot {
+      margin-top: 0;
+    }
   }
 
   .scroll-hint {

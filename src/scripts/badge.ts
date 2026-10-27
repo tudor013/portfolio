@@ -36,6 +36,15 @@ const DRAG_FOLLOW = 0.16;
 const STEP_MS = 1000 / 120;
 const MAX_STEPS_PER_FRAME = 5;
 
+/**
+ * The badge enters by having its anchor descend from above the viewport
+ * rather than by being displaced sideways. Gravity and the rope do the rest,
+ * so the card trails the clip on the way down and swings as it arrives —
+ * which is what a badge dropped on a lanyard actually does.
+ */
+const DROP_HEIGHT = 900;
+const DROP_MS = 900;
+
 const SWAY_AMPLITUDE = 0.009;
 const SWAY_PERIOD_MS = 5200;
 /** Velocity, in pixels per step, given to the card when it is clicked. */
@@ -63,11 +72,13 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
   /** How far below the clip the card's weight acts. */
   const cardDrop = Math.max(60, card.offsetHeight * 0.45);
 
-  const entrance = calm ? 0 : -Math.min(130, root.clientWidth * 0.14);
+  // Reduced motion gets the badge already in place; everyone else watches it
+  // arrive.
+  const dropFrom = calm ? 0 : -DROP_HEIGHT;
 
   const rope: Point[] = Array.from({ length: SEGMENTS + 1 }, (_, i) => {
-    const lean = (i / SEGMENTS) ** 2 * entrance;
-    return { x: anchorX + lean, y: i * restLength, px: anchorX + lean, py: i * restLength };
+    const y = dropFrom + i * restLength;
+    return { x: anchorX, y, px: anchorX, py: y };
   });
 
   /**
@@ -80,7 +91,8 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
    * welded to the lanyard.
    */
   const clip = () => rope[rope.length - 1]!;
-  const tail: Point = { x: anchorX, y: ropeLength + cardDrop, px: anchorX, py: ropeLength + cardDrop };
+  const tailY = dropFrom + ropeLength + cardDrop;
+  const tail: Point = { x: anchorX, y: tailY, px: anchorX, py: tailY };
 
   /** Set on pointerdown: where the clip should sit relative to the cursor. */
   let grab: { dx: number; dy: number } | null = null;
@@ -131,9 +143,15 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
       end.y += (pointer.y + grab.dy - end.y) * DRAG_FOLLOW;
     }
 
+    // The anchor travels down over DROP_MS, carrying everything with it.
+    // easeOutCubic so it arrives without a hard stop.
+    const t = Math.min(1, elapsed / DROP_MS);
+    const eased = 1 - (1 - t) ** 3;
+    const anchorY = dropFrom * (1 - eased);
+
     for (let pass = 0; pass < RELAX_PASSES; pass++) {
       rope[0]!.x = anchorX;
-      rope[0]!.y = 0;
+      rope[0]!.y = anchorY;
       for (let i = 0; i < rope.length - 1; i++) {
         link(rope[i]!, rope[i + 1]!, restLength, i === 0, false);
       }

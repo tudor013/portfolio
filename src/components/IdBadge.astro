@@ -8,10 +8,10 @@ import portrait from '../assets/tudor.png';
 ---
 
 <div class="badge" data-badge>
-  <svg class="rope" viewBox="0 0 420 560" aria-hidden="true" preserveAspectRatio="none">
+  <svg class="rope" viewBox="0 0 560 760" aria-hidden="true" preserveAspectRatio="none">
     {/* The static d is what renders before (or without) the script: a strap
         hanging straight down. The simulation overwrites it each frame. */}
-    <path data-strap d="M210,0 L210,215" />
+    <path data-strap d="M280,0 L280,275" />
   </svg>
 
   <div class="card" data-card>
@@ -25,6 +25,7 @@ import portrait from '../assets/tudor.png';
       height={220}
       class="portrait"
       loading="eager"
+      draggable={false}
     />
 
     <p class="name">Tudor-Andrei Ifrim</p>
@@ -37,12 +38,17 @@ import portrait from '../assets/tudor.png';
 <style>
   .badge {
     position: relative;
-    width: 420px;
-    height: 560px;
+    width: 560px;
+    height: 760px;
+    /* The strap is drawn above its own box while the badge drops in, and
+       passes behind the header, which sits on a higher layer. */
+    overflow: visible;
     perspective: 1100px;
     perspective-origin: 50% 20%;
-    /* Keeps a dragged badge from selecting the text around it. */
+    /* A dragged badge must not select the text it passes over, and the card
+       itself must not be text a reader can accidentally highlight mid-swing. */
     user-select: none;
+    -webkit-user-select: none;
   }
 
   .rope {
@@ -74,7 +80,7 @@ import portrait from '../assets/tudor.png';
     backface-visibility: visible;
     /* Static placement for the no-script and reduced-motion cases. The
        simulation replaces this transform once it starts. */
-    transform: translate(115px, 215px) rotate(-3deg);
+    transform: translate(185px, 275px) rotate(-3deg);
 
     display: flex;
     flex-direction: column;
@@ -124,6 +130,15 @@ import portrait from '../assets/tudor.png';
     height: 110px;
     object-fit: cover;
     border-radius: var(--radius-sm);
+    /* The press has to reach the card, not the image: otherwise the browser
+       starts its own image drag and the badge never moves. */
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Nothing inside the card is a separate target. It is one object. */
+  .card * {
+    pointer-events: none;
   }
 
   .name {

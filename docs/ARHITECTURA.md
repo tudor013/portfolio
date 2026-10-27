@@ -693,3 +693,62 @@ Căutarea a confirmat abordarea canonică (badge-ul Vercel Ship '24, cu
 react-three-fiber + Rapier și `useRopeJoint`), dar **articolul în sine e
 blocat de proxy-ul containerului**, deci nu i-am putut citi codul de drag.
 Corecțiile de mai sus vin din citirea propriului cod, nu dintr-o copiere.
+
+---
+
+## Faza 10b — Badge-ul ca obiect unic, și intrarea prin cădere
+
+Patru cereri, toate rezolvate.
+
+### De ce nu se mișca dacă apucai de poză
+
+O etichetă `<img>` e **trasabilă nativ** în orice browser. Apăsarea pe ea
+pornea drag-and-drop-ul browserului (cel care copiază imaginea), iar
+`pointerdown`-ul nostru nu mai ajungea la card.
+
+Trei apărări, pentru că una singură nu acoperă toate browserele:
+
+```html
+draggable={false}
+```
+```css
+.portrait { pointer-events: none; -webkit-user-drag: none; }
+.card *    { pointer-events: none; }   /* nimic dinăuntru nu e țintă separată */
+.badge     { user-select: none; -webkit-user-select: none; }
+```
+
+`.card *` e cea care contează cel mai mult: **badge-ul e un singur obiect**,
+deci nimic din interiorul lui nu primește pointerul separat. Nu contează de
+unde îl apuci.
+
+### Căderea de deasupra paginii
+
+Prima variantă îl arunca lateral. Acum **ancora însăși coboară** de la 900px
+deasupra viewportului până la locul ei, pe o curbă `easeOutCubic`, în 900ms.
+
+Diferența e că gravitația și funia fac restul: cardul rămâne în urma clemei
+la coborâre și se leagănă când ajunge — exact ce face un ecuson lăsat să cadă
+pe un lanyard. Dacă aș fi animat direct poziția cardului, ar fi fost o
+animație; așa, e o consecință.
+
+Cu `prefers-reduced-motion`, badge-ul e deja la locul lui la încărcare.
+
+### Ancorarea sub navbar
+
+Banda pornește acum **exact de sub header** (verificat: distanță 0px între
+marginea de jos a header-ului și ancora benzii). Se obține trăgând zona
+badge-ului în sus prin propriul padding al hero-ului, cu
+`margin-top: calc(var(--space-16) * -1)` — anulat sub 60rem, unde badge-ul
+trece sub text.
+
+Zona de mișcare a crescut de la 420×560 la **560×760**.
+
+### Verificat
+
+| | |
+|---|---|
+| cardul pornește de la | y = −642px (deasupra ecranului) |
+| distanța căderii | 915px |
+| apucat **de poză** | mișcă badge-ul, 117px |
+| ancoră bandă vs header | **0px** |
+| overflow orizontal | 0px |
