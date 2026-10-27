@@ -6,6 +6,7 @@ import { CATEGORY_LABELS } from '../../content.config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
+import SplineScene from '../../components/SplineScene.astro';
 
 // One static page per published project. Astro calls this at build time, so
 // adding a Markdown file is all it takes to get a new page.
@@ -80,6 +81,24 @@ const data = project.data;
       )
     }
 
+    {
+      data.scenes.length > 0 && (
+        <section class="scenes" aria-labelledby="scenes-heading">
+          <h2 id="scenes-heading">Scenes</h2>
+          <div class="scene-grid">
+            {data.scenes.map((scene) => (
+              <SplineScene
+                poster={scene.poster}
+                alt={scene.alt}
+                title={scene.title}
+                sceneUrl={scene.url}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
     <div class="story">
       <Content />
     </div>
@@ -133,5 +152,12 @@ const data = project.data;
 
   .links {
     padding-left: var(--space-4);
+  }
+
+  .scene-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    gap: var(--space-6);
+    margin-block: var(--space-6) var(--space-12);
   }
 </style>

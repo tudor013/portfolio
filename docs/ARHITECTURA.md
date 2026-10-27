@@ -584,3 +584,55 @@ poziția anterioară acolo. Altfel Verlet vede o diferență mare între ele și
 transformă peretele în trambulină.
 
 Măsurat după: mișcare proprie **81px** (era 208px), **0px** cu reduced-motion.
+
+---
+
+## Faza 9 — Scene Spline, și unelte
+
+### Cum se afișează o scenă Spline (și de ce nu direct)
+
+Un runtime Spline are **câțiva megabytes de WebGL**. Încorporat direct, ar fi
+cel mai greu lucru de pe site — plătit de fiecare vizitator, inclusiv de cei
+care nici nu se uită la el. Pe un site cu prag Performance ≥ 90, asta singură
+ar rupe pragul.
+
+Componenta `SplineScene.astro` face altceva:
+
+1. **Se livrează o imagine statică** a scenei (poster). Atât vede majoritatea.
+2. Un buton **„Load interactive scene"** creează iframe-ul abia la click.
+3. Fără JavaScript rămân posterul și un link spre scenă — munca e tot vizibilă.
+
+Iframe-ul e creat la click, nu scris în pagină cu `loading="lazy"`: un iframe
+lazy **tot se descarcă** imediat ce se apropie de ecran, deci pe o pagină cu
+mai multe scene ai plăti oricum toți megabytes.
+
+### Linkurile de Spline: editor vs publicat
+
+| Formă | Ce e | Merge încorporat? |
+|---|---|---|
+| `app.spline.design/file/<id>` | **editorul** — cere cont | **nu** |
+| `my.spline.design/<slug>` | scena **publicată** | da |
+
+Linkurile pe care le avem acum sunt de editor. Ca să fie afișabile, fiecare
+scenă trebuie **publicată** din Spline (butonul *Export → Public link*), ceea
+ce dă un link `my.spline.design`.
+
+Schema de proiect acceptă acum un câmp `scenes`, în care `poster` e
+**obligatoriu** iar `url` opțional — o imagine se afișează întotdeauna, scena
+vie e un bonus. `poster` trece prin `image()` din Astro, deci build-ul
+eșuează dacă fișierul nu există, în loc să livreze o imagine ruptă.
+
+### Unelte adăugate
+
+- **Server MCP `21st`** — înregistrat în configul *local* al utilizatorului
+  (`/root/.claude.json`), nu în repo. Cheia API nu e nici în fișiere, nici în
+  istoricul git. **Din containerul ăsta nu se conectează** (proxy 403), dar
+  configurarea e validă pe mașina lui Tudor.
+- **Plugin `ui-ux-pro-max`** — instalat prin sistemul de pluginuri
+  (`claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`), la
+  nivel de utilizator. Zero octeți adăugați în repo.
+
+Sub-skill-ul `ui-styling` al acelui plugin presupune **shadcn/ui + Tailwind**,
+ceea ce contrazice regula din `CLAUDE.md` („CSS simplu cu variabile, fără
+Tailwind"). Se folosesc `design-system` și catalogul de stiluri; `ui-styling`
+nu se aplică acestui proiect.

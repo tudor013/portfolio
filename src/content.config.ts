@@ -36,7 +36,8 @@ const projects = defineCollection({
   // Every field an employer needs to judge the work is required. A project with
   // a missing `role` or `results` fails the build instead of shipping as a
   // vague card nobody can evaluate.
-  schema: z.object({
+  schema: ({ image }) =>
+    z.object({
     title: z.string(),
     category: z.enum(CATEGORIES),
     year: z.number().int().min(2000).max(2100),
@@ -72,7 +73,26 @@ const projects = defineCollection({
 
     /** Keep an unfinished project out of the build without deleting the file. */
     draft: z.boolean().default(false),
-  }),
+
+    /**
+     * Interactive 3D scenes shown on the case study page.
+     *
+     * `poster` is required and `url` is not: a still always renders, and the
+     * live scene is an optional upgrade. `url` must be a PUBLISHED Spline
+     * link (https://my.spline.design/...) — an app.spline.design/file/... link
+     * is the editor, and asks the viewer to sign in.
+     */
+    scenes: z
+      .array(
+        z.object({
+          poster: image(),
+          alt: z.string(),
+          title: z.string(),
+          url: z.url().optional(),
+        }),
+      )
+      .default([]),
+    }),
 });
 
 export const collections = { projects };
