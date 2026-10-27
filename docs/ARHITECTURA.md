@@ -1059,3 +1059,11 @@ când tab-ul e ascuns.
   dispare, iar arborele rămâne întreg, la locul lui.
 - **Patru lățimi, 7 rute:** zero scroll orizontal și consolă curată. Fără JavaScript, tot textul e
   vizibil. Ordinea din tastatură e neschimbată.
+
+### Faza 13b — Intro-ul pe două ecrane
+
+La cererea ta, paragraful „Systems with moving parts” și cele patru coloane (Who, What, Where,
+Reach) nu se mai văd în același timp. Paragraful are acum un ecran întreg, centrat pe verticală
+(`min-height: calc(100svh - 4rem)` în `Intro.astro`), plus 6rem distanță până la coloane. Când
+paragraful e vizibil, coloanele încep sub marginea de jos a ecranului; le aduce un scroll scurt.
+Am verificat la 1850×935, 1440×900, 1366×768 și 390×844.
