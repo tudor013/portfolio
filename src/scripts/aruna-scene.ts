@@ -7,13 +7,14 @@
  * something moving under the reader's hand, slowly, like light in a room.
  */
 import { addScene, beat } from './scenes';
+import { motionIsFull, onMotionChange } from './motion';
 
 const HANDOVERS = [0.4, 0.6, 0.8];
 const FADE = 0.07;
 const PUSH = 0.06;
 
 export function initArunaScene(root: HTMLElement): void {
-  const canRun = window.matchMedia('(min-width: 60rem) and (prefers-reduced-motion: no-preference)');
+  const canRun = window.matchMedia('(min-width: 60rem)');
   const frames = [...root.querySelectorAll<HTMLElement>('[data-frame]')];
   const pictures = frames.map((frame) => frame.querySelector<HTMLImageElement>('img'));
   const captions = frames.map((frame) => frame.querySelector<HTMLElement>('figcaption'));
@@ -60,11 +61,13 @@ export function initArunaScene(root: HTMLElement): void {
   const redraw = addScene(root, render);
 
   function sync(): void {
-    root.classList.toggle('is-live', canRun.matches);
-    if (!canRun.matches) rest();
+    const live = canRun.matches && motionIsFull();
+    root.classList.toggle('is-live', live);
+    if (!live) rest();
     redraw();
   }
 
   canRun.addEventListener('change', sync);
+  onMotionChange(sync);
   sync();
 }

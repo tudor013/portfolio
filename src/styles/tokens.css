@@ -2,9 +2,8 @@
  * Design tokens — "Blueprint", quiet-instrument build (27.10.2026).
  *
  * A drafting table: cool paper, one near-black ink, and blueprint blue. The
- * blue does two jobs and no others: the one primary action on a screen, and
- * the field of the Software chapter, where the page turns into a blueprint
- * and Tudor's schema is drawn on it in white.
+ * blue carries the primary action and the Software chapter; a light tint also
+ * inks the hero's drafting sheet so the direction appears before that scene.
  *
  * Gone from the previous version, at Tudor's request: the liquid glass and the
  * light that followed the scroll. The page now moves through its content (the
@@ -43,8 +42,8 @@
 
   /* A control's boundary has to clear 3:1 (WCAG 1.4.11); this one is 3.55. */
   --edge-control: color-mix(in srgb, var(--ink-900) 52%, transparent);
-  /* Only for the lines a real table or a definition list carries. The landing
-     page separates things by space and tone, never by a rule. */
+  /* Lines for tables and definition lists; the hero's drafting sheet has its
+     own lighter tokens so it reads as atmosphere rather than a boundary. */
   --edge-subtle: color-mix(in srgb, var(--ink-900) 12%, transparent);
 
   /* ---- SEMANTIC: the blueprint field ------------------------------------ */
@@ -54,6 +53,8 @@
   --field-ink: var(--chalk-50); /* 10.12 field · 7.63 table */
   --field-muted: var(--chalk-300); /*  6.24 field · 4.70 table */
   --field-line: rgb(255 255 255 / 0.6); /* relationships: 4.95:1 against the field */
+  --draft-grid: color-mix(in srgb, var(--accent) 10%, transparent);
+  --draft-line: color-mix(in srgb, var(--accent) 22%, transparent);
 
   /* ---- SEMANTIC: the ID badge ------------------------------------------ */
 

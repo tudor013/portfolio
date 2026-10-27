@@ -8,9 +8,10 @@
  * broken the page is simply still. Groups already on screen when it starts
  * are marked as arrived first, so nothing the reader is looking at blinks out.
  */
+import { motionIsFull, onMotionChange } from './motion';
+
 export function initEnter(): void {
   if (!('IntersectionObserver' in window)) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const groups = [...document.querySelectorAll<HTMLElement>('[data-enter]')];
   if (groups.length === 0) return;
@@ -27,12 +28,24 @@ export function initEnter(): void {
     { rootMargin: '0px 0px -10% 0px' },
   );
 
-  const height = window.innerHeight;
-  for (const group of groups) {
-    const box = group.getBoundingClientRect();
-    if (box.top < height && box.bottom > 0) group.classList.add('is-in');
-    else observer.observe(group);
+  function sync(): void {
+    if (!motionIsFull()) {
+      observer.disconnect();
+      document.documentElement.classList.remove('enter-ready');
+      return;
+    }
+
+    const height = window.innerHeight;
+    for (const group of groups) {
+      if (group.classList.contains('is-in')) continue;
+      const box = group.getBoundingClientRect();
+      if (box.top < height && box.bottom > 0) group.classList.add('is-in');
+      else observer.observe(group);
+    }
+
+    document.documentElement.classList.add('enter-ready');
   }
 
-  document.documentElement.classList.add('enter-ready');
+  onMotionChange(sync);
+  sync();
 }

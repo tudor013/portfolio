@@ -12,6 +12,17 @@ html {
      `position: sticky` in the scenes. */
   overflow-x: clip;
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Anchors land below the sticky header, not under it. */
+  scroll-padding-top: 4rem;
+}
+
+/* Below desktop width the header has two rows (name and motion control,
+   then the links), so it is taller. */
+@media (max-width: 60rem) {
+  html {
+    scroll-padding-top: 6.5rem;
+  }
 }
 
 body {
@@ -190,43 +201,55 @@ a:hover {
 
 /* ---- Entrances ----------------------------------------------------------- */
 
-/* The parts of a section arrive in reading order: heading, text, picture.
-   Written so the failure mode is "no animation", never "no content": nothing
-   is hidden unless enter.ts has started (it sets html.enter-ready), and the
-   reduced-motion setting turns the hiding off entirely. */
-@media (prefers-reduced-motion: no-preference) {
-  html.enter-ready [data-enter] > * {
-    opacity: 0;
-    transform: translateY(24px);
-    filter: blur(4px);
-  }
-
-  html.enter-ready [data-enter].is-in > * {
-    opacity: 1;
-    transform: none;
-    filter: none;
-    transition:
-      opacity var(--t-reveal) var(--ease-expo),
-      transform var(--t-reveal) var(--ease-expo),
-      filter var(--t-reveal) var(--ease-expo);
-  }
-
-  /* Each part waits for the one before it. */
-  html.enter-ready [data-enter].is-in > :nth-child(2) { transition-delay: calc(var(--stagger) * 1); }
-  html.enter-ready [data-enter].is-in > :nth-child(3) { transition-delay: calc(var(--stagger) * 2); }
-  html.enter-ready [data-enter].is-in > :nth-child(4) { transition-delay: calc(var(--stagger) * 3); }
-  html.enter-ready [data-enter].is-in > :nth-child(5) { transition-delay: calc(var(--stagger) * 4); }
-  html.enter-ready [data-enter].is-in > :nth-child(6) { transition-delay: calc(var(--stagger) * 5); }
-  html.enter-ready [data-enter].is-in > :nth-child(n + 7) { transition-delay: calc(var(--stagger) * 6); }
+/* The parts of a section arrive in reading order. Only the full-motion mode
+   hides items before they enter; the reduced mode leaves every line in place. */
+html[data-motion='full'].enter-ready [data-enter] > * {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(4px);
 }
 
-/* Anyone who has asked their OS to reduce motion gets the finished page.
-   Motion a person starts themselves (dragging the badge, the market's
-   controls) still answers them. */
+html[data-motion='full'].enter-ready [data-enter].is-in > * {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition:
+    opacity var(--t-reveal) var(--ease-expo),
+    transform var(--t-reveal) var(--ease-expo),
+    filter var(--t-reveal) var(--ease-expo);
+}
+
+/* Each part waits for the one before it. */
+html[data-motion='full'].enter-ready [data-enter].is-in > :nth-child(2) { transition-delay: calc(var(--stagger) * 1); }
+html[data-motion='full'].enter-ready [data-enter].is-in > :nth-child(3) { transition-delay: calc(var(--stagger) * 2); }
+html[data-motion='full'].enter-ready [data-enter].is-in > :nth-child(4) { transition-delay: calc(var(--stagger) * 3); }
+html[data-motion='full'].enter-ready [data-enter].is-in > :nth-child(5) { transition-delay: calc(var(--stagger) * 4); }
+html[data-motion='full'].enter-ready [data-enter].is-in > :nth-child(6) { transition-delay: calc(var(--stagger) * 5); }
+html[data-motion='full'].enter-ready [data-enter].is-in > :nth-child(n + 7) { transition-delay: calc(var(--stagger) * 6); }
+
+/* The visitor's choice controls all page motion, including native anchor
+   scrolling. The media-query block below covers a failed or unavailable head
+   script, before the preference can be copied onto <html>. */
+html[data-motion='reduced'] {
+  scroll-behavior: auto;
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  html:not([data-motion-choice='user']) {
+    scroll-behavior: auto;
+  }
+
+  html:not([data-motion-choice='user']) *,
+  html:not([data-motion-choice='user']) *::before,
+  html:not([data-motion-choice='user']) *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

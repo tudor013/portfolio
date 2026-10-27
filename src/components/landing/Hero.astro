@@ -11,6 +11,47 @@ import IdBadge from '../IdBadge.astro';
 ---
 
 <section class="hero frame" aria-labelledby="hero-heading">
+  <div class="drafting-sheet" aria-hidden="true">
+    <svg viewBox="0 0 700 500" focusable="false" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <pattern id="hero-blueprint-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+          <path class="grid" d="M32 0H0V32" />
+        </pattern>
+        <pattern id="hero-blueprint-grid-major" width="160" height="160" patternUnits="userSpaceOnUse">
+          <path class="grid-major" d="M160 0H0V160" />
+        </pattern>
+      </defs>
+
+      <rect width="700" height="500" fill="url(#hero-blueprint-grid)" />
+      <rect width="700" height="500" fill="url(#hero-blueprint-grid-major)" />
+
+      <g class="guides">
+        <path d="M337 46V448M96 258H592" />
+        <path d="M138 414V190M536 414V190" />
+      </g>
+
+      <g class="structure">
+        <path d="M166 414V201L337 82L508 201V414Z" />
+        <path d="M207 414V247H467V414M207 292H467M337 247V414" />
+        <path d="M263 414V330H337V414M383 414V330H437V414" />
+        <path d="M237 247V210H303V247M370 247V210H436V247" />
+        <path d="M153 201L337 74L521 201" />
+      </g>
+
+      <g class="dimensions">
+        <path d="M166 178H508M166 170V186M508 170V186" />
+        <path d="M126 201V414M118 201H134M118 414H134" />
+        <path d="M337 64L345 72M337 64L329 72M337 448L345 440M337 448L329 440" />
+      </g>
+
+      <g class="registration">
+        <circle cx="166" cy="201" r="3" />
+        <circle cx="508" cy="201" r="3" />
+        <circle cx="337" cy="414" r="3" />
+      </g>
+    </svg>
+  </div>
+
   <div class="column">
     <h1 id="hero-heading"><span class="keep">Tudor-Andrei</span> Ifrim</h1>
 
@@ -37,6 +78,7 @@ import IdBadge from '../IdBadge.astro';
 
 <style>
   .hero {
+    isolation: isolate;
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -45,6 +87,63 @@ import IdBadge from '../IdBadge.astro';
        below to say the page goes on. */
     min-height: calc(100svh - 4rem - 5.5rem);
     min-height: max(36rem, calc(100svh - 4rem - 5.5rem));
+  }
+
+  .drafting-sheet {
+    position: absolute;
+    z-index: 0;
+    inset: 0 0 0 auto;
+    /* The right half only, behind the badge: wider, and the roof line ran
+       through the end of the sentence. */
+    width: min(52%, 50rem);
+    pointer-events: none;
+    opacity: 0.58;
+    /* A mask, not a fill: the sheet fades out before it reaches the name.
+       Gradients are allowed by Tudor; this is the only one on the page. */
+    mask-image: linear-gradient(90deg, transparent 0%, black 16%, black 100%); /* taste-skill-ignore */
+  }
+
+  .drafting-sheet svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .grid {
+    fill: none;
+    stroke: var(--draft-grid);
+    stroke-width: 0.7;
+  }
+
+  .grid-major {
+    fill: none;
+    stroke: var(--draft-line);
+    stroke-width: 0.9;
+  }
+
+  .guides,
+  .dimensions,
+  .registration {
+    fill: none;
+    stroke: var(--draft-line);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .guides {
+    stroke-dasharray: 3 6;
+  }
+
+  .structure {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.35;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .registration circle {
+    fill: var(--ground);
+    stroke: var(--accent);
+    stroke-width: 1.2;
   }
 
   /* Above the badge's box: the name runs a little into the badge column, and
@@ -103,15 +202,13 @@ import IdBadge from '../IdBadge.astro';
 
   /* ---- Load sequence ---------------------------------------------------- */
 
-  @media (prefers-reduced-motion: no-preference) {
-    .column > * {
-      animation: rise var(--t-reveal) var(--ease-expo) both;
-    }
-
-    .column > :nth-child(2) { animation-delay: 90ms; }
-    .column > :nth-child(3) { animation-delay: 180ms; }
-    .column > :nth-child(4) { animation-delay: 320ms; }
+  :global(html[data-motion='full']) .column > * {
+    animation: rise var(--t-reveal) var(--ease-expo) both;
   }
+
+  :global(html[data-motion='full']) .column > :nth-child(2) { animation-delay: 90ms; }
+  :global(html[data-motion='full']) .column > :nth-child(3) { animation-delay: 180ms; }
+  :global(html[data-motion='full']) .column > :nth-child(4) { animation-delay: 320ms; }
 
   @keyframes rise {
     from {
@@ -145,6 +242,11 @@ import IdBadge from '../IdBadge.astro';
     .badge-slot :global(.badge) {
       width: 100%;
     }
+
+    .drafting-sheet {
+      width: 74%;
+      opacity: 0.38;
+    }
   }
 
   /* A phone has no room beside the text, so the badge gets a band of its own
@@ -170,6 +272,15 @@ import IdBadge from '../IdBadge.astro';
       background: var(--surface);
       display: grid;
       justify-items: center;
+    }
+
+    .drafting-sheet {
+      top: 5rem;
+      bottom: auto;
+      width: 100%;
+      height: 22rem;
+      opacity: 0.22;
+      mask-image: linear-gradient(180deg, black 0%, transparent 100%); /* taste-skill-ignore */
     }
   }
 </style>

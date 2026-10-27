@@ -10,6 +10,7 @@
  */
 import { DAYS, DEFAULTS, runMarket, type MarketRun, type MarketSettings } from './market-model';
 import { addScene } from './scenes';
+import { motionIsFull, onMotionChange } from './motion';
 
 const PLAY_MS = 3200;
 
@@ -20,7 +21,6 @@ export function initMarketScene(root: HTMLElement): void {
   const context = canvas?.getContext('2d');
   if (!canvas || !panel || !form || !context) return;
 
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
   const readouts = {
     day: root.querySelector<HTMLElement>('[data-readout="day"]')!,
     price: root.querySelector<HTMLElement>('[data-readout="price"]')!,
@@ -123,8 +123,20 @@ export function initMarketScene(root: HTMLElement): void {
 
   addScene(panel, (progress) => {
     scrolled = progress;
-    if (playing || still.matches) return;
+    if (!motionIsFull()) return;
+    if (playing) return;
     shown = progress;
+    draw();
+  });
+
+  onMotionChange(() => {
+    if (!motionIsFull()) {
+      cancelAnimationFrame(playing);
+      playing = 0;
+      shown = 1;
+    } else {
+      shown = scrolled;
+    }
     draw();
   });
 
@@ -154,7 +166,7 @@ export function initMarketScene(root: HTMLElement): void {
     seed += 1;
     run = runMarket(settings, seed);
 
-    if (still.matches) {
+    if (!motionIsFull()) {
       shown = 1;
       draw();
       return;

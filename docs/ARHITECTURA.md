@@ -917,3 +917,73 @@ tokeni: au primit fontul și culorile noi, fără linii și umbre, dar nu au fos
 - `TODO(conținut)` din proiecte se văd în continuare pe paginile proiectelor.
 - Un CV descărcabil **fără număr de telefon** în `public/cv/`, dacă vrei buton de CV.
 - O imagine `og:image` de 1200×630 pentru preview-ul pe LinkedIn.
+
+---
+
+## Faza 12 — Foaia de desen și controlul mișcării
+
+Propunerea și patch-ul vin de la ChatGPT; le-am aplicat, verificat și reparat aici.
+
+### Ce s-a schimbat
+
+- Hero-ul are acum o foaie discretă de desen tehnic, cu grilă, elevație,
+  linii de cotă și repere. Este decor SVG, fără JavaScript și fără să pretindă
+  că arată un proiect construit. Excepția este limitată la prima secțiune; în
+  rest, grila rămâne rezervată desenelor reale.
+- Linkurile din navigare fac scroll lin către secțiuni. Un offset ține ținta
+  sub bara fixată în partea de sus.
+- Butonul „Motion” stă în dreapta sus și arată „on” sau „off”. Asta îndeplinește cerința din
+  CLAUDE.md cu cele două moduri de rulare. La prima vizită urmează setarea
+  sistemului; alegerea ulterioară se păstrează în `localStorage` sub cheia
+  `portfolio-motion` și se aplică înainte de prima pictare a paginii.
+- Modul redus arată conținutul complet, oprește scenele legate de scroll,
+  intrările, oscilația automată a ecusonului și derularea lină. Piața și
+  controalele ei rămân utilizabile, iar ecusonul rămâne trăgabil.
+
+### Unde stă logica
+
+| Fișier | Rol |
+|---|---|
+| `src/scripts/motion.ts` | Starea mișcării, butonul, preferința de sistem și evenimentul comun. |
+| `src/layouts/BaseLayout.astro` | Aplică preferința înainte de primul cadru și pornește controlul. |
+| `src/components/SiteHeader.astro` | Butonul accesibil, lângă marginea din dreapta sus. |
+| `src/components/landing/Hero.astro` | Grila și elevația vectorială pentru prima foaie. |
+| `src/scripts/schema-scene.ts`, `aruna-scene.ts`, `market-scene.ts` | Oprirea sau reluarea scenelor la schimbarea modului. |
+| `src/scripts/enter.ts` și `src/components/IdBadge.astro` | Oprirea aparițiilor și schimbarea ecusonului între modul animat și cel calm. |
+
+### Ce am reparat la aplicare
+
+- **Erori de tipuri în `motion.ts`.** `astro check` dădea 4 erori: TypeScript nu putea garanta
+  că butonul există în funcțiile interioare. Am rescris funcția astfel încât verificarea să
+  țină.
+- **Numele butonului pentru cititoarele de ecran.** În patch, butonul arăta „Motion on”, dar
+  cititorul de ecran auzea „Turn animations off”. Regula WCAG 2.5.3 cere ca numele auzit să
+  conțină textul văzut. Acum numele e fix, „Motion”, starea e în `aria-pressed`, iar cuvântul
+  „on/off” e doar vizual. Cititorul de ecran spune: „Motion, toggle button, pressed”.
+- **Cheia din `localStorage`** se numea `ei-motion`, moștenită de la proiectul Energy
+  Intelligence. Acum e `portfolio-motion`, aceeași în `motion.ts` și în scriptul din
+  `BaseLayout.astro`.
+- **Foaia de desen era prea lată.** La 1440 și 1366, linia acoperișului trecea prin capătul
+  propoziției din hero. Acum ocupă doar jumătatea dreaptă, în spatele badge-ului.
+- **Header-ul pe tabletă.** Cu patru linkuri și butonul de mișcare, numele se rupea pe două
+  rânduri la 768px. Sub 60rem, linkurile trec pe un al doilea rând.
+- **Ținta ancorelor.** Offset-ul (`scroll-padding-top`) urmează acum înălțimea reală a
+  header-ului: 64px pe desktop, 104px când are două rânduri.
+- **Cele două gradiente** sunt măști care estompează foaia spre text, nu umpluturi de culoare.
+  Le-am marcat `taste-skill-ignore`. Tu ai permis gradientele, iar acestea sunt singurele de
+  pe pagină.
+
+### Verificare
+
+- `astro check`: 0 erori. `taste-skill lint`: 0 FAIL, 0 WARN.
+- `taste-skill inspect`: 0 FAIL, cu aceleași 3 avertismente justificate în
+  `.taste-skill/critique.md`.
+- La 1440×900, 1366×768, 390×844 și 360×740, pe 7 rute: zero scroll orizontal și consolă
+  curată. Țintele au minimum 44px; excepția e linkul inline „Open it in Spline”.
+- Butonul, testat în browser, pornind din ambele setări de sistem:
+  - prima vizită urmează sistemul;
+  - un click schimbă modul, iar scenele trec în starea finală sau pornesc din nou;
+  - alegerea rămâne după reîncărcare;
+  - al doilea click o inversează.
+- Fără JavaScript butonul nu apare (are `hidden` până pornește scriptul) și tot textul e vizibil.
+- Din tastatură butonul e în ordinea Tab, după „Get in touch”, și are inel de focus.

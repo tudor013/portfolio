@@ -25,11 +25,30 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-motion="full" data-motion-choice="system">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="canonical" href={canonical} />
+
+    {/* Runs before the first paint so the page never draws in the wrong
+        motion mode and then jumps. The key matches STORAGE_KEY in
+        scripts/motion.ts. */}
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        let saved = null;
+        try {
+          saved = localStorage.getItem('portfolio-motion');
+        } catch {
+          // The operating-system preference remains available without storage.
+        }
+        const userChoice = saved === 'full' || saved === 'reduced';
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        root.dataset.motion = userChoice ? saved : reduced ? 'reduced' : 'full';
+        root.dataset.motionChoice = userChoice ? 'user' : 'system';
+      })();
+    </script>
 
     {/* Emits the self-hosted @font-face rules. Deliberately not preloaded:
         `preload` covers every variant of the family, which here is eight
@@ -60,8 +79,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 </html>
 
 <script>
+  import { initMotionToggle } from '../scripts/motion';
   import { initEnter } from '../scripts/enter';
 
+  initMotionToggle();
   initEnter();
 </script>
 

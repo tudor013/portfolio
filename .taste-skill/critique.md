@@ -37,6 +37,16 @@ Top three problems (most visible first):
    own box with a note saying so (mobile-page-01). Readable, but the scene's build is a desktop
    experience only, in line with Tudor's desktop-first decision.
 
+## ROUND 2 (after the ChatGPT drafting-sheet patch; inspect.mjs: 0 FAIL, 3 WARN)
+
+What changed on screen: a faint drafting sheet (grid, an elevation, dimension ticks) behind the
+badge, a "Motion" toggle top right, and the four links in one group in the header.
+
+New finding, kept but noted: the elevation drawn in the sheet is a house. It is decorative and
+says nothing about Tudor's work, and a reader may take it for architecture. A drawing made from
+his own material (the schema's outline, for instance) would carry the idea further. Left as
+the patch drew it, because Tudor asked for that work to go in as made.
+
 ### Warnings defended
 - `no-footage`: no honest clip exists. The Spline scenes cannot be recorded from here, and stock
   footage would show someone else's world. The moving pictures are the live market and the Aruna

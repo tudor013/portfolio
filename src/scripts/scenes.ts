@@ -20,6 +20,8 @@
  * library, and can be read top to bottom.
  */
 
+import { motionIsFull, onMotionChange } from './motion';
+
 export type Render = (progress: number) => void;
 
 type Scene = {
@@ -33,8 +35,15 @@ let queued = false;
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
+onMotionChange(() => {
+  for (const scene of scenes) scene.last = -1;
+  if (motionIsFull()) queue();
+});
+
 function update(): void {
   queued = false;
+  if (!motionIsFull()) return;
+
   const viewport = window.innerHeight;
 
   for (const scene of scenes) {
@@ -84,14 +93,13 @@ export function addScene(element: HTMLElement, render: Render): () => void {
 }
 
 /**
- * Whether held scenes should run here. They need room: on a phone, or with
- * reduced motion asked for, the section shows its finished composition
- * instead, with every piece of content in place.
+ * Whether held scenes should run here. They need room: on a phone, or when
+ * reduced motion is selected, the finished composition stays in place.
  */
 export function canHold(minWidth = 75): boolean {
   return (
     window.matchMedia(`(min-width: ${minWidth}rem)`).matches &&
-    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    motionIsFull()
   );
 }
 

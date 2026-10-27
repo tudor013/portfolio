@@ -142,6 +142,12 @@ la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
   `taste-skill-ignore`.
 - **Verificare înainte de commit:** `taste-skill lint` și `inspect` cu 0 FAIL. Critica rundei
   se scrie în `.taste-skill/critique.md`.
+- **Cele două moduri de rulare există** (faza 12): butonul „Motion” din header,
+  `scripts/motion.ts`, starea pe `<html data-motion>`, alegerea în `localStorage`
+  (`portfolio-motion`). Orice animație nouă citește `motionIsFull()` și ascultă
+  `onMotionChange()`, nu direct `prefers-reduced-motion`.
+- **Foaia de desen din hero** (grilă + elevație, din patch-ul ChatGPT) e singura excepție de
+  la „fără linii decorative”. E limitată la hero și stă în spatele badge-ului.
 
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).

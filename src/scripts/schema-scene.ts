@@ -11,6 +11,7 @@
  */
 import { RULES } from '../data/airline-schema';
 import { addScene, beat, easeOut } from './scenes';
+import { motionIsFull, onMotionChange } from './motion';
 
 const TABLES_FROM = 0.06;
 const TABLE_STAGGER = 0.026;
@@ -28,7 +29,7 @@ const SELF_REFERENCE = 'fk_d2026_ang_manager';
 export function initSchemaScene(root: HTMLElement): void {
   // Holding needs a wide screen (the drawing is wide) and a reader who has
   // not asked for less motion. Everyone else gets the finished drawing.
-  const canRun = window.matchMedia('(min-width: 75rem) and (prefers-reduced-motion: no-preference)');
+  const canRun = window.matchMedia('(min-width: 75rem)');
 
   const tables = [...root.querySelectorAll<SVGGElement>('[data-table]')];
   const relations = [...root.querySelectorAll<SVGPathElement>('[data-relation]')];
@@ -85,11 +86,13 @@ export function initSchemaScene(root: HTMLElement): void {
   const redraw = addScene(root, render);
 
   function sync(): void {
-    root.classList.toggle('is-live', canRun.matches);
-    if (!canRun.matches) rest();
+    const live = canRun.matches && motionIsFull();
+    root.classList.toggle('is-live', live);
+    if (!live) rest();
     redraw();
   }
 
   canRun.addEventListener('change', sync);
+  onMotionChange(sync);
   sync();
 }

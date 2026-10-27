@@ -177,12 +177,14 @@ import portrait from '../assets/tudor.png';
 
 <script>
   import { initBadge } from '../scripts/badge';
+  import { motionIsFull, onMotionChange } from '../scripts/motion';
 
   const root = document.querySelector<HTMLElement>('[data-badge]');
-  // Reduced motion silences the entrance and the idle sway, but the badge
-  // still answers a pointer: motion a person asks for is not the motion that
-  // setting is about, and freezing it entirely makes the badge look broken.
-  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (root) initBadge(root, { calm });
+  if (root) {
+    let stop = initBadge(root, { calm: !motionIsFull() });
+    onMotionChange(() => {
+      stop();
+      stop = initBadge(root, { calm: !motionIsFull() });
+    });
+  }
 </script>

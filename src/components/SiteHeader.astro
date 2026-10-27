@@ -1,7 +1,6 @@
 ---
-// A plain bar: the name, the three directions, one way to get in touch. No
-// glass, no pill. It stays at the top so contact is one click from anywhere,
-// and it is opaque so it reads the same over paper and over the blueprint.
+// A plain bar: the name, the three directions, contact and a motion control.
+// It stays opaque over both paper and the blueprint field.
 import { CATEGORIES, CATEGORY_SHORT, CATEGORY_SLUGS } from '../content.config';
 
 const LINKS = CATEGORIES.map((category) => ({
@@ -31,10 +30,16 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
           );
         })
       }
+      <li><a href="/#contact">Get in touch</a></li>
     </ul>
   </nav>
 
-  <a class="contact" href="/#contact">Get in touch</a>
+  <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="true" hidden>
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M2 11h4l3-7v13l3-7h6" />
+    </svg>
+    Motion <span class="state" aria-hidden="true" data-motion-state>on</span>
+  </button>
 </header>
 
 <style>
@@ -60,6 +65,48 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
   .wordmark {
     justify-self: start;
     font-weight: var(--weight-head);
+  }
+
+  .motion-toggle {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 0;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step-small);
+    cursor: pointer;
+  }
+
+  .motion-toggle[hidden] {
+    display: none;
+  }
+
+  .motion-toggle:hover {
+    background: color-mix(in srgb, var(--surface) 92%, var(--ink));
+  }
+
+  .state {
+    min-width: 1.6em;
+    font-weight: var(--weight-head);
+  }
+
+  .motion-toggle svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+
+  .motion-toggle path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
   }
 
   nav ul {
@@ -94,16 +141,10 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
     transform: scaleX(1);
   }
 
-  .contact {
-    justify-self: end;
-    font-weight: var(--weight-head);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.22em;
-  }
-
-  /* On a phone the three directions take their own row under the name. */
-  @media (max-width: 40rem) {
+  /* Below desktop width the directions take their own row under the name;
+     four links and the motion control beside it would squeeze the name onto
+     two lines. */
+  @media (max-width: 60rem) {
     .bar {
       grid-template-columns: 1fr auto;
       padding-block: var(--space-1);
@@ -115,7 +156,8 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
     }
 
     nav ul {
-      gap: var(--space-6);
+      flex-wrap: wrap;
+      gap: 0 var(--space-6);
     }
   }
 </style>
