@@ -13,9 +13,9 @@ const published = (await getCollection('projects')).filter((p) => !p.data.draft)
 
 /** One line per category, in Tudor's own terms. */
 const BLURBS: Record<(typeof CATEGORIES)[number], string> = {
-  dev: 'TODO(conținut): ce fel de software construiești și cu ce.',
-  design: 'TODO(conținut): ce parte din design faci — research, UI, design system?',
-  data: 'TODO(conținut): ce fel de întrebări răspunzi cu date.',
+  dev: 'Mostly C and C++, C#, Python, MariaDB and Oracle SQL, with AI tooling in the loop. I build software that is pleasant to use and solves a problem someone actually has.',
+  design: 'Brand design, UI/UX and interface work in Figma, Illustrator, Photoshop and Spline, with motion in Premiere Pro and DaVinci Resolve. I design interfaces around the person using them.',
+  data: 'Inferential and macroeconomic statistics, and the economic cybernetics I study: resource allocation, correlation between series, and models whose results have to survive being checked.',
 };
 
 // Group once rather than filtering inside the template three times. CATEGORIES

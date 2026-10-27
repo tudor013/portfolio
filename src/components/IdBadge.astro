@@ -39,6 +39,8 @@ import portrait from '../assets/tudor.png';
     position: relative;
     width: 300px;
     height: 440px;
+    perspective: 1100px;
+    perspective-origin: 50% 20%;
     /* Keeps a dragged badge from selecting the text around it. */
     user-select: none;
   }
@@ -66,6 +68,10 @@ import portrait from '../assets/tudor.png';
     width: 190px;
     /* Rotation happens about the point the strap holds. */
     transform-origin: 50% 0;
+    transform-style: preserve-3d;
+    /* The back of a laminated card still catches light, so the reverse side
+       is not simply invisible when it turns past edge-on. */
+    backface-visibility: visible;
     /* Static placement for the no-script and reduced-motion cases. The
        simulation replaces this transform once it starts. */
     transform: translate(55px, 185px) rotate(-3deg);
@@ -77,9 +83,9 @@ import portrait from '../assets/tudor.png';
     padding: var(--space-6) var(--space-4) var(--space-4);
 
     background: var(--surface-raised);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    box-shadow: var(--edge-highlight);
+    box-shadow: var(--shadow-lift);
   }
 
   /* Only offer the grab cursor once the simulation is actually running. */
@@ -100,7 +106,7 @@ import portrait from '../assets/tudor.png';
     border: 1px solid var(--border-strong);
     border-radius: 3px 3px 5px 5px;
     background: var(--surface-canvas);
-    box-shadow: var(--edge-highlight);
+    box-shadow: var(--shadow-soft);
   }
 
   .punch {

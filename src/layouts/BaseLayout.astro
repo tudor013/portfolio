@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import ScrollLight from '../components/ScrollLight.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -43,6 +44,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <ScrollLight />
     <main id="main" class="page">
       <slot />
     </main>

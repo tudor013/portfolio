@@ -19,7 +19,7 @@ problem: >-
   directly online, by single order or by subscription, with delivery to the
   door.
 results: >-
-  The business sells over 100 kg of coffee a month through the online shop I
+  The business sold over 100 kg of coffee a month through the online shop I
   built.
 order: 10
 draft: false

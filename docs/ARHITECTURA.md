@@ -352,3 +352,74 @@ pagina arată ruptă.
 
 Poza sursă e **200×200**. La dimensiunea afișată (110px) e în regulă, dar nu
 suportă mărire. Dacă badge-ul crește, trebuie o versiune mai mare.
+
+---
+
+## Faza 6 — Schimbarea pe light theme („Blueprint")
+
+### De ce albastrul ăsta și nu cel evident
+
+„Light + albastru" e cea mai comună paletă corporate care există. Luată
+de-a gata, face orice portofoliu să arate ca un template. Albastrul standard
+de SaaS (`#2563EB`) a și picat la măsurători: **4.73** pe hârtia noastră —
+trece AA la limită și devine inutilizabil pe suprafețe mai mari.
+
+Ales: **`#1549A6`, albastru de blueprint — 7.57.** Ideea vine din felul în
+care lucrezi: ai desenat interfața Aruna în Illustrator *înainte* să fie
+construit ceva. Asta e gândire de planșă. Cyanotipia e albastru pe hârtie, iar
+lumina care urmărește scroll-ul devine lampa de pe planșă.
+
+### Lumina care reacționează la scroll
+
+Un singur element fix, cu un gradient radial, mutat prin `transform`.
+
+**De ce `transform` și nu `top`:** `transform` e singura proprietate pe care
+compozitorul browserului o poate anima fără să recalculeze layout-ul și fără
+să repicteze pagina. Mutarea prin `top` ar forța o recalculare la fiecare
+cadru de scroll și ar sacada.
+
+Scriptul scrie o singură variabilă CSS, cel mult o dată pe cadru
+(`requestAnimationFrame`). Fără JS, lumina rămâne în poziția de sus — pagina e
+completă, doar nu te urmărește.
+
+### Capcana contrastului pe temă deschisă
+
+Pe o temă întunecată, riscul e textul prea șters. Pe una deschisă cu glow,
+riscul e **textul care stă sub lumină**: fundalul se întunecă local și
+contrastul scade exact unde nu te uiți.
+
+Prima paletă trecea testul plat (5.80) dar sub lumină cădea la **4.63** — la
+0.13 peste pragul AA. Orice ajustare ulterioară a luminii l-ar fi rupt tăcut.
+Textul secundar a fost întunecat la `#4C5668`: **5.40 sub lumină**, marjă
+reală.
+
+**Regula care rămâne:** contrastul se măsoară sub lumină, nu pe fundalul plat.
+
+### Badge-ul: trei defecte reparate
+
+1. **Nu se mișca.** Îl pornisem exact în poziția de echilibru, unde gravitația
+   deja îl ținea. Testul meu zicea „se animă" pentru că măsura câțiva pixeli de
+   așezare — adevărat tehnic, invizibil practic. Acum pornește deviat lateral și
+   intră legănându-se, plus o oscilație lentă permanentă care îi spune
+   vizitatorului că poate fi apucat.
+2. **Nu era 3D.** Containerul a primit `perspective`, iar cardul se rotește pe
+   `rotateY` proporțional cu viteza lui orizontală. Un ecuson real se întoarce
+   pe muchie când se leagănă — asta e, de fapt, mare parte din ce îl face să
+   pară obiect, nu poză.
+3. **Ieșea din pagină.** Un element transformat extinde zona de scroll. Acum
+   ultimul punct al funiei e limitat la cutia badge-ului, deci cardul nu poate
+   ieși nici la pendulare liberă, nici tras cu mouse-ul.
+
+### O lecție despre testare
+
+Scriptul meu de capturi raporta 96px overflow pe mobil și 124px pe desktop.
+Am „reparat" de două ori. **Testul era stricat, nu pagina:** măsuram overflow-ul
+*după* o captură `fullPage`, iar Playwright redimensionează viewportul ca să
+prindă toată pagina — deci măsuram un layout pe care niciun utilizator nu îl
+vede.
+
+Un diagnostic separat, care enumera elementele ieșite din viewport, a arătat
+**zero**. Am mutat măsurătoarea înaintea capturii.
+
+Morala: când un test raportează un bug, verifică întâi testul. Măsurătoarea
+trebuie să spună care element și unde, nu doar un număr.

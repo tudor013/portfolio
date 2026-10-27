@@ -85,18 +85,21 @@ a {
 }
 
 .page {
+  position: relative;
+  /* Above the fixed light layer, which sits at z-index 0. */
+  z-index: 1;
   max-width: var(--page-max);
   margin-inline: auto;
   padding: var(--space-12) var(--space-4) var(--space-24);
 }
 
-/* A panel is an L1 surface: subtle border first, edge highlight second, never
-   an outer glow. */
+/* A panel is an L1 surface: subtle border first, soft shadow second. On paper
+   the lightness step alone is only 1.09:1, so the border does the real work. */
 .panel {
   background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: var(--edge-highlight);
+  box-shadow: var(--shadow-soft);
 }
 
 /* Anyone who has asked their OS to reduce motion gets no animation at all,

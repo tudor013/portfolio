@@ -15,9 +15,7 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
     <h1>Tudor-Andrei Ifrim</h1>
 
   <p class="promise">
-    TODO(conținut): o propoziție — ce rol cauți și ce te face potrivit. Ex:
-    „Junior software developer drawn to systems whose behaviour emerges from
-    interacting parts."
+    Software developer who can make it happen.
   </p>
 
   <p class="actions">
@@ -42,7 +40,7 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
     /* The badge keeps its intrinsic width; the text takes what is left. */
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-12);
-    align-items: start;
+    align-items: center;
     padding-block: var(--space-16) var(--space-12);
   }
 
@@ -52,6 +50,10 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
     .hero {
       grid-template-columns: minmax(0, 1fr);
       justify-items: start;
+      /* A swinging badge must never be able to widen the page. `clip` stops
+         the overflow without turning this into a scroll container, which
+         `hidden` would do. */
+      overflow-x: clip;
     }
   }
 
