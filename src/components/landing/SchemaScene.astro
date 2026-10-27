@@ -1,0 +1,310 @@
+---
+/**
+ * Chapter one, Software. The page turns into a blueprint and Tudor's airline
+ * schema is drawn on it as the reader scrolls: the tables arrive at the places
+ * he put them, the foreign keys draw in, and the scene stops on three rules.
+ *
+ * The finished drawing is what renders without a script, under reduced
+ * motion and on narrow screens; schema-scene.ts only animates towards it.
+ */
+import {
+  TABLES,
+  RELATIONS,
+  RULES,
+  TABLE_WIDTH,
+  HEADER,
+  ROW,
+  VIEWBOX,
+  heightOf,
+  pathOf,
+} from '../../data/airline-schema';
+
+const box = `${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.width} ${VIEWBOX.height}`;
+
+// Tables arrive top to bottom, so each one appears as its part of the stage
+// slides into view.
+const arrival = [...TABLES].sort((a, b) => a.y - b.y || a.x - b.x).map((t) => t.id);
+
+const description =
+  'Ten tables: D2026_MODELE_AVION, D2026_AVIOANE, D2026_AEROPORTURI, D2026_RUTE, D2026_ZBORURI, ' +
+  'D2026_ANGAJATI, D2026_ECHIPAJ, D2026_PASAGERI, D2026_REZERVARI and D2026_BILETE, joined by ' +
+  'thirteen foreign keys. A ticket refers to its booking, its flight and its passenger; a flight ' +
+  'to its route and its aircraft; a route to two airports; a crew row to a flight and an employee; ' +
+  'and an employee to their manager, who is another employee.';
+---
+
+<section class="schema" id="schema" aria-labelledby="schema-heading" data-schema style="--hold: 2">
+  <div class="stage">
+    <div class="title-block">
+      <div class="intro" data-enter>
+        <h2 id="schema-heading">A seat sold once</h2>
+        <p>
+          The reservations database I designed for a model airline in Oracle SQL:
+          ten tables, and the rules that keep its data honest written into the
+          schema itself.
+        </p>
+      </div>
+
+      <ol class="captions">
+        <li data-caption="tables">
+          <strong>Ten tables,</strong> at the places I put them in drawDB.
+        </li>
+        <li data-caption="keys">
+          <strong>Thirteen foreign keys</strong> tie a ticket to its booking, its
+          flight and its passenger.
+        </li>
+        {
+          RULES.map((rule) => (
+            <li data-caption={rule.id}>
+              <strong>{rule.title}</strong> {rule.text}
+            </li>
+          ))
+        }
+      </ol>
+
+      <a class="go" href="/software/">All software work</a>
+    </div>
+
+    <p class="sideways">The drawing is wider than the screen; it scrolls sideways.</p>
+
+    <div class="drawing" data-ui tabindex="0" aria-label="The airline schema, scrollable sideways">
+      <svg viewBox={box} role="img" aria-labelledby="schema-title schema-desc">
+        <title id="schema-title">The airline reservations schema</title>
+        <desc id="schema-desc">{description}</desc>
+
+        <g class="relations">
+          {
+            RELATIONS.map((relation) => (
+              <path d={pathOf(relation)} pathLength="1" data-relation={relation.name} />
+            ))
+          }
+        </g>
+
+        {
+          TABLES.map((table) => (
+            <g class="table" data-table={table.id} data-order={arrival.indexOf(table.id)}>
+              <rect class="body" x={table.x} y={table.y} width={TABLE_WIDTH} height={heightOf(table)} />
+              <rect class="head" x={table.x} y={table.y} width={TABLE_WIDTH} height={HEADER} />
+              <text class="name" x={table.x + 16} y={table.y + 30}>
+                {table.id}
+              </text>
+
+              {table.fields.map((field, i) => (
+                <>
+                  <rect
+                    class="mark"
+                    x={table.x}
+                    y={table.y + HEADER + i * ROW}
+                    width={TABLE_WIDTH}
+                    height={ROW}
+                    data-row={`${table.id}.${field.name}`}
+                  />
+                  <text
+                    class:list={['field', field.key?.startsWith('pk') && 'key']}
+                    x={table.x + 16}
+                    y={table.y + HEADER + i * ROW + 23}
+                  >
+                    {field.name}
+                  </text>
+                </>
+              ))}
+
+              {table.more > 0 && (
+                <text class="more" x={table.x + 16} y={table.y + HEADER + table.fields.length * ROW + 23}>
+                  {`+${table.more} more`}
+                </text>
+              )}
+            </g>
+          ))
+        }
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .schema {
+    position: relative;
+    background: var(--field);
+    color: var(--field-ink);
+  }
+
+  .stage {
+    display: grid;
+    gap: var(--space-12);
+    padding: var(--space-24) var(--margin);
+  }
+
+  .title-block {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 40rem;
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .captions {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--field-muted);
+  }
+
+  .captions strong {
+    color: var(--field-ink);
+    font-weight: var(--weight-strong);
+  }
+
+  .go {
+    justify-self: start;
+  }
+
+  .sideways {
+    color: var(--field-muted);
+    font-size: var(--step-small);
+  }
+
+  @media (min-width: 62rem) {
+    .sideways {
+      display: none;
+    }
+  }
+
+  /* On narrow screens the drawing keeps a readable size and scrolls sideways
+     inside its own box, rather than shrinking every label below 13px. */
+  .drawing {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  svg {
+    width: 100%;
+    min-width: 62rem;
+    height: auto;
+    font-family: var(--font);
+  }
+
+  .relations path {
+    fill: none;
+    stroke: var(--field-line);
+    stroke-width: 2.5;
+  }
+
+  .body {
+    fill: var(--field-table);
+  }
+
+  .head {
+    fill: color-mix(in srgb, var(--field-table) 84%, var(--field-ink));
+  }
+
+  .mark {
+    fill: var(--field-ink);
+    opacity: 0;
+  }
+
+  text {
+    fill: var(--field-ink);
+    font-size: 21px;
+  }
+
+  .name {
+    font-size: 22px;
+    font-weight: var(--weight-strong);
+  }
+
+  .key {
+    font-weight: var(--weight-strong);
+  }
+
+  .more {
+    fill: var(--field-muted);
+    font-style: italic;
+  }
+
+  /* ---- Held: the stage pins and the drawing builds as the page scrolls ---- */
+
+  .schema.is-live {
+    height: calc((var(--hold) + 1) * 100svh);
+  }
+
+  .schema.is-live .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    /* The header stays on top, so the drawing starts below it. */
+    padding: calc(4rem + var(--space-6)) var(--margin) var(--space-8);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .schema.is-live .sideways {
+    display: none;
+  }
+
+  .schema.is-live .drawing {
+    grid-area: 1 / 1;
+    overflow: visible;
+    align-self: start;
+  }
+
+  .schema.is-live svg {
+    min-width: 0;
+    max-height: calc(100svh - 4rem - var(--space-16));
+  }
+
+  /* The title block sits in the drawing's own empty corner, bottom right,
+     where a real blueprint keeps its title block. */
+  .schema.is-live .title-block {
+    grid-area: 1 / 1;
+    z-index: 1;
+    align-self: end;
+    justify-self: end;
+    width: min(38rem, 44vw);
+  }
+
+  /* One statement at a time: the captions share one cell and cross over. */
+  .schema.is-live .captions {
+    grid-template-areas: 'caption';
+  }
+
+  .schema.is-live .captions li {
+    grid-area: caption;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--t-ui) ease,
+      transform var(--t-ui) var(--ease-out);
+  }
+
+  .schema.is-live .captions li.is-current {
+    opacity: 1;
+    transform: none;
+  }
+
+  .schema.is-live .table,
+  .schema.is-live .relations path {
+    will-change: transform, opacity;
+  }
+
+  .mark.is-lit {
+    opacity: 0.16;
+  }
+
+  .relations path.is-lit {
+    stroke: var(--field-ink);
+    stroke-width: 4;
+  }
+</style>
+
+<script>
+  import { initSchemaScene } from '../../scripts/schema-scene';
+
+  const root = document.querySelector<HTMLElement>('[data-schema]');
+  if (root) initSchemaScene(root);
+</script>

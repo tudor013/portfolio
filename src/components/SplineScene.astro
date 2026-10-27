@@ -47,8 +47,8 @@ const { poster, alt, title, sceneUrl } = Astro.props;
     {
       sceneUrl && (
         <>
-          {' — '}
-          <a href={sceneUrl}>open in Spline</a>
+          {'. '}
+          <a href={sceneUrl}>Open it in Spline</a>
         </>
       )
     }
@@ -63,10 +63,8 @@ const { poster, alt, title, sceneUrl } = Astro.props;
   .frame {
     position: relative;
     overflow: hidden;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
-    background: var(--surface-raised);
+    border-radius: var(--radius);
+    background: var(--surface);
   }
 
   .poster {
@@ -87,21 +85,23 @@ const { poster, alt, title, sceneUrl } = Astro.props;
        show, and a translucent fill takes its contrast from that image: over
        the dark product scene the label went grey-on-grey. Glass is fine over
        a background this design controls; it is not fine over arbitrary art. */
-    background: var(--glass-fill-opaque);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-lift);
+    background: var(--ground);
+    border: 0;
+    border-radius: var(--radius);
 
-    color: var(--text-primary);
+    color: var(--ink);
     font: inherit;
-    font-size: var(--text-secondary);
-    font-weight: var(--weight-medium);
+    font-size: var(--step-body);
+    font-weight: var(--weight-head);
     cursor: pointer;
-    transition: border-color var(--duration-fast) var(--ease-out);
+    transition:
+      background-color var(--t-hover) ease,
+      color var(--t-hover) ease;
   }
 
   .play:hover {
-    border-color: var(--text-accent);
+    background: var(--ink);
+    color: var(--ground);
   }
 
   /* Swapped in once the scene is requested. */

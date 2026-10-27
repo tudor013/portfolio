@@ -10,6 +10,7 @@ stack:
   - Python
   - NumPy
   - Matplotlib
+kind: 'Neural network'
 problem: >-
   The Mandelbrot set has a boundary of infinite detail, which makes it a hard
   and honest test of what a small network can and cannot learn: a model that

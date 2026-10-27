@@ -11,6 +11,7 @@ stack:
   - Python
   - SciPy
   - turtle
+kind: 'Regression from first principles'
 problem: >-
   TODO(conținut): ce voiai să înțelegi făcând asta — regresia în sine, sau
   cum se desenează un grafic de la zero?

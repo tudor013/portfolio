@@ -1,110 +1,92 @@
 /*
- * Design tokens — direction "Blueprint".
+ * Design tokens — "Blueprint", quiet-instrument build (27.10.2026).
  *
- * Light paper, blueprint ink, and a cool light that tracks the reader down the
- * page. The reference is a drafting table, not a SaaS landing page: Tudor's
- * actual method on Aruna was to draw the interface before anything was built,
- * and the page's one moving element is a feedback loop — it answers the
- * reader's scroll, which is the subject of his degree.
+ * A drafting table: cool paper, one near-black ink, and blueprint blue. The
+ * blue does two jobs and no others: the one primary action on a screen, and
+ * the field of the Software chapter, where the page turns into a blueprint
+ * and Tudor's schema is drawn on it in white.
+ *
+ * Gone from the previous version, at Tudor's request: the liquid glass and the
+ * light that followed the scroll. The page now moves through its content (the
+ * schema assembling, the market running) instead of through a lighting effect.
  *
  * Two layers on purpose:
  *   PRIMITIVES  raw values, named after what they are. Never used in a component.
  *   SEMANTIC    named after the job they do. Components use only these.
  *
- * Every text pair below is measured against the WCAG 2.1 formula. The weakest
- * is muted-on-white at 6.34:1, against a 4.5:1 floor.
+ * Every text pair is measured with the WCAG 2.1 formula; the number is beside
+ * it. The weakest text pair is soft text on a table in the schema, 4.70:1.
  */
 
 :root {
   /* ---- PRIMITIVES ------------------------------------------------------ */
 
-  /* Paper with a cool cast — not pure white, and deliberately not the warm
-     cream that generated pages default to. */
-  --paper-50: #f2f5f9;
-  --paper-0: #ffffff;
-
+  --paper-0: #ffffff; /* only the laminated ID card is truly white */
+  --paper-100: #f3f5f8; /* the ground: cool paper, not white and not cream */
+  --paper-200: #e4e9f0; /* one tone down, for panels */
   --ink-900: #0f1724;
-  --ink-500: #4c5668;
-
-  /* Blueprint blue. The common SaaS blue (#2563EB) measures 4.73 on this
-     paper — AA by a hair, and unusable on any larger area. This one is 7.57. */
+  --ink-600: #4c5668;
   --blue-700: #1549a6;
-  --blue-400: #4b86e8;
+  --blue-800: #123a7e; /* blueprint field */
+  --blue-750: #1c4c9c; /* a table drawn on the field */
+  --chalk-50: #f4f7fc; /* white ink on the blueprint */
+  --chalk-300: #b4c5e4; /* soft white ink on the blueprint */
 
-  /* ---- SEMANTIC: surfaces ---------------------------------------------- */
+  /* ---- SEMANTIC: paper -------------------------------------------------- */
 
-  /* In a light theme a raised surface is lighter than the canvas, and the
-     separation comes from a border plus a soft shadow rather than the
-     lightness step alone — that step is only 1.09:1 on its own. */
-  --surface-canvas: var(--paper-50);
-  --surface-raised: var(--paper-0);
+  --ground: var(--paper-100);
+  --surface: var(--paper-200); /* 1.12:1 step from the ground: a tone, not a line */
+  --ink: var(--ink-900); /* 16.46 ground · 14.73 surface */
+  --muted: var(--ink-600); /*  6.77 ground ·  6.06 surface */
+  --accent: var(--blue-700); /*  7.58 ground ·  6.79 surface */
+  --on-accent: var(--chalk-50); /*  7.71 on the accent */
 
-  /* ---- SEMANTIC: text --------------------------------------------------- */
+  /* A control's boundary has to clear 3:1 (WCAG 1.4.11); this one is 3.55. */
+  --edge-control: color-mix(in srgb, var(--ink-900) 52%, transparent);
+  /* Only for the lines a real table or a definition list carries. The landing
+     page separates things by space and tone, never by a rule. */
+  --edge-subtle: color-mix(in srgb, var(--ink-900) 12%, transparent);
 
-  --text-primary: var(--ink-900); /* 16.44:1 paper · 17.97:1 white */
-  --text-muted: var(--ink-500); /*  6.77:1 paper ·  7.40:1 white */
-  --text-accent: var(--blue-700); /*  7.57:1 paper ·  8.28:1 white */
+  /* ---- SEMANTIC: the blueprint field ------------------------------------ */
 
-  /* ---- SEMANTIC: borders and elevation ---------------------------------- */
+  --field: var(--blue-800);
+  --field-table: var(--blue-750); /* 1.33:1 step: tables read as filled shapes */
+  --field-ink: var(--chalk-50); /* 10.12 field · 7.63 table */
+  --field-muted: var(--chalk-300); /*  6.24 field · 4.70 table */
+  --field-line: rgb(255 255 255 / 0.6); /* relationships: 4.95:1 against the field */
 
-  /* Decorative chrome follows the light-mode guidance (6–12% of foreground);
-     anything bounding an interactive control must clear WCAG 1.4.11's 3:1. */
-  --border-subtle: color-mix(in srgb, var(--ink-900) 12%, transparent); /* 1.28:1 */
-  --border-strong: color-mix(in srgb, var(--ink-900) 52%, transparent); /* 3.66:1 */
+  /* ---- SEMANTIC: the ID badge ------------------------------------------ */
 
-  /* Light-mode shadows stay under 0.08 alpha. Large blur, small offset: a
-     sheet lying on a surface, not a sticker floating above it. */
-  --shadow-soft: 0 1px 2px rgb(15 23 36 / 0.04), 0 4px 16px rgb(15 23 36 / 0.05);
-  --shadow-lift: 0 2px 4px rgb(15 23 36 / 0.05), 0 12px 32px rgb(15 23 36 / 0.07);
-
-  /* ---- SEMANTIC: liquid glass ------------------------------------------ */
-
-  /* Used sparingly — the navigation bar and two panels. Glass is banned as a
-     default by the taste rules precisely because it is usually applied to
-     everything; the exception here is earned by the scroll light, which the
-     glass is there to refract. Each surface needs a border that clears 3:1
-     against whatever shows through, and an opaque fallback. */
-  --glass-fill: rgb(255 255 255 / 0.72);
-  --glass-fill-opaque: #fbfcfe;
-  --glass-blur: saturate(1.6) blur(14px);
-  --glass-border: rgb(15 23 36 / 0.14);
-  /* The hairline of light along a glass panel's top edge. */
-  --glass-sheen: inset 0 1px 0 rgb(255 255 255 / 0.9);
-
-  /* ---- SEMANTIC: the scroll light --------------------------------------- */
-
-  /* Set by scroll-light.ts; the fallback keeps the glow where it sits at the
-     top of the page, so the design is complete before the script runs. */
-  --light-y: 0;
-  --light-strength: 1;
-  --light-tint: 21 73 166;
+  /* The badge is an object, not interface: a white laminated card on a blue
+     strap. It is the one thing that really hangs in front of the page, so it
+     is the one thing allowed to cast a soft dark edge below it. */
+  --badge-card: var(--paper-0); /* ink 17.97 · muted 7.40 */
+  --badge-strap: var(--blue-800);
+  --badge-shadow: 0 2px 4px rgb(15 23 36 / 0.06), 0 18px 40px rgb(15 23 36 / 0.14); /* taste-skill-ignore */
 
   /* ---- SEMANTIC: type --------------------------------------------------- */
 
-  /* Plex survives the palette change on merit: it was chosen for engineering
-     character rather than for the dark theme, and it reads as well on paper. */
-  --family-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --family-mono: var(--font-mono), ui-monospace, monospace;
+  /* One family. Headings are Literata at 500 and a larger size. */
+  --font: var(--font-text), 'Iowan Old Style', Georgia, serif;
 
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
+  --weight-text: 400;
+  --weight-head: 500;
+  --weight-strong: 600;
 
-  /* Minor third (1.2) from a 1rem body. Nothing below 0.75rem. */
-  --text-meta: 0.75rem;
-  --text-secondary: 0.875rem;
-  --text-body: 1rem;
-  --text-h3: 1.2rem;
-  --text-h2: 1.44rem;
-  --text-h1: 1.728rem;
-  --text-display: 2.488rem;
+  /* Five sizes and no more. From the dealt type system; display comes from the
+     composition (5–7vw), capped so a wide monitor does not shout. */
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem); /* 13–14px, captions only */
+  --step-body: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem); /* 17–19px */
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem); /* 20–26px */
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem); /* 32–64px */
+  --step-display: clamp(3rem, 1rem + 5.6vw, 6.25rem); /* 48–100px */
 
-  --leading-tight: 1.2;
-  --leading-body: 1.55;
-  --leading-meta: 1.4;
+  --leading-display: 1.05;
+  --leading-head: 1.1;
+  --leading-text: 1.6;
   --tracking-display: -0.02em;
 
-  /* ---- SEMANTIC: space -------------------------------------------------- */
+  /* ---- SEMANTIC: space and frame ---------------------------------------- */
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -115,16 +97,29 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-24: 6rem;
+  --space-32: 8rem;
 
-  --radius-sm: 3px;
-  --radius-md: 6px;
+  /* One pair of outer margins for every width. */
+  --margin: clamp(1.25rem, 0.6rem + 2.6vw, 3rem);
+  /* Gap between sections: clearly larger than any gap inside one. */
+  --section-gap: clamp(6rem, 3rem + 9vw, 11rem);
+  /* The quiet instrument's column starts about 22% in on a desktop. */
+  --column-start: clamp(0rem, -6rem + 26vw, 20rem);
+  --column: 36rem;
+  --measure: 62ch;
 
-  --measure: 68ch;
-  --page-max: 68rem;
+  /* One corner for the whole page: square. A drafting table has no pills. */
+  --radius: 0;
 
   /* ---- SEMANTIC: motion ------------------------------------------------- */
 
-  --duration-fast: 120ms;
-  --duration-base: 200ms;
-  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  /* From the taste-skill motion study: strong ease-outs, no overshoot. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --t-press: 140ms;
+  --t-hover: 180ms;
+  --t-ui: 240ms;
+  --t-reveal: 800ms;
+  --stagger: 80ms;
 }

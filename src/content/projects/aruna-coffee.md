@@ -13,6 +13,7 @@ stack:
   - Spline
   - Illustrator
   - 'Google OAuth'
+kind: 'Online shop'
 problem: >-
   Specialty coffee in Romania is mostly sold through cafés and a handful of
   roasteries, so buying it at home means knowing where to look. Aruna sells it
@@ -21,6 +22,10 @@ problem: >-
 results: >-
   The business sold over 100 kg of coffee a month through the online shop I
   built.
+cover:
+  src: '../../assets/landing/aruna-4-product.webp'
+  alt: >-
+    The shop's lit product scene: a paper cup beside the line about sugar, on dark brown.
 order: 10
 draft: false
 links: []

@@ -1,0 +1,89 @@
+---
+/**
+ * About, as a short letter in the first person. Every sentence is a fact from
+ * the CV or from what Tudor has said about his work; nothing is a feeling
+ * attributed to him that he did not state.
+ */
+import { Image } from 'astro:assets';
+import portrait from '../../assets/tudor.png';
+---
+
+<section class="letter frame" id="about" aria-labelledby="about-heading">
+  <div class="column" data-enter>
+    <Image src={portrait} alt="Tudor-Andrei Ifrim" width={88} height={88} class="portrait" loading="lazy" />
+
+    <h2 id="about-heading">How I got here</h2>
+
+    <p>
+      Before university I competed in robotics, and came away with three
+      national awards and a top-half placing in an international competition.
+    </p>
+
+    <p>
+      Now I study Economic Informatics in Bucharest. What I build tends to be a
+      system with moving parts: a market of agents, an airline’s bookings, a
+      shop that has to take an order and a payment. I like working out how they
+      behave, then making something people can actually use.
+    </p>
+
+    <p>
+      In 2025 I co-founded Aruna Coffee. I designed the brand, drew the shop in
+      Illustrator before it existed, and directed its build from those drawings,
+      with Supabase behind it. The business sells over 100 kg of coffee a month
+      through it.
+    </p>
+
+    <p>
+      This summer I worked at Soft Tehnica as a junior programmer, alongside
+      senior developers, on AI work in Python. Since July I have led the UI/UX
+      division of SiSC, the Cybernetics students’ union, where I set up how the
+      division works and started rebuilding its websites.
+    </p>
+
+    <p class="sign">
+      <span class="signature">Tudor-Andrei Ifrim</span>
+      <span class="role">Software developer, Bucharest</span>
+    </p>
+  </div>
+</section>
+
+<style>
+  .letter {
+    padding-block: var(--section-gap) 0;
+  }
+
+  .column {
+    display: grid;
+    gap: var(--space-6);
+    width: min(100%, 34rem);
+    margin-inline: auto;
+  }
+
+  .portrait {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  h2 {
+    font-size: var(--step-lead);
+    letter-spacing: 0;
+  }
+
+  .sign {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-4);
+  }
+
+  .signature {
+    font-size: var(--step-lead);
+    font-style: italic;
+  }
+
+  .role {
+    color: var(--muted);
+    font-size: var(--step-small);
+  }
+</style>

@@ -22,3 +22,10 @@ raw/
 
 # Wrangler local state
 .wrangler/
+
+# Local pre-redesign snapshots; git tags carry the same state remotely.
+backup/
+
+# Inspector screenshots are regenerated on every run; the direction sheet and
+# the written critique next to them are kept.
+.taste-skill/inspect/

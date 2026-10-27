@@ -7,6 +7,7 @@ role: >-
   Soft Tehnica.
 stack:
   - 'TODO(conținut): ce ai folosit'
+kind: 'Proof of concept'
 problem: >-
   TODO(conținut): ce trebuia să demonstreze demo-ul și cui.
 results: >-

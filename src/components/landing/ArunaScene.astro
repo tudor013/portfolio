@@ -1,0 +1,207 @@
+---
+/**
+ * Chapter three, Design: four stills from the Spline scenes Tudor made for
+ * Aruna Coffee, crossfading as the page scrolls, each pushing in slowly while
+ * it is on screen. This is the page's signature move: the picture changes as
+ * its part of the story arrives.
+ *
+ * Without the held scene (no script, reduced motion, narrow screens) the four
+ * stills sit in a grid with their captions: the same content, finished.
+ */
+import { Image } from 'astro:assets';
+import wordmark from '../../assets/landing/aruna-1-wordmark.webp';
+import swan from '../../assets/landing/aruna-3-swan.webp';
+import cup from '../../assets/landing/aruna-2-cup.webp';
+import product from '../../assets/landing/aruna-4-product.webp';
+
+const FRAMES = [
+  {
+    src: wordmark,
+    alt: 'The Aruna Coffee wordmark above a small black cup with a cream sleeve, on a white ground.',
+    caption: 'The wordmark and the cup.',
+  },
+  {
+    src: swan,
+    alt: 'The cup seen up close: its cream sleeve carries a black swan in a white oval.',
+    caption: 'The swan mark, up close.',
+  },
+  {
+    src: cup,
+    alt: 'The cup lying on its side under the line “Cu sau fără zahăr? Indiferent de alegere, Aruna Coffee asigură începutul unei dimineți de care ai nevoie”.',
+    caption: 'The cup turned on its side, under the line it carries.',
+  },
+  {
+    src: product,
+    alt: 'A paper cup lit from one side on a dark brown ground, beside the line “Cu sau fără zahăr? Indiferent de alegere, gustul autentic rămâne același.”',
+    caption: 'The lit scene the shop’s copy sits on.',
+  },
+];
+---
+
+<section class="aruna" id="aruna" aria-labelledby="aruna-heading" data-aruna style="--hold: 2">
+  <div class="stage">
+    <div class="text">
+      <div class="copy" data-enter>
+        <h2 id="aruna-heading">Drawn before it was built</h2>
+        <p>
+          I designed Aruna Coffee’s brand and drew its interface in Illustrator
+          before any of it was built. The moving scenes behind the shop are my
+          Spline work; the shop’s controls sit on top of them, in code.
+        </p>
+        <p class="result">
+          The business sells over 100 kg of coffee a month through the shop.
+        </p>
+      </div>
+      <a class="go" href="/design/">All design work</a>
+    </div>
+
+    <ol class="frames">
+      {
+        FRAMES.map((frame, i) => (
+          <li data-frame={i}>
+            <figure>
+              <div class="picture">
+                <Image
+                  src={frame.src}
+                  alt={frame.alt}
+                  widths={[560, 900, 1300]}
+                  sizes="(min-width: 75rem) 62vw, (min-width: 40rem) 45vw, 92vw"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <figcaption>{frame.caption}</figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .aruna {
+    padding-top: var(--section-gap);
+  }
+
+  .stage {
+    display: grid;
+    gap: var(--space-12);
+    padding-inline: var(--margin);
+  }
+
+  .text {
+    display: grid;
+    align-content: start;
+    gap: var(--space-8);
+    padding-left: var(--column-start);
+  }
+
+  .copy {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .result {
+    font-weight: var(--weight-strong);
+  }
+
+  .go {
+    justify-self: start;
+  }
+
+  /* Finished composition: two by two, captions under the pictures. */
+  .frames {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8) var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  figure {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .picture {
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--surface);
+  }
+
+  .picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  figcaption {
+    color: var(--muted);
+    font-size: var(--step-small);
+  }
+
+  @media (max-width: 40rem) {
+    .text {
+      padding-left: 0;
+    }
+
+    .frames {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---- Held: one picture at a time, changing as the page scrolls -------- */
+
+  .aruna.is-live {
+    height: calc((var(--hold) + 1) * 100svh);
+    padding-top: 0;
+  }
+
+  .aruna.is-live .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 7fr);
+    align-items: center;
+    padding-block: calc(4rem + var(--space-8)) var(--space-8);
+  }
+
+  /* The heading needs the width to stay on two lines; the picture gives it. */
+  .aruna.is-live .text {
+    padding-left: 0;
+    max-width: 34rem;
+  }
+
+  .aruna.is-live .frames {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'frame';
+    /* As large as the screen allows, and never taller than it. */
+    width: min(100%, calc((100svh - 4rem - var(--space-24)) * 4 / 3));
+    justify-self: end;
+  }
+
+  .aruna.is-live li {
+    grid-area: frame;
+    opacity: 0;
+    will-change: opacity;
+  }
+
+  .aruna.is-live li:first-child {
+    opacity: 1;
+  }
+
+  .aruna.is-live .picture img {
+    will-change: transform;
+  }
+</style>
+
+<script>
+  import { initArunaScene } from '../../scripts/aruna-scene';
+
+  const root = document.querySelector<HTMLElement>('[data-aruna]');
+  if (root) initArunaScene(root);
+</script>

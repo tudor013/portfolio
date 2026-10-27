@@ -1,0 +1,207 @@
+---
+/**
+ * Every project, as a quiet ledger grouped by direction: name, kind of work,
+ * year. Hovering or focusing a row keeps it in the ink, lets the others fall
+ * back, and shows a still of the work (or what problem it took on) in the
+ * empty space to the right. Pure CSS; nothing here needs a script.
+ */
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { CATEGORIES, CATEGORY_LABELS, CATEGORY_SLUGS } from '../../content.config';
+
+// Drafts are excluded at build time so an unfinished case study cannot ship.
+const published = (await getCollection('projects')).filter((p) => !p.data.draft);
+
+const groups = CATEGORIES.map((category) => ({
+  category,
+  href: `/${CATEGORY_SLUGS[category]}/`,
+  label: CATEGORY_LABELS[category],
+  projects: published
+    .filter((p) => p.data.category === category)
+    .sort((a, b) => a.data.order - b.data.order || b.data.year - a.data.year),
+}));
+---
+
+<section class="ledger frame" id="work" aria-labelledby="work-heading">
+  <div class="column">
+    <h2 id="work-heading">All the work</h2>
+
+    {
+      groups.map((group) => (
+        <div class="group" data-enter>
+          <h3>
+            <a href={group.href}>{group.label}</a>
+          </h3>
+
+          <ul data-enter>
+            {group.projects.map((project) => (
+              <li class="row">
+                <a class="name" href={`/projects/${project.id}/`}>
+                  {project.data.title}
+                </a>
+                <span class="kind">{project.data.kind}</span>
+                <span class="year figures">{project.data.year}</span>
+
+                <div class="preview" aria-hidden="true">
+                  {project.data.cover ? (
+                    <Image
+                      src={project.data.cover.src}
+                      alt=""
+                      width={600}
+                      height={450}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <p>{project.data.problem}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .ledger {
+    padding-block: var(--section-gap) 0;
+  }
+
+  .column {
+    display: grid;
+    gap: var(--space-12);
+    width: min(40rem, 100% - var(--column-start));
+    margin-left: var(--column-start);
+  }
+
+  .group {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  h3 a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Three fixed starts make the columns; no line is drawn between rows. */
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 55% 1fr auto;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 48px;
+    transition: color var(--t-hover) ease;
+  }
+
+  .name {
+    text-decoration: none;
+  }
+
+  /* The whole row is the link's target. */
+  .name::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .kind,
+  .year {
+    color: var(--muted);
+    font-size: var(--step-small);
+  }
+
+  /* Hover or focus one row: the others fall back to the soft ink. */
+  ul:has(.row:hover, .row:focus-within) .row:not(:hover, :focus-within) {
+    color: var(--muted);
+  }
+
+  .row:hover .name,
+  .row:focus-within .name {
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+
+  /* The preview hangs in the empty space right of the column, its top level
+     with the row. */
+  .preview {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--space-16));
+    width: 20rem;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition:
+      opacity 150ms ease,
+      transform var(--t-ui) var(--ease-out);
+  }
+
+  .row:hover .preview,
+  .row:focus-within .preview,
+  .column:not(:has(.row:hover, .row:focus-within)) .row:first-child .preview {
+    opacity: 1;
+    transform: none;
+  }
+
+  .preview img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .preview p {
+    color: var(--ink);
+    font-size: var(--step-body);
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* No room for the preview: it stays out, and the row says it all. */
+  @media (max-width: 75rem) {
+    .preview {
+      display: none;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .column {
+      width: 100%;
+      margin-left: 0;
+    }
+
+    .row {
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'name year'
+        'kind kind';
+      gap: 0 var(--space-4);
+      min-height: 56px;
+      padding-block: var(--space-2);
+    }
+
+    .name { grid-area: name; }
+    .kind { grid-area: kind; }
+    .year { grid-area: year; }
+  }
+</style>

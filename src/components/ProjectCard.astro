@@ -27,26 +27,22 @@ const { title, year, role, stack, results } = project.data;
 </li>
 
 <style>
-  /* An L1 panel: subtle border first, edge highlight second, no outer glow. */
+  /* A filled surface, one tone off the ground: no line, no shadow. */
   .card {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     padding: var(--space-6);
-    background: var(--surface-raised);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
+    background: var(--surface);
+    border-radius: var(--radius);
     transition:
-      border-color var(--duration-base) var(--ease-out),
-      box-shadow var(--duration-base) var(--ease-out),
-      transform var(--duration-base) var(--ease-out);
+      background-color var(--t-hover) ease,
+      transform var(--t-ui) var(--ease-out);
   }
 
   .card:hover,
   .card:focus-within {
-    border-color: var(--border-strong);
-    box-shadow: var(--shadow-lift);
+    background: color-mix(in srgb, var(--surface) 70%, var(--ground));
     transform: translateY(-2px);
   }
 
@@ -59,16 +55,16 @@ const { title, year, role, stack, results } = project.data;
 
   h3 {
     margin: 0;
-    font-size: var(--text-h3);
+    font-size: var(--step-lead);
   }
 
   h3 a {
-    color: var(--text-primary);
+    color: var(--ink);
     text-decoration: none;
   }
 
   .card:hover h3 a {
-    color: var(--text-accent);
+    color: var(--accent);
   }
 
   /* The outcome leads, because it is the thing an employer is scanning for. */
@@ -90,7 +86,6 @@ const { title, year, role, stack, results } = project.data;
     justify-content: space-between;
     margin-top: auto;
     padding-top: var(--space-4);
-    border-top: 1px solid var(--border-subtle);
   }
 
   .stack {

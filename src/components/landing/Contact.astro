@@ -1,0 +1,104 @@
+---
+/**
+ * The close: what kind of work he is open to, and the two ways to reach him.
+ * Email and LinkedIn only; the phone number stays off the site (CLAUDE.md).
+ */
+---
+
+<section class="contact frame" id="contact" aria-labelledby="contact-heading">
+  <p class="statement" data-enter>
+    <span>
+      An internship, part-time work alongside my degree or a junior role: I can
+      start now.
+    </span>
+  </p>
+
+  <div class="reach" data-enter>
+    <h2 id="contact-heading">Have a role in mind?</h2>
+    <ul>
+      <li><a href="mailto:tudorifrim606@gmail.com">tudorifrim606@gmail.com</a></li>
+      <li><a href="https://www.linkedin.com/in/tudor-ifrim-697b0b26a/">LinkedIn</a></li>
+    </ul>
+    <p class="place">Bucharest, Romania. English and Romanian.</p>
+  </div>
+</section>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--space-8);
+    padding-block: var(--section-gap);
+  }
+
+  .statement {
+    grid-column: 1 / span 6;
+    padding-left: var(--column-start);
+    max-width: none;
+  }
+
+  .statement span {
+    display: block;
+    max-width: 22ch;
+    font-size: var(--step-lead);
+    font-weight: var(--weight-head);
+    line-height: 1.3;
+  }
+
+  .reach {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  h2 {
+    font-size: var(--step-lead);
+    letter-spacing: 0;
+  }
+
+  ul {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  ul a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--step-lead);
+    overflow-wrap: anywhere;
+  }
+
+  .place {
+    color: var(--muted);
+    font-size: var(--step-small);
+  }
+
+  /* Narrower: the two halves meet in the middle instead of hugging the
+     left edge. */
+  @media (max-width: 60rem) {
+    .statement {
+      grid-column: 1 / span 7;
+      padding-left: 0;
+    }
+
+    .reach {
+      grid-column: 8 / span 5;
+    }
+  }
+
+  /* Twelve columns' worth of gaps is wider than a small phone. */
+  @media (max-width: 40rem) {
+    .contact {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .statement,
+    .reach {
+      grid-column: auto;
+    }
+  }
+</style>

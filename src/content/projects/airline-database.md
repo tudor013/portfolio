@@ -10,12 +10,17 @@ role: >-
 stack:
   - 'Oracle SQL'
   - drawDB
+kind: 'Schema design'
 problem: >-
   An airline's data is a web of constraints that a table layout alone does not
   enforce: a seat cannot be sold twice on the same flight, a passenger cannot
   hold two tickets for it, and an employee reports to another employee.
 results: >-
   TODO(conținut): nota primită, sau ce a mers/nu a mers la verificare.
+cover:
+  src: '../../assets/landing/airline-schema.webp'
+  alt: >-
+    Part of the airline schema in white on blueprint blue: models, aircraft, airports, routes, flights, employees and crew, joined by their foreign keys.
 order: 30
 draft: false
 links: []

@@ -777,3 +777,143 @@ header și nume.
 Marginea negativă a badge-ului și padding-ul de sus al hero-ului vin acum
 dintr-**o singură variabilă** (`--hero-top`). Dacă ar fi scrise separat, o
 schimbare a uneia ar face banda să înceapă în aer.
+
+## Faza 11 — Landing-ul refăcut de la zero (27.10.2026)
+
+Ai cerut patru lucruri: să folosesc cele patru skill-uri, stilul Blueprint, animații legate de
+scroll și o pagină fără secțiuni generice. Mai jos e ce s-a schimbat, fișier cu fișier, și de ce.
+
+### Cum s-a ales direcția
+
+1. **taste-skill** a „împărțit" o direcție din biblioteca lui de site-uri premiate: *The quiet
+   instrument* (instrumentul liniștit). Pe scurt: puține lucruri pe ecran, dar cele mari sunt
+   mari, mult spațiu gol compus intenționat, un singur font (Literata). Foaia completă e în
+   `.taste-skill/direction.json`; o poți reafișa cu `node <skill>/scripts/draw.mjs --show`.
+2. **ui-ux-pro-max** a propus un sistem de design întreg. Am păstrat doar tiparul de pagină,
+   „Scroll-Triggered Storytelling" (capitole care se citesc și fără efecte). Restul (stil
+   brutalist, fonturile Caveat/Quicksand, albastrul `#2563EB`) l-am respins, cu motivul scris.
+3. **awesome-design-claude** a dat principiile de culoare: fundal care nu e alb pur, cerneală
+   aproape neagră, un singur accent folosit rar, ierarhie din tipografie, fără umbre.
+4. **design-motion-principles** a dat ponderea pentru mișcare: Jakub (intrări fine: opacitate,
+   o mică ridicare, puțin blur), Jhey (scene legate de scroll), Emil (tot ce e sub mână:
+   rapid, 140–240 ms).
+
+Răspunsurile tale au decis restul: fără liquid glass, fără lumina care urmărea scroll-ul,
+gradientele permise (dar nu a fost nevoie de niciunul).
+
+**Ideea paginii, într-o propoziție:** modelele și desenele tale devin scene care rulează pe
+măsură ce dai scroll. Un alt student de la CSIE nu are schema asta, brandul ăsta sau modelul
+ăsta, deci ideea nu se poate muta pe portofoliul altcuiva.
+
+### Ordinea paginii (e un argument, nu o listă)
+
+| Secțiune | Fișier | Ce spune |
+|---|---|---|
+| Hero | `components/landing/Hero.astro` | cine ești, ce faci, cum acționez; badge-ul în dreapta |
+| Schema | `components/landing/SchemaScene.astro` | dovada imediat: baza de date a companiei aeriene |
+| Intro | `components/landing/Intro.astro` | varianta scurtă: cine, ce, unde, cum te contactez |
+| Piața | `components/landing/MarketScene.astro` | lucrul „viu": modelul tău NetLogo, cu slider-ele tale |
+| Aruna | `components/landing/ArunaScene.astro` | designul: cadrele tale din Spline, una după alta |
+| Ledger | `components/landing/Ledger.astro` | toate proiectele, grupate pe direcții |
+| Scrisoare | `components/landing/Letter.astro` | omul din spatele proiectelor |
+| Contact | `components/landing/Contact.astro` | ce cauți și cum ajunge cineva la tine |
+
+`pages/index.astro` doar le pune în ordinea asta. Header-ul și footer-ul sunt acum în
+`layouts/BaseLayout.astro`, ca să apară identic pe toate paginile fără să le importe fiecare.
+
+### Cum funcționează scenele de scroll
+
+Fișierul central e `scripts/scenes.ts`. E singurul loc din pagină care citește poziția
+scroll-ului. Pentru fiecare scenă calculează un număr între 0 și 1 („cât din scenă s-a
+parcurs") și îl dă unei funcții care desenează starea potrivită.
+
+O scenă „ținută" e o secțiune înaltă de 3 ecrane, cu o „scenă" (stage) de un ecran care rămâne
+lipită de ecran (`position: sticky`) cât timp pagina trece pe lângă ea. Pagina se derulează
+normal: nu blocăm rotița, nu „furăm" scroll-ul, iar bara de scroll spune mereu adevărul.
+Dacă dai scroll înapoi, scena rulează invers fără niciun cod în plus, pentru că desenul
+depinde doar de poziție.
+
+- **Schema** (`scripts/schema-scene.ts`): tabelele apar în ordinea de sus în jos, la pozițiile
+  tale din drawDB (`data/airline-schema.ts`, transcrise din fișierul tău JSON). Apoi cele 13
+  chei străine se desenează (linia are `pathLength="1"`, deci „cât e desenat" e un singur
+  număr). Apoi trei reguli, pe rând, cu rândurile lor luminate: `uq_d2026_bilet_loc_zbor`,
+  `uq_d2026_bilet_pas_zbor` și `fk_d2026_ang_manager`. Toate trei sunt în fișierul tău.
+- **Aruna** (`scripts/aruna-scene.ts`): patru cadre reale din scenele tale Spline, decupate fără
+  rama editorului (`assets/landing/aruna-*.webp`). Fiecare intră peste cel dinainte și se
+  apropie lent cu 6% cât stă pe ecran. Legendele se schimbă la jumătatea tranziției, ca să nu
+  se suprapună două texte.
+
+**De ce nu GSAP**, deși e în stack-ul din CLAUDE.md: fiecare scenă de aici înseamnă câteva
+numere transformate în câteva stiluri. O funcție simplă e mai scurtă decât o cronologie GSAP,
+nu adaugă nicio librărie și se poate citi de sus în jos. Dacă vom face vreodată video
+scrubbing pe secvențe de cadre, GSAP rămâne opțiunea.
+
+### Simularea pieței
+
+`scripts/market-model.ts` e modelul tău NetLogo, regulă cu regulă. Nu l-am „reparat": traderii
+tehnici chiar cumpără sau vând pe baza unei monede aruncate, pentru că asta spune modelul.
+Generatorul de numere aleatoare are seed (mulberry32), deci aceeași rulare se poate derula
+înainte și înapoi cu scroll-ul. Numerele nu vor fi identice cu ale tale din NetLogo, pentru că
+NetLogo are alt generator. Regulile sunt aceleași, știrile diferă.
+
+`scripts/market-scene.ts` desenează pe `<canvas>`. Ziua curentă depinde de cât din panou e pe
+ecran: ziua 0 când marginea de sus intră, ziua 500 când tot panoul e vizibil. Slider-ele
+recalculează rularea pe loc. Butonul „Run with new news" schimbă seed-ul (alte știri) și redă
+rularea în 3,2 secunde, pentru cine preferă să privească decât să dea scroll.
+
+De ce prețul arată ca o bandă: cei 350 de fundamentaliști sunt identici, deci toți cumpără sau
+toți vând în aceeași zi, iar prețul sare cu circa 17 puncte. Asta e comportamentul modelului.
+De aceea prețul e desenat subțire, iar valoarea fundamentală groasă, deasupra.
+
+Fără JavaScript, panoul arată o imagine fixă a aceleiași rulări, calculată la build cu
+același cod (SVG-ul din `MarketScene.astro`). Controalele nu apar, pentru că niște controale
+care nu fac nimic ar fi o minciună.
+
+### Intrările secțiunilor
+
+`scripts/enter.ts` și blocul „Entrances" din `styles/global.css`. Elementele dintr-un
+`[data-enter]` apar pe rând: titlul, apoi textul, apoi imaginea, la 80 ms unul de altul.
+Regula importantă: **nimic nu e ascuns înainte ca scriptul să pornească.** Ascunderea depinde
+de clasa `enter-ready`, pe care o pune chiar scriptul. Dacă JavaScript e oprit sau scriptul
+se strică, pagina e doar statică, nu goală. Ce e deja pe ecran la încărcare nu dispare și
+reapare.
+
+Hero-ul are propria secvență de încărcare, doar în CSS (`@keyframes rise`). Rulează din primul
+cadru și nu așteaptă niciun script.
+
+### Badge-ul
+
+Fizica e aceeași din fazele 10–10c. S-a schimbat doar aspectul: card alb, curea albastru
+blueprint, textul în Literata, fără monospace. Cutia transparentă a badge-ului are acum
+`pointer-events: none`, ca să nu acopere numele de alături. Doar cardul se poate apuca.
+
+Pe tabletă badge-ul rămâne lângă text și atârnă tot de sub header. Pe telefon nu e loc
+lângă text, deci primește o bandă proprie sub el și atârnă de marginea ei de sus, nu din aer.
+
+### Tokenii (`styles/tokens.css`)
+
+Rescriși de la zero. Un singur font, cinci mărimi de text, culori cu raportul de contrast
+scris lângă fiecare. Perechea cea mai slabă e textul alb-palid pe un tabel din schemă, la
+4,70:1. Pragul AA e 4,5. Paginile interioare (`/software/`, `/projects/...`) folosesc aceiași
+tokeni: au primit fontul și culorile noi, fără linii și umbre, dar nu au fost redesenate.
+
+### Cum am verificat
+
+- `taste-skill lint`: 0 FAIL, 0 WARN pe tot `src/`.
+- `taste-skill inspect` în Chromium real, la 1440, 768 și 390: 0 FAIL, 3 avertismente
+  justificate în `.taste-skill/critique.md`: niciun video, titlul schemei stă în colțul
+  desenului, o scenă ținută are 3 ecrane.
+- Script propriu, la 1440×900, 1366×768, 390×844 și 360×740, pe 7 rute: zero scroll
+  orizontal, consolă curată, toate țintele de 44px. Excepția e linkul „Open it in Spline",
+  inline într-o legendă (WCAG 2.5.8).
+- Fără JavaScript: toate titlurile și tot textul sunt vizibile.
+- Din tastatură: ordinea Tab e logică, iar fiecare oprire are inel de focus.
+- Mișcare redusă: fiecare scenă își arată compoziția finală, iar badge-ul tot se poate trage.
+
+### Ce rămâne de făcut de tine
+
+- **Scrisoarea** („How I got here") e asamblată numai din fapte din CV și din ce mi-ai spus.
+  Citește-o: e la persoana întâi, deci trebuie să sune a tine.
+- `TODO(conținut)` din proiecte se văd în continuare pe paginile proiectelor.
+- Un CV descărcabil **fără număr de telefon** în `public/cv/`, dacă vrei buton de CV.
+- O imagine `og:image` de 1200×630 pentru preview-ul pe LinkedIn.

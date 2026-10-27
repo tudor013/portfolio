@@ -15,6 +15,13 @@ export const CATEGORY_LABELS: Record<(typeof CATEGORIES)[number], string> = {
   data: 'Data Science',
 };
 
+/** Short names for navigation, where the full heading would crowd the bar. */
+export const CATEGORY_SHORT: Record<(typeof CATEGORIES)[number], string> = {
+  dev: 'Software',
+  design: 'Design',
+  data: 'Data',
+};
+
 /** The URL segment each category lives at, kept here so links cannot drift. */
 export const CATEGORY_SLUGS: Record<(typeof CATEGORIES)[number], string> = {
   dev: 'software',
@@ -46,15 +53,19 @@ const projects = defineCollection({
     role: z.string(),
     stack: z.array(z.string()).min(1),
 
+    /** The kind of work in a few words, for the ledger on the landing page. */
+    kind: z.string(),
+
     /** The problem, in one or two sentences. */
     problem: z.string(),
 
     /** A concrete outcome: a number, a decision it drove, feedback received. */
     results: z.string(),
 
+    /** A still of the work itself, shown beside its row in the ledger. */
     cover: z
       .object({
-        src: z.string(),
+        src: image(),
         alt: z.string(),
       })
       .optional(),

@@ -1,23 +1,68 @@
 ---
+// A single quiet line: what this is, where to go, the year. The page above has
+// already made its invitation, so the footer does not repeat it.
+import { CATEGORIES, CATEGORY_SHORT, CATEGORY_SLUGS } from '../content.config';
+
 const year = new Date().getFullYear();
 ---
 
-<footer class="foot">
-  <p class="meta">
-    <span class="figure">{year}</span> Tudor-Andrei Ifrim. Built with Astro.{' '}
-    <a href="https://github.com/tudor013/portfolio">Source on GitHub</a>.
-  </p>
+<footer class="foot frame">
+  <p class="what">Tudor-Andrei Ifrim, software developer in Bucharest</p>
+
+  <ul class="links">
+    {
+      CATEGORIES.map((category) => (
+        <li>
+          <a href={`/${CATEGORY_SLUGS[category]}/`}>{CATEGORY_SHORT[category]}</a>
+        </li>
+      ))
+    }
+    <li><a href="https://www.linkedin.com/in/tudor-ifrim-697b0b26a/">LinkedIn</a></li>
+    <li><a href="https://github.com/tudor013/portfolio">Source</a></li>
+  </ul>
+
+  <p class="year figures">{year}</p>
 </footer>
 
 <style>
   .foot {
-    margin-top: var(--space-24);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--border-subtle);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-2) var(--space-6);
+    padding-block: var(--space-6);
+    font-size: var(--step-small);
+    color: var(--muted);
   }
 
-  p {
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-6);
     margin: 0;
-    max-width: none;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink);
+  }
+
+  .year {
+    justify-self: end;
+  }
+
+  @media (max-width: 48rem) {
+    .foot {
+      grid-template-columns: 1fr;
+      justify-items: start;
+    }
+
+    .year {
+      justify-self: start;
+    }
   }
 </style>

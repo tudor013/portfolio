@@ -18,15 +18,14 @@ const FONT_DIR = './src/assets/fonts';
  * array literal widens away from.
  *
  * @param {400 | 500 | 600} weight
+ * @param {'normal' | 'italic'} style
  * @param {'latin' | 'latin-ext'} subset
  * @param {string} range
  */
-const sansVariant = (weight, subset, range) => ({
+const literata = (weight, style, subset, range) => ({
   weight,
-  style: /** @type {const} */ ('normal'),
-  src: /** @type {[string]} */ ([
-    `${FONT_DIR}/ibm-plex-sans-${subset}-${weight}-normal.woff2`,
-  ]),
+  style,
+  src: /** @type {[string]} */ ([`${FONT_DIR}/literata-${subset}-${weight}-${style}.woff2`]),
   unicodeRange: /** @type {[string]} */ ([range]),
 });
 
@@ -46,42 +45,23 @@ export default defineConfig({
   // cross-origin request, which keeps the Performance budget intact.
   fonts: [
     {
+      // One family for the whole site. Literata is a reading serif with a
+      // large x-height: headings are the same face at 500 and a larger size,
+      // so the page needs no second typeface to have a hierarchy.
       provider: fontProviders.local(),
-      name: 'IBM Plex Sans',
-      cssVariable: '--font-sans',
+      name: 'Literata',
+      cssVariable: '--font-text',
       options: {
         variants: [
-          sansVariant(400, 'latin', LATIN),
-          sansVariant(400, 'latin-ext', LATIN_EXT),
-          sansVariant(500, 'latin', LATIN),
-          sansVariant(500, 'latin-ext', LATIN_EXT),
-          sansVariant(600, 'latin', LATIN),
-          sansVariant(600, 'latin-ext', LATIN_EXT),
-        ],
-      },
-    },
-    {
-      provider: fontProviders.local(),
-      name: 'IBM Plex Mono',
-      cssVariable: '--font-mono',
-      options: {
-        variants: [
-          {
-            weight: /** @type {const} */ (400),
-            style: /** @type {const} */ ('normal'),
-            src: /** @type {[string]} */ ([
-              `${FONT_DIR}/ibm-plex-mono-latin-400-normal.woff2`,
-            ]),
-            unicodeRange: /** @type {[string]} */ ([LATIN]),
-          },
-          {
-            weight: /** @type {const} */ (400),
-            style: /** @type {const} */ ('normal'),
-            src: /** @type {[string]} */ ([
-              `${FONT_DIR}/ibm-plex-mono-latin-ext-400-normal.woff2`,
-            ]),
-            unicodeRange: /** @type {[string]} */ ([LATIN_EXT]),
-          },
+          literata(400, 'normal', 'latin', LATIN),
+          literata(400, 'normal', 'latin-ext', LATIN_EXT),
+          literata(500, 'normal', 'latin', LATIN),
+          literata(500, 'normal', 'latin-ext', LATIN_EXT),
+          literata(600, 'normal', 'latin', LATIN),
+          literata(600, 'normal', 'latin-ext', LATIN_EXT),
+          // Only the signature under the letter is italic.
+          literata(400, 'italic', 'latin', LATIN),
+          literata(400, 'italic', 'latin-ext', LATIN_EXT),
         ],
       },
     },

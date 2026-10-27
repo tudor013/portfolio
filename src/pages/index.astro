@@ -1,84 +1,34 @@
 ---
-import { getCollection } from 'astro:content';
-import {
-  CATEGORIES,
-  CATEGORY_LABELS,
-  CATEGORY_SLUGS,
-  CATEGORY_BLURBS,
-} from '../content.config';
+/**
+ * The landing page, rebuilt 27.10.2026 on the "quiet instrument" direction.
+ *
+ * The idea: Tudor's own models and drawings become scenes that run as you
+ * scroll. The order is an argument — who he is, then proof straight away
+ * (the schema), the short version, more proof (the market, the brand), every
+ * project, the person, and how to reach him.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
-import Hero from '../components/Hero.astro';
-import Profile from '../components/Profile.astro';
-import Skills from '../components/Skills.astro';
-import DirectionCard from '../components/DirectionCard.astro';
-import Experience from '../components/Experience.astro';
-import ContactCta from '../components/ContactCta.astro';
-import SiteFooter from '../components/SiteFooter.astro';
-
-// Drafts are excluded at build time so an unfinished case study cannot ship.
-const published = (await getCollection('projects')).filter((p) => !p.data.draft);
-
-// The landing page points at the three directions rather than listing every
-// project: the page's job is to say who Tudor is, and the depth lives one
-// click away on a page dedicated to each.
-const directions = CATEGORIES.map((category) => ({
-  href: `/${CATEGORY_SLUGS[category]}/`,
-  label: CATEGORY_LABELS[category],
-  blurb: CATEGORY_BLURBS[category],
-  count: published.filter((p) => p.data.category === category).length,
-}));
+import Hero from '../components/landing/Hero.astro';
+import SchemaScene from '../components/landing/SchemaScene.astro';
+import Intro from '../components/landing/Intro.astro';
+import MarketScene from '../components/landing/MarketScene.astro';
+import ArunaScene from '../components/landing/ArunaScene.astro';
+import Ledger from '../components/landing/Ledger.astro';
+import Letter from '../components/landing/Letter.astro';
+import Contact from '../components/landing/Contact.astro';
 ---
 
 <BaseLayout
   title="Tudor-Andrei Ifrim — Software Developer"
   description="Software developer in Bucharest. I build software people enjoy using, for problems they actually have."
+  layout="full"
 >
-  <SiteHeader />
   <Hero />
-
-  <Profile />
-
-  <section id="work" aria-labelledby="work-heading">
-    <div class="head">
-      <h2 id="work-heading">Work</h2>
-    </div>
-
-    <ul class="directions">
-      {directions.map((direction) => <DirectionCard {...direction} />)}
-    </ul>
-  </section>
-
-  <Skills />
-  <Experience />
-
-  <div id="contact">
-    <ContactCta />
-  </div>
-
-  <SiteFooter />
+  <SchemaScene />
+  <Intro />
+  <MarketScene />
+  <ArunaScene />
+  <Ledger />
+  <Letter />
+  <Contact />
 </BaseLayout>
-
-<style>
-  section[id='work'] {
-    padding-block: var(--space-12);
-  }
-
-  .head {
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--border-subtle);
-  }
-
-  h2 {
-    margin: 0;
-  }
-
-  .directions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: var(--space-4);
-    margin: var(--space-8) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-</style>

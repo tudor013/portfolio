@@ -1,0 +1,175 @@
+---
+/**
+ * The first screen: who this is, what he does, and how to act on it, with the
+ * ID badge hanging on the right as the screen's one physical object. The
+ * blueprint field of the next chapter peeks in along the bottom edge.
+ *
+ * The load sequence is CSS only, so it runs from the first frame and never
+ * waits on a script: the name rises, then the sentence, then the actions.
+ */
+import IdBadge from '../IdBadge.astro';
+---
+
+<section class="hero frame" aria-labelledby="hero-heading">
+  <div class="column">
+    <h1 id="hero-heading"><span class="keep">Tudor-Andrei</span> Ifrim</h1>
+
+    <p class="sentence">
+      Software developer in Bucharest. I build software people enjoy using, for
+      problems they actually have.
+    </p>
+
+    <p class="actions">
+      <a class="button" href="#work">See the work</a>
+      <a class="go" href="#contact">Get in touch</a>
+    </p>
+
+    <p class="status">
+      Open to an internship, a part-time role or a junior position, and
+      available now. Studying Economic Informatics, graduating in 2028.
+    </p>
+  </div>
+
+  <div class="badge-slot">
+    <IdBadge />
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-8);
+    /* One screen, less the header and the strip of blueprint that peeks in
+       below to say the page goes on. */
+    min-height: calc(100svh - 4rem - 5.5rem);
+    min-height: max(36rem, calc(100svh - 4rem - 5.5rem));
+  }
+
+  /* Above the badge's box: the name runs a little into the badge column, and
+     the transparent box the strap is drawn in must not sit over it. */
+  .column {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
+    align-content: start;
+    gap: var(--space-6);
+    padding-left: var(--column-start);
+    /* Less on a short screen, so the blueprint still peeks in at 768px. */
+    padding-block: clamp(1.5rem, 5vh, 3rem);
+  }
+
+  /* The name is the one big thing, and it may run wider than the column. It
+     breaks only between the two names, never at the hyphen, so it is always
+     two lines. */
+  h1 {
+    /* Wider than "Tudor-Andrei", narrower than the full name. */
+    width: 7.5em;
+    max-width: none;
+    margin-bottom: var(--space-2);
+  }
+
+  .keep {
+    white-space: nowrap;
+  }
+
+  .sentence {
+    max-width: 30ch;
+    font-size: var(--step-lead);
+    line-height: 1.4;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-8);
+  }
+
+  /* Sits on the hero's floor: the first thing a recruiter wants after the
+     name is whether he is available, so it is on the first screen. */
+  .status {
+    align-self: end;
+    max-width: 36ch;
+  }
+
+  .badge-slot {
+    /* The strap hangs from the header's bottom edge. */
+    align-self: start;
+    margin-right: calc(var(--space-8) * -1);
+  }
+
+  /* ---- Load sequence ---------------------------------------------------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .column > * {
+      animation: rise var(--t-reveal) var(--ease-expo) both;
+    }
+
+    .column > :nth-child(2) { animation-delay: 90ms; }
+    .column > :nth-child(3) { animation-delay: 180ms; }
+    .column > :nth-child(4) { animation-delay: 320ms; }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.6em);
+      filter: blur(6px);
+    }
+  }
+
+  /* ---- Narrow ----------------------------------------------------------- */
+
+  /* A tablet keeps the two columns, with a narrower box for the badge; the
+     strap still hangs from the header. */
+  @media (max-width: 60rem) {
+    .hero {
+      column-gap: var(--space-4);
+      /* A card swung to the edge must never widen the page. `clip` cuts the
+         sideways overflow only, so the strap can still drop in from above. */
+      overflow-x: clip;
+    }
+
+    .column {
+      padding-left: 0;
+    }
+
+    .badge-slot {
+      width: 20rem;
+      margin-right: 0;
+    }
+
+    .badge-slot :global(.badge) {
+      width: 100%;
+    }
+  }
+
+  /* A phone has no room beside the text, so the badge gets a band of its own
+     under it, one tone down, and hangs from the band's top edge. */
+  @media (max-width: 40rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .column {
+      padding-block: var(--space-8);
+    }
+
+    h1 {
+      width: auto;
+    }
+
+    .badge-slot {
+      width: auto;
+      height: 36rem;
+      margin-inline: calc(var(--margin) * -1);
+      background: var(--surface);
+      display: grid;
+      justify-items: center;
+    }
+  }
+</style>

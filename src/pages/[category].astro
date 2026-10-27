@@ -8,9 +8,7 @@ import {
   CATEGORY_BLURBS,
 } from '../content.config';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import SiteFooter from '../components/SiteFooter.astro';
 
 // One page per direction. Each is generated from the same template, so a new
 // category means one entry in CATEGORIES rather than a new file.
@@ -39,7 +37,6 @@ const blurb = CATEGORY_BLURBS[category];
 ---
 
 <BaseLayout title={`${label} — Tudor-Andrei Ifrim`} description={blurb}>
-  <SiteHeader />
 
   <section class="direction" aria-labelledby="direction-heading">
     <h1 id="direction-heading">{label}</h1>
@@ -58,7 +55,6 @@ const blurb = CATEGORY_BLURBS[category];
     }
   </section>
 
-  <SiteFooter />
 </BaseLayout>
 
 <style>
@@ -68,12 +64,12 @@ const blurb = CATEGORY_BLURBS[category];
 
   h1 {
     margin-block: 0 var(--space-4);
-    font-size: var(--text-h1);
+    font-size: var(--step-head);
   }
 
   .blurb {
     margin-block: 0 var(--space-12);
-    color: var(--text-muted);
+    color: var(--muted);
   }
 
   .grid {
@@ -87,10 +83,9 @@ const blurb = CATEGORY_BLURBS[category];
 
   .empty {
     padding: var(--space-8);
-    background: var(--surface-raised);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    color: var(--text-muted);
+    background: var(--surface);
+    border-radius: var(--radius);
+    color: var(--muted);
     max-width: none;
   }
 </style>

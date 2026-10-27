@@ -126,6 +126,23 @@ Tudor a cerut ca acest fișier să nu mai frâneze partea creativă. Regulile se
 accesibilitate, și dacă nu trece caut o cale să obțin același efect fără să cadă — nu renunț
 la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
 
+## Landing-ul din 27.10.2026 — ce s-a decis și nu se reface fără Tudor
+
+- **Direcția:** taste-skill „The quiet instrument” (seed 1940305872, `.taste-skill/direction.json`)
+  pe paleta Blueprint. Un singur font, Literata, cu cinci mărimi. Fără liquid glass și fără
+  lumina care urmărea scroll-ul: le-a scos Tudor. Gradientele sunt permise de el, dar nu s-a
+  folosit niciunul.
+- **Ideea:** modelele și desenele lui Tudor devin scene care rulează la scroll: schema bazei de
+  date (`SchemaScene`), modelul NetLogo (`MarketScene`), cadrele Spline Aruna (`ArunaScene`).
+- **Modelul de piață e portat fidel** (`scripts/market-model.ts`). Nu îl „repara”: traderii
+  tehnici chiar tranzacționează pe baza unei monede aruncate.
+- **Scenele nu folosesc GSAP.** Un singur cititor de scroll (`scripts/scenes.ts`) dă fiecărei
+  scene un număr 0–1. Motivul e explicat în `docs/ARHITECTURA.md`, faza 11.
+- **Badge-ul** e singurul obiect cu umbră și singurul alb pur. Excepția e deliberată și marcată
+  `taste-skill-ignore`.
+- **Verificare înainte de commit:** `taste-skill lint` și `inspect` cu 0 FAIL. Critica rundei
+  se scrie în `.taste-skill/critique.md`.
+
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).
 
@@ -169,9 +186,12 @@ Implementarea lor nu.
 
 ### Skill-uri: ce există efectiv
 
-Ghidul listează patru skilluri instalate pe laptopul lui Tudor. **În sesiunile din cloud e
-disponibil doar `ui-ux-pro-max`** (ca plugin). `taste-skill`, `design-motion-principles` și
-`awesome-design-claude` **nu există aici** — nu le revendica și nu raporta că le-ai folosit.
+Ghidul listează patru skilluri instalate pe laptopul lui Tudor. În cloud, `ui-ux-pro-max` vine
+ca plugin. Pe 27.10.2026, `taste-skill`, `design-motion-principles` și `awesome-design-claude`
+au fost instalate în sesiune în `/root/.claude/skills/`, de la commit-urile fixate în ghid.
+Containerul e efemer, deci **o sesiune nouă nu le mai are** până nu sunt reinstalate. Verifică
+înainte să le revendici. Nu rula `taste-skill/scripts/assets.mjs`: descarcă imagini de pe
+internet, iar aici nu folosim poze stock.
 
 ### Ce am verificat din ghid la integrare (27.10.2026)
 
@@ -179,7 +199,7 @@ disponibil doar `ui-ux-pro-max`** (ca plugin). `taste-skill`, `design-motion-pri
 |---|---|
 | nicio culoare hex în componente | **respectată** — zero apariții în afara `tokens.css` |
 | doar `transform` / `opacity` / `filter` animate | respectată |
-| un singur cititor de scroll → variabile CSS | respectată (`scroll-light.ts`) |
+| un singur cititor de scroll → variabile CSS | respectată (`scripts/scenes.ts`) |
 | `overflow-x: clip`, nu `hidden` | respectată |
 | mișcarea redusă lasă pagina vie, nu moartă | respectată — **aceeași greșeală o făcusem la badge** (greșeala 1 din ghid) |
 | contrast măsurat numeric | respectată |

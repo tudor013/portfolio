@@ -4,8 +4,6 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import { CATEGORY_LABELS } from '../../content.config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SiteHeader from '../../components/SiteHeader.astro';
-import SiteFooter from '../../components/SiteFooter.astro';
 import SplineScene from '../../components/SplineScene.astro';
 
 // One static page per published project. Astro calls this at build time, so
@@ -30,10 +28,9 @@ const data = project.data;
 ---
 
 <BaseLayout title={`${data.title} — Tudor-Andrei Ifrim`} description={data.problem}>
-  <SiteHeader />
 
   <article class="case">
-    <p class="back"><a href="/#work">Back to the work</a></p>
+    <p class="back"><a href="/#work">Back to all the work</a></p>
 
     <h1>{data.title}</h1>
 
@@ -104,7 +101,6 @@ const data = project.data;
     </div>
   </article>
 
-  <SiteFooter />
 </BaseLayout>
 
 <style>
@@ -116,23 +112,35 @@ const data = project.data;
     margin-block: 0 var(--space-8);
   }
 
-  h1 {
-    margin-block: 0 var(--space-8);
-    font-size: var(--text-h1);
+  /* Inside a case study the sections are steps of one story, not chapters
+     of the site: they take the lead size, well under the title. */
+  .case h2,
+  .case :global(h2) {
+    margin-block: var(--space-12) var(--space-4);
+    font-size: var(--step-lead);
+    letter-spacing: 0;
   }
 
-  /* An L1 panel holding the facts, so they read as a plate on an instrument
-     rather than as loose text on the canvas. */
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  h1 {
+    margin-block: 0 var(--space-8);
+    font-size: var(--step-head);
+  }
+
+  /* The facts on a filled plate, one tone off the ground. */
   .facts {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: var(--space-6);
     margin: 0 0 var(--space-12);
     padding: var(--space-6);
-    background: var(--surface-raised);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
+    background: var(--surface);
+    border-radius: var(--radius);
   }
 
   .facts dt {
@@ -156,7 +164,7 @@ const data = project.data;
 
   .scene-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
     gap: var(--space-6);
     margin-block: var(--space-6) var(--space-12);
   }

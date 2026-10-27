@@ -6,80 +6,169 @@
   box-sizing: border-box;
 }
 
+html {
+  /* A swinging badge or a held scene must never widen the page. `clip` stops
+     the overflow without making <html> a scroll container, which would break
+     `position: sticky` in the scenes. */
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  background: var(--surface-canvas);
-  color: var(--text-primary);
-  font-family: var(--family-sans);
-  font-size: var(--text-body);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-body);
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--step-body);
+  font-weight: var(--weight-text);
+  line-height: var(--leading-text);
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
 
 h1,
 h2,
 h3 {
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
+  margin: 0;
+  font-weight: var(--weight-head);
+  line-height: var(--leading-head);
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
-  margin-block: var(--space-12) var(--space-4);
 }
 
 h1 {
-  font-size: var(--text-h1);
+  font-size: var(--step-display);
+  line-height: var(--leading-display);
 }
+
 h2 {
-  font-size: var(--text-h2);
+  font-size: var(--step-head);
 }
+
 h3 {
-  font-size: var(--text-h3);
+  font-size: var(--step-lead);
+  letter-spacing: 0;
 }
 
 p {
+  margin: 0;
   max-width: var(--measure);
+  text-wrap: pretty;
 }
 
-/* Figures carry the mono face because the tabular shapes make them scannable —
-   it is never applied to labels. */
-.figure {
-  font-family: var(--family-mono);
-  font-variant-numeric: tabular-nums;
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
 }
 
-.meta {
-  font-size: var(--text-meta);
-  line-height: var(--leading-meta);
-  color: var(--text-muted);
+/* Markdown emphasis becomes <strong>, which browsers draw at 700. The type
+   system stops at 600. */
+strong,
+b {
+  font-weight: var(--weight-strong);
 }
 
+/* Numbers that line up: years in the ledger, the market's readouts. The text
+   face does this itself; no monospace needed. */
+.figures {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Links are in the ink and underlined. The accent is saved for the one
+   primary action on a screen, so it keeps meaning "do this". */
 a {
-  color: var(--text-accent);
-  text-underline-offset: 0.2em;
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color var(--t-hover) ease;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
 }
 
 /* A visible focus ring is the only way a keyboard user can tell where they
    are. :focus-visible keeps it off mouse clicks, so it costs nothing. */
 :focus-visible {
-  outline: 2px solid var(--text-accent);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ---- The one button shape ------------------------------------------------ */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-weight: var(--weight-head);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
+}
+
+.button:hover {
+  background: color-mix(in srgb, var(--accent) 82%, var(--ink));
+}
+
+/* Press feedback: the button gives a little under the finger. */
+.button:active {
+  transform: scale(0.97);
+}
+
+/* A text link that leads somewhere, with an arrow that answers the pointer. */
+.go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 44px;
+  font-weight: var(--weight-head);
+}
+
+.go::after {
+  content: '→';
+  transition: transform var(--t-ui) var(--ease-out);
+}
+
+.go:hover::after,
+.go:focus-visible::after {
+  transform: translateX(4px);
+}
+
+/* ---- Frame --------------------------------------------------------------- */
+
+/* One pair of outer margins for every section on every page. */
+.frame {
+  padding-inline: var(--margin);
 }
 
 /* Lets a keyboard or screen-reader user jump past the header on every page. */
 .skip-link {
   position: absolute;
-  left: var(--space-4);
-  top: var(--space-4);
-  z-index: 10;
+  left: var(--margin);
+  top: var(--space-2);
+  z-index: 40;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: var(--space-2) var(--space-4);
-  background: var(--surface-raised);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  padding: 0 var(--space-4);
+  background: var(--ink);
+  color: var(--ground);
   transform: translateY(-200%);
 }
 
@@ -87,26 +176,53 @@ a {
   transform: translateY(0);
 }
 
-.page {
-  position: relative;
-  /* Above the fixed light layer, which sits at z-index 0. */
-  z-index: 1;
-  max-width: var(--page-max);
-  margin-inline: auto;
-  padding: var(--space-6) var(--space-4) var(--space-24);
+/* Visually hidden, still read aloud. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-/* A panel is an L1 surface: subtle border first, soft shadow second. On paper
-   the lightness step alone is only 1.09:1, so the border does the real work. */
-.panel {
-  background: var(--surface-raised);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-soft);
+/* ---- Entrances ----------------------------------------------------------- */
+
+/* The parts of a section arrive in reading order: heading, text, picture.
+   Written so the failure mode is "no animation", never "no content": nothing
+   is hidden unless enter.ts has started (it sets html.enter-ready), and the
+   reduced-motion setting turns the hiding off entirely. */
+@media (prefers-reduced-motion: no-preference) {
+  html.enter-ready [data-enter] > * {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(4px);
+  }
+
+  html.enter-ready [data-enter].is-in > * {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition:
+      opacity var(--t-reveal) var(--ease-expo),
+      transform var(--t-reveal) var(--ease-expo),
+      filter var(--t-reveal) var(--ease-expo);
+  }
+
+  /* Each part waits for the one before it. */
+  html.enter-ready [data-enter].is-in > :nth-child(2) { transition-delay: calc(var(--stagger) * 1); }
+  html.enter-ready [data-enter].is-in > :nth-child(3) { transition-delay: calc(var(--stagger) * 2); }
+  html.enter-ready [data-enter].is-in > :nth-child(4) { transition-delay: calc(var(--stagger) * 3); }
+  html.enter-ready [data-enter].is-in > :nth-child(5) { transition-delay: calc(var(--stagger) * 4); }
+  html.enter-ready [data-enter].is-in > :nth-child(6) { transition-delay: calc(var(--stagger) * 5); }
+  html.enter-ready [data-enter].is-in > :nth-child(n + 7) { transition-delay: calc(var(--stagger) * 6); }
 }
 
-/* Anyone who has asked their OS to reduce motion gets no animation at all,
-   rather than a slower version of it. */
+/* Anyone who has asked their OS to reduce motion gets the finished page.
+   Motion a person starts themselves (dragging the badge, the market's
+   controls) still answers them. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -115,63 +231,5 @@ a {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-
-/* A set of links is a list, not a sentence joined by separator characters.
-   Marking it up as one also gives a screen reader the item count. */
-.links {
-  display: flex;
-  gap: var(--space-6);
-  list-style: none;
-  margin: var(--space-6) 0 0;
-  padding: 0;
-}
-
-/* Markdown emphasis becomes <strong>, which browsers draw at 700. The type
-   contract caps weight at 600 and gets emphasis from size and colour instead,
-   so the default is overridden rather than left to the user agent. */
-strong,
-b {
-  font-weight: var(--weight-semibold);
-}
-
-/* Reveal-on-scroll, written so the failure mode is "no animation" rather than
-   "no content": elements are visible by default and the attribute only ever
-   plays an animation on top. Nothing waits to be revealed. */
-[data-reveal='in'] {
-  animation: reveal-fade 260ms var(--ease-out) both;
-}
-
-@keyframes reveal-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal='in'] {
-    animation: none;
-  }
-}
-
-/* Liquid glass, used on the two panels that sit over the scroll light rather
-   than on every surface. The border is what keeps text and edges legible when
-   the light passes underneath. */
-.glass {
-  background: var(--glass-fill);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--glass-sheen), var(--shadow-soft);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass {
-    background: var(--glass-fill-opaque);
   }
 }

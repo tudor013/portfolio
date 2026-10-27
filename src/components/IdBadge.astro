@@ -7,7 +7,7 @@ import portrait from '../assets/tudor.png';
 // off, can be selected and translated, and reaches assistive technology.
 ---
 
-<div class="badge" data-badge>
+<div class="badge" data-badge data-ui>
   <svg class="rope" viewBox="0 0 560 760" aria-hidden="true" preserveAspectRatio="none">
     {/* The static d is what renders before (or without) the script: a strap
         hanging straight down. The simulation overwrites it each frame. */}
@@ -31,7 +31,7 @@ import portrait from '../assets/tudor.png';
     <p class="name">Tudor-Andrei Ifrim</p>
     <p class="role">Software Developer</p>
 
-    <p class="id figure">ID 2028&middot;CSIE</p>
+    <p class="id figures">ID 2028&middot;CSIE</p>
   </div>
 </div>
 
@@ -49,6 +49,9 @@ import portrait from '../assets/tudor.png';
        itself must not be text a reader can accidentally highlight mid-swing. */
     user-select: none;
     -webkit-user-select: none;
+    /* The box is mostly empty air around the strap. It must not sit on top of
+       the name beside it and swallow clicks; only the card is a target. */
+    pointer-events: none;
   }
 
   .rope {
@@ -61,7 +64,7 @@ import portrait from '../assets/tudor.png';
 
   .rope path {
     fill: none;
-    stroke: var(--border-strong);
+    stroke: var(--badge-strap);
     stroke-width: 11;
     stroke-linecap: butt;
     stroke-linejoin: round;
@@ -71,16 +74,16 @@ import portrait from '../assets/tudor.png';
     position: absolute;
     left: 0;
     top: 0;
-    width: 190px;
+    width: 200px;
     /* Rotation happens about the point the strap holds. */
     transform-origin: 50% 0;
     transform-style: preserve-3d;
     /* The back of a laminated card still catches light, so the reverse side
        is not simply invisible when it turns past edge-on. */
     backface-visibility: visible;
-    /* Static placement for the no-script and reduced-motion cases. The
-       simulation replaces this transform once it starts. */
-    transform: translate(185px, 275px) rotate(-3deg);
+    /* Static placement for the no-script case. The simulation replaces this
+       transform once it starts. */
+    transform: translate(180px, 275px) rotate(-3deg);
 
     display: flex;
     flex-direction: column;
@@ -88,10 +91,13 @@ import portrait from '../assets/tudor.png';
     gap: var(--space-2);
     padding: var(--space-6) var(--space-4) var(--space-4);
 
-    background: var(--surface-raised);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lift);
+    pointer-events: auto;
+    background: var(--badge-card);
+    color: var(--ink);
+    /* A real card has rounded corners; this is an object, not interface. */
+    border-radius: 10px;
+    /* It truly hangs in front of the page, so it casts a shadow. */
+    box-shadow: var(--badge-shadow); /* taste-skill-ignore */
   }
 
   /* The grab cursor appears once the simulation is running — which is now
@@ -110,10 +116,8 @@ import portrait from '../assets/tudor.png';
     width: 30px;
     height: 24px;
     margin-left: -15px;
-    border: 1px solid var(--border-strong);
     border-radius: 3px 3px 5px 5px;
-    background: var(--surface-canvas);
-    box-shadow: var(--shadow-soft);
+    background: color-mix(in srgb, var(--badge-strap) 70%, var(--ink));
   }
 
   .punch {
@@ -121,15 +125,16 @@ import portrait from '../assets/tudor.png';
     height: 7px;
     margin-bottom: var(--space-3);
     border-radius: 999px;
-    background: var(--surface-canvas);
-    box-shadow: inset 0 1px 0 rgb(0 0 0 / 0.4);
+    background: var(--ground);
+    /* The slot is punched through the card: an inner edge, not elevation. */
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 35%, transparent); /* taste-skill-ignore */
   }
 
   .portrait {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
-    border-radius: var(--radius-sm);
+    border-radius: 4px;
     /* The press has to reach the card, not the image: otherwise the browser
        starts its own image drag and the badge never moves. */
     pointer-events: none;
@@ -141,31 +146,32 @@ import portrait from '../assets/tudor.png';
     pointer-events: none;
   }
 
-  .name {
-    margin: var(--space-3) 0 0;
+  .card p {
     max-width: none;
-    font-size: var(--text-secondary);
-    font-weight: var(--weight-semibold);
     text-align: center;
-    line-height: var(--leading-tight);
+  }
+
+  .name {
+    margin-top: var(--space-3);
+    font-size: 1rem;
+    font-weight: var(--weight-strong);
+    line-height: 1.25;
   }
 
   .role {
-    margin: 0;
-    max-width: none;
-    font-size: var(--text-meta);
-    color: var(--text-muted);
+    font-size: var(--step-small);
+    color: var(--muted);
   }
 
   .id {
-    margin: var(--space-3) 0 0;
-    max-width: none;
     width: 100%;
+    margin-top: var(--space-3);
     padding-top: var(--space-3);
-    border-top: 1px solid var(--border-subtle);
-    font-size: var(--text-meta);
-    color: var(--text-accent);
-    text-align: center;
+    /* The strap's colour printed across the card, like a band on a real ID. */
+    border-top: 3px solid var(--badge-strap);
+    font-size: var(--step-small);
+    font-weight: var(--weight-head);
+    color: var(--badge-strap);
   }
 </style>
 

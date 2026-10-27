@@ -11,6 +11,7 @@ stack:
   - Supabase
   - 'Cloudflare Workers'
   - Python
+kind: 'Team platform'
 problem: >-
   Solar and battery installations produce more telemetry than anyone reads, so
   a failing string or a drifting battery is usually noticed in the monthly

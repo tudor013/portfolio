@@ -1,0 +1,98 @@
+---
+/**
+ * After the first proof, the short version: a lead that reads as the opening
+ * of a text, then four plain answers (who, what, where, how to reach). Bold
+ * run-ins are the only markers; no cards, icons or dividers.
+ */
+---
+
+<section class="intro frame" aria-labelledby="intro-heading">
+  <div class="lead" data-enter>
+    <h2 id="intro-heading">Systems with moving parts</h2>
+    <p class="statement">
+      I study economic cybernetics, how systems steer themselves through
+      feedback, and build alongside it: the database above, the shop a coffee
+      brand sells through, and a market where two kinds of trader meet.
+    </p>
+  </div>
+
+  <div class="columns" data-enter>
+    <p>
+      <strong>Who.</strong> Tudor-Andrei Ifrim, studying Economic Informatics at
+      the Faculty of Cybernetics, Statistics and Economic Informatics in
+      Bucharest, graduating in July 2028. Co-founder of Aruna Coffee and head of
+      the UI/UX division at SiSC. Before university, robotics: three national
+      awards and a top-half international placing.
+    </p>
+    <p>
+      <strong>What.</strong> Software first: C and C++, C#, Python, and SQL on
+      MariaDB and Oracle. Interfaces second: Figma, Illustrator, Photoshop and
+      Spline, with motion in Premiere Pro and DaVinci Resolve. Data third:
+      inferential and macroeconomic statistics, and models whose results have to
+      survive being checked.
+    </p>
+    <p>
+      <strong>Where.</strong> Bucharest, or remote. Open to an internship, a
+      part-time role alongside my degree, or a junior position, and available
+      now. I work in English (IELTS C1) and Romanian, with some Spanish and
+      French.
+    </p>
+    <p>
+      <strong>Reach.</strong> Write to{' '}
+      <a href="mailto:tudorifrim606@gmail.com">tudorifrim606@gmail.com</a>, or
+      find me on{' '}
+      <a href="https://www.linkedin.com/in/tudor-ifrim-697b0b26a/">LinkedIn</a>.
+      The code for this site is public on{' '}
+      <a href="https://github.com/tudor013/portfolio">GitHub</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .intro {
+    display: grid;
+    gap: var(--space-16);
+    padding-block: var(--section-gap) 0;
+  }
+
+  .lead {
+    display: grid;
+    gap: var(--space-6);
+    padding-left: var(--column-start);
+  }
+
+  .statement {
+    max-width: 40ch;
+    font-size: var(--step-lead);
+    line-height: 1.35;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-12) var(--space-8);
+    padding-left: var(--column-start);
+  }
+
+  .columns p {
+    max-width: none;
+  }
+
+  @media (max-width: 75rem) {
+    .columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .lead,
+    .columns {
+      padding-left: 0;
+    }
+
+    .columns {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+  }
+</style>

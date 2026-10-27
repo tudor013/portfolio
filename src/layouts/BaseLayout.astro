@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
-import ScrollLight from '../components/ScrollLight.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -8,9 +9,15 @@ interface Props {
   title: string;
   /** One sentence; shows in search results and in LinkedIn link previews. */
   description: string;
+  /**
+   * `page` puts the content in the site's frame (inner pages). `full` hands
+   * each section the whole width, which the landing page needs for the
+   * blueprint field and the held scenes.
+   */
+  layout?: 'page' | 'full';
 }
 
-const { title, description } = Astro.props;
+const { title, description, layout = 'page' } = Astro.props;
 
 // Astro.site comes from `site` in astro.config.mjs. Open Graph requires
 // absolute URLs, so relative paths would silently produce broken previews.
@@ -25,11 +32,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonical} />
 
     {/* Emits the self-hosted @font-face rules. Deliberately not preloaded:
-        `preload` covers every variant of a family, which here is six files
-        competing with the text that drives LCP. Astro emits metric-matched
-        fallbacks, so the real face swaps in without shifting layout. */}
-    <Font cssVariable="--font-sans" />
-    <Font cssVariable="--font-mono" />
+        `preload` covers every variant of the family, which here is eight
+        files competing with the text that drives LCP. Astro emits
+        metric-matched fallbacks, so the real face swaps in without shifting
+        layout. */}
+    <Font cssVariable="--font-text" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -44,17 +51,24 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <ScrollLight />
-    <main id="main" class="page">
+    <SiteHeader />
+    <main id="main" class:list={[layout === 'page' && 'page frame']}>
       <slot />
     </main>
+    <SiteFooter />
   </body>
 </html>
 
 <script>
-  import { initReveal } from '../scripts/reveal';
+  import { initEnter } from '../scripts/enter';
 
-  // Cards and timeline rows only. Fading in whole sections is the pattern that
-  // reads as generated, and it delays the text a reader came for.
-  initReveal('.grid > li, .timeline > li');
+  initEnter();
 </script>
+
+<style>
+  .page {
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-block: var(--space-16) var(--section-gap);
+  }
+</style>

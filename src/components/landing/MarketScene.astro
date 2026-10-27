@@ -1,0 +1,364 @@
+---
+/**
+ * Chapter two, Data: the live thing on the page. Tudor's NetLogo market runs
+ * here with its original rules and his own four sliders. Scrolling the panel
+ * into view runs time forward; the controls change the market.
+ *
+ * Without a script, the panel shows a still of the same model's default run
+ * (drawn at build time, below) and the controls are not offered, because
+ * controls that do nothing would be a lie.
+ */
+import { DEFAULTS, DAYS, runMarket } from '../../scripts/market-model';
+
+const SEED = 42;
+
+// The no-script picture: the default run as an SVG line drawing, computed at
+// build time from the same code the live chart uses.
+const run = runMarket(DEFAULTS, SEED);
+const all = [...run.price, ...run.value];
+const low = Math.min(...all);
+const high = Math.max(...all);
+const toPoints = (series: Float64Array) =>
+  [...series]
+    .map((v, day) => `${((day / DAYS) * 1000).toFixed(1)},${(400 - ((v - low) / (high - low)) * 400).toFixed(1)}`)
+    .join(' ');
+
+const CONTROLS = [
+  { id: 'agents', label: 'Agents', min: 10, max: 500, step: 10, value: DEFAULTS.agents, unit: '' },
+  { id: 'fundamentalists', label: 'Fundamentalists', min: 0, max: 100, step: 5, value: DEFAULTS.fundamentalists, unit: '%' },
+  { id: 'herding', label: 'Herding probability', min: 0, max: 100, step: 5, value: DEFAULTS.herding, unit: '%' },
+  { id: 'news', label: 'News impact', min: 0, max: 10, step: 0.1, value: DEFAULTS.news, unit: '' },
+] as const;
+---
+
+<section class="market frame" id="market" aria-labelledby="market-heading" data-market data-seed={SEED}>
+  <div class="head" data-enter>
+    <h2 id="market-heading">Two kinds of trader</h2>
+    <p>
+      My agent-based market from NetLogo, rebuilt here with its original rules.
+      Fundamentalists buy below the value and sell above it; the others, when
+      they join in, buy or sell on a coin flip. Scroll to run it, or change the
+      market.
+    </p>
+  </div>
+
+  <div class="panel" data-ui>
+    <figure class="plot">
+      <figcaption class="legend">
+        <span class="series price">Price</span>
+        <span class="series value">Fundamental value</span>
+      </figcaption>
+
+      <div class="canvas-box">
+        {/* The still, for no script. The live canvas is drawn over it. */}
+        <svg class="still" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
+          <polyline class="price" points={toPoints(run.price)} />
+          <polyline class="value" points={toPoints(run.value)} />
+        </svg>
+        <canvas
+          data-chart
+          role="img"
+          aria-label={`Price and fundamental value over ${DAYS} days of the simulated market.`}
+        ></canvas>
+      </div>
+
+      <p class="axis figures" aria-hidden="true">
+        <span>Day 0</span><span>Day {DAYS / 2}</span><span>Day {DAYS}</span>
+      </p>
+    </figure>
+
+    <div class="side">
+      <dl class="readouts figures">
+        <div><dt>Day</dt><dd data-readout="day">{DAYS}</dd></div>
+        <div><dt>Price</dt><dd data-readout="price">{run.price[DAYS].toFixed(1)}</dd></div>
+        <div><dt>Value</dt><dd data-readout="value">{run.value[DAYS].toFixed(1)}</dd></div>
+      </dl>
+
+      <form class="controls" data-controls hidden>
+        {
+          CONTROLS.map((control) => (
+            <div class="control">
+              <label for={`market-${control.id}`}>{control.label}</label>
+              <output class="figures" for={`market-${control.id}`} data-output={control.id}>
+                {control.value}
+                {control.unit}
+              </output>
+              <input
+                type="range"
+                id={`market-${control.id}`}
+                name={control.id}
+                min={control.min}
+                max={control.max}
+                step={control.step}
+                value={control.value}
+                data-unit={control.unit}
+              />
+            </div>
+          ))
+        }
+
+        <div class="buttons">
+          <button class="button" type="button" data-rerun>Run with new news</button>
+          <button class="reset" type="button" data-reset>Back to my settings</button>
+        </div>
+      </form>
+
+      <a class="go" href="/data/">All data work</a>
+    </div>
+  </div>
+
+  <p class="source">
+    Follows Chen, Zheng and Tan’s 2013 model of asymmetric trading and herding.
+  </p>
+</section>
+
+<style>
+  .market {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: var(--section-gap) 0;
+    padding-left: calc(var(--margin) + var(--column-start));
+  }
+
+  .head {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 62fr) minmax(0, 38fr);
+    background: var(--surface);
+  }
+
+  /* The chart takes whatever height the controls give the panel. */
+  .plot {
+    display: grid;
+    grid-template-rows: auto minmax(20rem, 1fr) auto;
+    gap: var(--space-3);
+    min-width: 0;
+    margin: 0;
+    padding: var(--space-8);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    font-size: var(--step-small);
+  }
+
+  .series {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* Each series is told apart by weight as well as colour: a hairline
+     price, a heavy value. */
+  .series::before {
+    content: '';
+    width: 1.75rem;
+    height: 0;
+    border-top: 1.5px solid var(--ink);
+  }
+
+  .series.value::before {
+    border-top: 4px solid var(--accent);
+  }
+
+  .canvas-box {
+    position: relative;
+    width: 100%;
+  }
+
+  .still,
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .still polyline {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .still .price {
+    stroke: var(--ink);
+    stroke-width: 1;
+  }
+
+  .still .value {
+    stroke: var(--accent);
+    stroke-width: 3;
+  }
+
+  /* Once the live chart is running, the still steps aside. */
+  .market.is-live .still {
+    visibility: hidden;
+  }
+
+  .axis {
+    display: flex;
+    justify-content: space-between;
+    max-width: none;
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .side {
+    display: grid;
+    align-content: start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    /* One tone up from the panel: the controls are a separate area. */
+    background: var(--ground);
+  }
+
+  .readouts {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: var(--space-8);
+    margin: 0;
+  }
+
+  .readouts dt {
+    font-size: var(--step-small);
+    color: var(--muted);
+  }
+
+  .readouts dd {
+    margin: 0;
+    font-size: var(--step-lead);
+    font-weight: var(--weight-head);
+  }
+
+  .controls {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .control {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--space-4);
+    min-height: 44px;
+  }
+
+  .control label {
+    font-size: var(--step-small);
+  }
+
+  .control output {
+    font-size: var(--step-small);
+    font-weight: var(--weight-head);
+  }
+
+  /* ---- The range input: a square thumb on a filled track ---------------- */
+
+  input[type='range'] {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 44px;
+    margin: 0;
+    background: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--edge-control);
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 4px;
+    background: var(--edge-control);
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-top: -8px;
+    background: var(--ink);
+    transition: transform var(--t-press) var(--ease-out);
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 0;
+    background: var(--ink);
+  }
+
+  /* The thumb gives a little under the finger, like the button does. */
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-4);
+  }
+
+  .reset {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    cursor: pointer;
+  }
+
+  .go {
+    justify-self: start;
+  }
+
+  .source {
+    color: var(--muted);
+    font-size: var(--step-small);
+  }
+
+  @media (max-width: 60rem) {
+    .market {
+      padding-left: var(--margin);
+    }
+
+    .panel {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .plot,
+    .side {
+      padding: var(--space-6) var(--space-4);
+    }
+
+    .plot {
+      grid-template-rows: auto auto auto;
+    }
+
+    .canvas-box {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>
+
+<script>
+  import { initMarketScene } from '../../scripts/market-scene';
+
+  const root = document.querySelector<HTMLElement>('[data-market]');
+  if (root) initMarketScene(root);
+</script>

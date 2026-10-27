@@ -1,5 +1,5 @@
 ---
-title: 'SiSC — UI/UX division'
+title: 'SiSC UI/UX division'
 category: design
 year: 2026
 role: >-
@@ -9,6 +9,7 @@ stack:
   - Figma
   - Illustrator
   - Photoshop
+kind: 'Design process and web redesign'
 problem: >-
   The division had no shared process, so every project restarted from nothing
   and the sites drifted apart visually.
