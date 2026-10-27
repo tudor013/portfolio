@@ -15,9 +15,11 @@ interface Props {
    * blueprint field and the held scenes.
    */
   layout?: 'page' | 'full';
+  /** `night` swaps the paper for a black ground with light-blue ink (tokens.css). */
+  theme?: 'paper' | 'night';
 }
 
-const { title, description, layout = 'page' } = Astro.props;
+const { title, description, layout = 'page', theme = 'paper' } = Astro.props;
 
 // Astro.site comes from `site` in astro.config.mjs. Open Graph requires
 // absolute URLs, so relative paths would silently produce broken previews.
@@ -25,7 +27,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en" data-motion="full" data-motion-choice="system">
+<html lang="en" data-motion="full" data-motion-choice="system" data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

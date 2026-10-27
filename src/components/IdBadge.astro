@@ -1,20 +1,20 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import portrait from '../assets/tudor.png';
 
-// A credential hanging from a lanyard, drawn as DOM rather than canvas or
-// WebGL. Everything legible here is real text, so it survives with scripting
-// off, can be selected and translated, and reaches assistive technology.
+// The badge in two forms. The DOM card below is what renders without a
+// script and in reduced motion: real text, selectable, read by assistive
+// technology. In full motion scripts/badge.ts paints the same card onto the
+// React Bits lanyard (three.js) in [data-stage] and the DOM card steps back
+// to the accessibility tree only.
+const face = await getImage({ src: portrait, width: 640, height: 640, format: 'webp' });
 ---
 
-<div class="badge" data-badge data-ui>
-  <svg class="rope" viewBox="0 0 560 760" aria-hidden="true" preserveAspectRatio="none">
-    {/* The static d is what renders before (or without) the script: a strap
-        hanging straight down. The simulation overwrites it each frame. */}
-    <path data-strap d="M280,0 L280,275" />
-  </svg>
+<div class="badge" data-badge data-ui data-portrait={face.src}>
+  <div class="stage" data-stage aria-hidden="true"></div>
 
   <div class="card" data-card>
+    <span class="strap" aria-hidden="true"></span>
     <span class="clip" aria-hidden="true"></span>
     <span class="punch" aria-hidden="true"></span>
 
@@ -36,54 +36,46 @@ import portrait from '../assets/tudor.png';
 </div>
 
 <style>
+  /* The box fills the hero's badge column, top to bottom: the lanyard hangs
+     from its top edge, which is the header's bottom edge. */
   .badge {
     position: relative;
-    width: 560px;
-    height: 760px;
-    /* The strap is drawn above its own box while the badge drops in, and
-       passes behind the header, which sits on a higher layer. */
-    overflow: visible;
-    perspective: 1100px;
-    perspective-origin: 50% 20%;
-    /* A dragged badge must not select the text it passes over, and the card
-       itself must not be text a reader can accidentally highlight mid-swing. */
-    user-select: none;
-    -webkit-user-select: none;
-    /* The box is mostly empty air around the strap. It must not sit on top of
-       the name beside it and swallow clicks; only the card is a target. */
-    pointer-events: none;
-  }
-
-  .rope {
-    position: absolute;
-    inset: 0;
     width: 100%;
     height: 100%;
-    overflow: visible;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
-  .rope path {
-    fill: none;
-    stroke: var(--badge-strap);
-    stroke-width: 11;
-    stroke-linecap: butt;
-    stroke-linejoin: round;
+  /* The still strap is drawn upwards without end; the box's top edge, the
+     header's bottom edge, is where it is cut. Not while the lanyard runs:
+     its stage reaches past the box. */
+  .badge:not([data-live]) {
+    overflow: clip;
   }
+
+  /* Wider than the badge's column by --swing on the left, so a card pulled
+     towards the name is not cut off at the column's edge. The canvas is
+     transparent and sits under the hero's text, so the text stays a target. */
+  .stage {
+    position: absolute;
+    inset: 0 0 0 calc(var(--swing, 0px) * -1);
+  }
+
+  .stage :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ---- The still card: no script, reduced motion, no WebGL --------------- */
 
   .card {
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 50%;
+    top: clamp(9rem, 26vh, 15rem);
     width: 200px;
-    /* Rotation happens about the point the strap holds. */
+    transform: translateX(-50%) rotate(-3deg);
     transform-origin: 50% 0;
-    transform-style: preserve-3d;
-    /* The back of a laminated card still catches light, so the reverse side
-       is not simply invisible when it turns past edge-on. */
-    backface-visibility: visible;
-    /* Static placement for the no-script case. The simulation replaces this
-       transform once it starts. */
-    transform: translate(180px, 275px) rotate(-3deg);
 
     display: flex;
     flex-direction: column;
@@ -91,7 +83,6 @@ import portrait from '../assets/tudor.png';
     gap: var(--space-2);
     padding: var(--space-6) var(--space-4) var(--space-4);
 
-    pointer-events: auto;
     background: var(--badge-card);
     color: var(--ink);
     /* A real card has rounded corners; this is an object, not interface. */
@@ -100,13 +91,24 @@ import portrait from '../assets/tudor.png';
     box-shadow: var(--badge-shadow); /* taste-skill-ignore */
   }
 
-  /* The grab cursor appears once the simulation is running — which is now
-     also the case under reduced motion, where dragging still works. */
+  /* Once the lanyard draws the card, this one leaves the screen but stays in
+     the accessibility tree: the photo's alt and the text still reach a
+     screen reader, which the canvas cannot do. */
   .badge[data-live] .card {
-    cursor: grab;
+    clip-path: inset(50%);
+    opacity: 0;
+    pointer-events: none;
   }
-  .badge[data-dragging] .card {
-    cursor: grabbing;
+
+  /* The strap, straight up to the header. */
+  .strap {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    width: 11px;
+    height: 100svh;
+    margin-left: -5.5px;
+    background: var(--badge-strap);
   }
 
   .clip {
@@ -135,15 +137,7 @@ import portrait from '../assets/tudor.png';
     height: 120px;
     object-fit: cover;
     border-radius: 4px;
-    /* The press has to reach the card, not the image: otherwise the browser
-       starts its own image drag and the badge never moves. */
-    pointer-events: none;
     -webkit-user-drag: none;
-  }
-
-  /* Nothing inside the card is a separate target. It is one object. */
-  .card * {
-    pointer-events: none;
   }
 
   .card p {
@@ -177,14 +171,7 @@ import portrait from '../assets/tudor.png';
 
 <script>
   import { initBadge } from '../scripts/badge';
-  import { motionIsFull, onMotionChange } from '../scripts/motion';
 
   const root = document.querySelector<HTMLElement>('[data-badge]');
-  if (root) {
-    let stop = initBadge(root, { calm: !motionIsFull() });
-    onMotionChange(() => {
-      stop();
-      stop = initBadge(root, { calm: !motionIsFull() });
-    });
-  }
+  if (root) initBadge(root);
 </script>

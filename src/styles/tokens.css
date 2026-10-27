@@ -31,6 +31,11 @@
   --blue-750: #1c4c9c; /* a table drawn on the field */
   --chalk-50: #f4f7fc; /* white ink on the blueprint */
   --chalk-300: #b4c5e4; /* soft white ink on the blueprint */
+  --night-950: #05070c; /* the Software page's ground: black, a breath of blue */
+  --night-900: #111826;
+  --sky-200: #a9c8f5; /* light-blue ink on the night ground */
+  --sky-300: #8ab8ff;
+  --sky-400: #7e9cc8;
 
   /* ---- SEMANTIC: paper -------------------------------------------------- */
 
@@ -126,4 +131,22 @@
   --t-ui: 240ms;
   --t-reveal: 800ms;
   --stagger: 80ms;
+}
+
+/* ---- SEMANTIC: the night theme (Software page, Tudor's request) ----------
+
+   Black ground, light-blue text. Only the semantic tokens change, so every
+   component on the page follows without knowing the theme exists. Pairs
+   measured like the paper ones. */
+:root[data-theme='night'] {
+  color-scheme: dark;
+
+  --ground: var(--night-950);
+  --surface: var(--night-900); /* 1.13:1 step, as on paper */
+  --ink: var(--sky-200); /* 11.77 ground · 10.37 surface */
+  --muted: var(--sky-400); /*  7.17 ground ·  6.32 surface */
+  --accent: var(--sky-300); /*  9.96 ground ·  8.78 surface */
+  --on-accent: var(--night-950); /*  9.96 on the accent */
+  --edge-control: color-mix(in srgb, var(--sky-200) 52%, transparent); /* 3.72 ground */
+  --edge-subtle: color-mix(in srgb, var(--sky-200) 14%, transparent);
 }

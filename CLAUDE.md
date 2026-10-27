@@ -142,6 +142,12 @@ la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
   Tudor). Amândouă se încarcă doar în modul cu animații. Lenis nu pornește pe touch.
 - **Badge-ul** e singurul obiect cu umbră și singurul alb pur. Excepția e deliberată și marcată
   `taste-skill-ignore`.
+- **Badge-ul e Lanyard din React Bits** (faza 16, la cererea lui Tudor), portat în
+  `scripts/lanyard.ts`. Three.js se încarcă **doar în modul cu animații**. În modul redus și fără
+  JS rămâne cardul HTML din `IdBadge.astro`, care e și sursa textului pictat pe cardul 3D.
+- **Pagina Software e pe negru, cu text albastru deschis** (`theme="night"` în `BaseLayout`,
+  tokenii din `:root[data-theme='night']`). **Titlul paginii Design e TechText** (React Bits,
+  `scripts/tech-text.ts`). Pe ambele, h1-ul rămâne text real.
 - **Verificare înainte de commit:** `taste-skill lint` și `inspect` cu 0 FAIL. Critica rundei
   se scrie în `.taste-skill/critique.md`.
 - **Cele două moduri de rulare există** (faza 12): butonul „Motion” din header,

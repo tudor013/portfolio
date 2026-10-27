@@ -1,276 +1,184 @@
 /**
- * Verlet-integrated lanyard for the hero ID badge.
+ * The hero's ID badge: the React Bits lanyard (scripts/lanyard.ts) in full
+ * motion mode, the static DOM card everywhere else.
  *
- * Why not a 3D physics engine: the usual build of this effect (Vercel's Ship
- * '24 badge and the many copies of it) pulls in React, three.js and a Rapier
- * WASM build — roughly half a megabyte before anything draws. The rope here
- * is a chain of points integrated by position rather than velocity, which
- * fits in a few hundred bytes of logic, and the badge stays a real DOM
- * element, so its text is selectable and reachable by a screen reader.
+ * Why three.js is loaded only in full mode: it is about 150 KB compressed, and
+ * the Performance threshold is measured in reduced mode. The DOM card is the
+ * same object standing still, so reduced mode and no-script readers lose the
+ * swing, not the content.
+ *
+ * The 3D card's faces are painted here from the DOM card's own text and
+ * photo, so there is one source for what the badge says.
  */
+import { motionIsFull, onMotionChange } from './motion';
+import type { Lanyard } from './lanyard';
 
-interface Point {
-  x: number;
-  y: number;
-  /** Previous position. Verlet derives velocity from the gap between the two. */
-  px: number;
-  py: number;
+/** The card's face in pixels; the lanyard's portrait card is 1.6 × 2.25. */
+const FACE_WIDTH = 1024;
+const FACE_HEIGHT = 1440;
+
+function token(root: HTMLElement, name: string): string {
+  return getComputedStyle(root).getPropertyValue(name).trim();
 }
 
-const SEGMENTS = 14;
-const GRAVITY = 0.55;
-const DAMPING = 0.975;
-const RELAX_PASSES = 8;
-
-/**
- * Fraction of the remaining distance the grabbed point closes per *step*.
- *
- * This has to be applied once per step, not inside the relaxation loop: at
- * eight passes, a 0.22 follow closes 1 - 0.78^8 ≈ 86% of the gap every frame,
- * which is a teleport wearing a lerp's clothing. That bug is what made the
- * badge snap to the cursor on click.
- */
-const DRAG_FOLLOW = 0.16;
-
-/** Physics runs at a fixed rate so a 144Hz display behaves like a 60Hz one. */
-const STEP_MS = 1000 / 120;
-const MAX_STEPS_PER_FRAME = 5;
-
-/**
- * The badge falls from above the page and the lanyard catches it.
- *
- * The whole assembly — strap included — starts this far above its resting
- * place and is left in **free fall**: the anchor is not pinned while it
- * drops, so everything accelerates under the same gravity as anything else
- * in the simulation. The moment the anchor reaches its hook, it pins, the
- * strap snaps taut, and the card carries on under its own momentum and
- * swings out before settling.
- *
- * An earlier version eased the anchor down on a timing curve. That is a
- * controlled descent, not a fall: it arrived at a constant-ish speed and the
- * strap never went taut, so there was no catch.
- */
-const DROP_HEIGHT = 1100;
-
-const SWAY_AMPLITUDE = 0.009;
-const SWAY_PERIOD_MS = 5200;
-/** Velocity, in pixels per step, given to the card when it is clicked. */
-const NUDGE = 13;
-
-export interface BadgeOptions {
-  /**
-   * Suppresses the entrance swing and the idle sway, leaving only motion the
-   * visitor asks for. Reduced motion means no unprompted animation; it does
-   * not mean the badge stops answering a pointer.
-   */
-  calm?: boolean;
-}
-
-export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => void {
-  const calm = options.calm ?? false;
-  const strap = root.querySelector<SVGPathElement>('[data-strap]');
-  const card = root.querySelector<HTMLElement>('[data-card]');
-  if (!strap || !card) return () => {};
-
-  const anchorX = root.clientWidth / 2;
-  const ropeLength = root.clientHeight * 0.34;
-  const restLength = ropeLength / SEGMENTS;
-
-  /** How far below the clip the card's weight acts. */
-  const cardDrop = Math.max(60, card.offsetHeight * 0.45);
-
-  // Reduced motion gets the badge already in place; everyone else watches it
-  // arrive.
-  const dropFrom = calm ? 0 : -DROP_HEIGHT;
-  /** False until the anchor reaches its hook, after which it is pinned. */
-  let landed = calm;
-
-  const rope: Point[] = Array.from({ length: SEGMENTS + 1 }, (_, i) => {
-    const y = dropFrom + i * restLength;
-    return { x: anchorX, y, px: anchorX, py: y };
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
   });
+}
 
-  /**
-   * The card is not glued to the strap's last segment — it hangs from it.
-   *
-   * `tail` is a second mass a little below the clip, held at a fixed distance
-   * from it. The card's tilt comes from the line between the two, so it lags
-   * the strap on the way out and overshoots on the way back, the way a real
-   * badge does. Deriving the angle straight from the rope made the card feel
-   * welded to the lanyard.
-   */
-  const clip = () => rope[rope.length - 1]!;
-  const tailY = dropFrom + ropeLength + cardDrop;
-  const tail: Point = { x: anchorX, y: tailY, px: anchorX, py: tailY };
+function surface(width: number, height: number) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  return { canvas, ctx: canvas.getContext('2d')! };
+}
 
-  /** Set on pointerdown: where the clip should sit relative to the cursor. */
-  let grab: { dx: number; dy: number } | null = null;
-  let pointer: { x: number; y: number } | null = null;
-  let travelled = 0;
+interface Faces {
+  front: string;
+  back: string;
+  strap: string;
+}
 
-  let frame = 0;
-  let lastTime = 0;
-  let accumulator = 0;
-  let elapsed = 0;
-  let turn = 0;
+async function paintFaces(root: HTMLElement): Promise<Faces> {
+  const text = (selector: string) => root.querySelector(selector)?.textContent?.trim() ?? '';
+  const name = text('.name');
+  const role = text('.role');
+  const id = text('.id');
 
-  function integrate(p: Point, sway: number) {
-    const vx = (p.x - p.px) * DAMPING;
-    const vy = (p.y - p.py) * DAMPING;
-    p.px = p.x;
-    p.py = p.y;
-    p.x += vx + sway;
-    p.y += vy + GRAVITY;
+  const card = token(root, '--badge-card');
+  const ink = token(root, '--ink');
+  const muted = token(root, '--muted');
+  const strap = token(root, '--badge-strap');
+  const family = getComputedStyle(root.querySelector('.name')!).fontFamily;
+
+  // The canvas draws with whatever font is ready; without this the name
+  // would be painted once in the fallback serif and stay that way.
+  // Only the first family is asked for: the generated metric fallback face
+  // after it has no file, and asking for it rejects the whole load.
+  const first = family.split(',')[0];
+  await Promise.all(
+    ['600 76px', '400 52px', '500 52px'].map((spec) => document.fonts.load(`${spec} ${first}`).catch(() => [])),
+  );
+  const portrait = await loadImage(root.dataset.portrait!);
+
+  // ---- Front: the DOM card's layout at five times the size ---------------
+  // The top 160px stay clear: the lanyard punches its strap slot there.
+  const front = surface(FACE_WIDTH, FACE_HEIGHT);
+  {
+    const { ctx } = front;
+    ctx.fillStyle = card;
+    ctx.fillRect(0, 0, FACE_WIDTH, FACE_HEIGHT);
+
+    const side = 560;
+    const x = (FACE_WIDTH - side) / 2;
+    const y = 220;
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x, y, side, side, 20);
+    ctx.clip();
+    const scale = Math.max(side / portrait.width, side / portrait.height);
+    const w = portrait.width * scale;
+    const h = portrait.height * scale;
+    ctx.drawImage(portrait, x + (side - w) / 2, y + (side - h) / 2, w, h);
+    ctx.restore();
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = ink;
+    ctx.font = `600 76px ${family}`;
+    ctx.fillText(name, FACE_WIDTH / 2, 920, FACE_WIDTH - 120);
+    ctx.fillStyle = muted;
+    ctx.font = `400 52px ${family}`;
+    ctx.fillText(role, FACE_WIDTH / 2, 1004, FACE_WIDTH - 120);
+
+    // The strap's colour printed across the card, as on the DOM card.
+    ctx.fillStyle = strap;
+    ctx.fillRect(80, 1130, FACE_WIDTH - 160, 14);
+    ctx.font = `500 52px ${family}`;
+    ctx.fillText(id, FACE_WIDTH / 2, 1250);
   }
 
-  function link(a: Point, b: Point, length: number, pinA: boolean, pinB: boolean) {
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const dist = Math.hypot(dx, dy) || 0.0001;
-    const correction = (dist - length) / dist;
-    // A pinned end does not move, so the free end takes the whole correction.
-    const shareA = pinA ? 0 : pinB ? 1 : 0.5;
-    const shareB = pinB ? 0 : pinA ? 1 : 0.5;
-    a.x += dx * correction * shareA;
-    a.y += dy * correction * shareA;
-    b.x -= dx * correction * shareB;
-    b.y -= dy * correction * shareB;
+  // ---- Back: the strap's blue, with the name and the ID -----------------
+  const back = surface(FACE_WIDTH, FACE_HEIGHT);
+  {
+    const { ctx } = back;
+    ctx.fillStyle = strap;
+    ctx.fillRect(0, 0, FACE_WIDTH, FACE_HEIGHT);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = card;
+    ctx.font = `600 76px ${family}`;
+    ctx.fillText(name, FACE_WIDTH / 2, 760, FACE_WIDTH - 120);
+    ctx.font = `500 52px ${family}`;
+    ctx.fillText(id, FACE_WIDTH / 2, 850);
   }
 
-  function step() {
-    elapsed += STEP_MS;
-    const sway =
-      pointer || calm ? 0 : Math.sin((elapsed / SWAY_PERIOD_MS) * Math.PI * 2) * SWAY_AMPLITUDE;
-
-    // While falling, the anchor is just another mass: it accelerates with
-    // everything else. Pinning it is what ends the fall.
-    if (!landed) integrate(rope[0]!, 0);
-    for (let i = 1; i < rope.length; i++) integrate(rope[i]!, sway * i);
-    integrate(tail, sway * SEGMENTS);
-
-    if (!landed && rope[0]!.y >= 0) landed = true;
-
-    // Once per step, not once per relaxation pass.
-    if (pointer && grab) {
-      const end = clip();
-      end.x += (pointer.x + grab.dx - end.x) * DRAG_FOLLOW;
-      end.y += (pointer.y + grab.dy - end.y) * DRAG_FOLLOW;
-    }
-
-    for (let pass = 0; pass < RELAX_PASSES; pass++) {
-      // Held horizontally throughout so the drop stays on its hook, but held
-      // vertically only once it has landed.
-      rope[0]!.x = anchorX;
-      if (landed) rope[0]!.y = 0;
-      for (let i = 0; i < rope.length - 1; i++) {
-        link(rope[i]!, rope[i + 1]!, restLength, i === 0, false);
-      }
-      link(clip(), tail, cardDrop, false, false);
-    }
-
-    // Keep the whole assembly inside its own box. Moving the previous
-    // position to the wall as well is what stops the boundary behaving like a
-    // trampoline: a stale `px` reads as a large velocity.
-    if (!landed) return;
-
-    const margin = card!.offsetWidth / 2;
-    for (const p of [clip(), tail]) {
-      const bounded = Math.max(margin, Math.min(root.clientWidth - margin, p.x));
-      if (bounded !== p.x) {
-        p.px = bounded;
-        p.x = bounded;
-      }
-    }
+  // ---- Strap: the name woven in, along its length ------------------------
+  // The lanyard lays the image's width along the strap and its height across.
+  const across = 192;
+  const along = 1400;
+  const band = surface(along, across);
+  {
+    const { ctx } = band;
+    ctx.fillStyle = strap;
+    ctx.fillRect(0, 0, along, across);
+    ctx.fillStyle = card;
+    ctx.font = `500 80px ${family}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(name, along / 2, across / 2 + 4);
   }
 
-  function render() {
-    strap!.setAttribute(
-      'd',
-      rope.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '),
-    );
-
-    const end = clip();
-    const angle = (Math.atan2(tail.x - end.x, tail.y - end.y) * 180) / Math.PI;
-
-    // A real badge turns edge-on as it swings, which is most of what makes it
-    // read as an object rather than a picture.
-    const speed = tail.x - tail.px;
-    turn += (Math.max(-26, Math.min(26, speed * 2.2)) - turn) * 0.08;
-
-    const half = card!.offsetWidth / 2;
-    card!.style.transform =
-      `translate(${(end.x - half).toFixed(1)}px, ${end.y.toFixed(1)}px) ` +
-      `rotateZ(${(-angle).toFixed(2)}deg) rotateY(${turn.toFixed(2)}deg)`;
-  }
-
-  function loop(now: number) {
-    if (!lastTime) lastTime = now;
-    // Clamped so a backgrounded tab does not return and run a thousand steps.
-    accumulator = Math.min(accumulator + (now - lastTime), STEP_MS * MAX_STEPS_PER_FRAME);
-    lastTime = now;
-
-    while (accumulator >= STEP_MS) {
-      step();
-      accumulator -= STEP_MS;
-    }
-
-    render();
-    frame = requestAnimationFrame(loop);
-  }
-
-  function toLocal(event: PointerEvent) {
-    const rect = root.getBoundingClientRect();
-    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
-  }
-
-  function onDown(event: PointerEvent) {
-    const local = toLocal(event);
-    const end = clip();
-    // Remember where the clip sits relative to the cursor, so grabbing the
-    // card does not move it at all — it only follows what the hand does next.
-    grab = { dx: end.x - local.x, dy: end.y - local.y };
-    pointer = local;
-    travelled = 0;
-    card!.setPointerCapture(event.pointerId);
-    root.dataset.dragging = 'true';
-  }
-
-  function onMove(event: PointerEvent) {
-    if (!pointer) return;
-    const local = toLocal(event);
-    travelled += Math.hypot(local.x - pointer.x, local.y - pointer.y);
-    pointer = local;
-  }
-
-  function onUp(event: PointerEvent) {
-    const wasPressed = pointer !== null;
-    pointer = null;
-    grab = null;
-    card!.releasePointerCapture(event.pointerId);
-    delete root.dataset.dragging;
-
-    // A press that never travelled is a click. Holding a point where it
-    // already was changes nothing, so give it a push instead — otherwise the
-    // most obvious way to try the badge appears to do nothing.
-    if (wasPressed && travelled < 5) {
-      tail.px = tail.x + (tail.x < root.clientWidth / 2 ? -NUDGE : NUDGE);
-    }
-  }
-
-  card.addEventListener('pointerdown', onDown);
-  card.addEventListener('pointermove', onMove);
-  card.addEventListener('pointerup', onUp);
-  card.addEventListener('pointercancel', onUp);
-
-  root.dataset.live = 'true';
-  frame = requestAnimationFrame(loop);
-
-  return () => {
-    cancelAnimationFrame(frame);
-    card.removeEventListener('pointerdown', onDown);
-    card.removeEventListener('pointermove', onMove);
-    card.removeEventListener('pointerup', onUp);
-    card.removeEventListener('pointercancel', onUp);
-    delete root.dataset.live;
+  return {
+    front: front.canvas.toDataURL('image/png'),
+    back: back.canvas.toDataURL('image/png'),
+    strap: band.canvas.toDataURL('image/png'),
   };
+}
+
+export function initBadge(root: HTMLElement): void {
+  const stage = root.querySelector<HTMLElement>('[data-stage]')!;
+  let lanyard: Lanyard | null = null;
+  let faces: Promise<Faces> | null = null;
+  // Each sync supersedes the one before; a slow import must not start a
+  // lanyard after the reader has switched motion off again.
+  let generation = 0;
+
+  async function sync(): Promise<void> {
+    const mine = ++generation;
+
+    if (!motionIsFull()) {
+      lanyard?.destroy();
+      lanyard = null;
+      root.removeAttribute('data-live');
+      return;
+    }
+    if (lanyard) return;
+
+    faces ??= paintFaces(root);
+    const [{ initLanyard }, painted] = await Promise.all([import('./lanyard'), faces]);
+    if (mine !== generation || lanyard) return;
+
+    lanyard = initLanyard(stage, {
+      frontImage: painted.front,
+      backImage: painted.back,
+      strapImage: painted.strap,
+      strapColor: token(root, '--badge-strap'),
+      cardColor: token(root, '--badge-card'),
+      finish: 'glossy',
+      metal: 'silver',
+      size: 0.42,
+      strapLength: 0.42,
+      strapWidth: 0.8,
+      cornerRadius: 0.25,
+    });
+    // No WebGL: the DOM card simply stays.
+    if (lanyard) root.dataset.live = '';
+  }
+
+  onMotionChange(() => void sync());
+  void sync();
 }

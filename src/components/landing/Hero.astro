@@ -143,16 +143,17 @@ import SearchTree from './SearchTree.astro';
     gap: var(--space-4) var(--space-8);
   }
 
-  /* Spans both rows: the badge's box is 760px tall, and in the first row
-     alone it would stretch the first screen past the bottom of a short
-     window. */
+  /* Spans both rows, so the badge never sets the first screen's height. */
   .badge-slot {
     position: relative;
     z-index: 1;
     grid-row: 1 / -1;
     grid-column: 2;
-    /* The strap hangs from the header's bottom edge. */
-    align-self: start;
+    /* The full height of the first screen: the strap hangs from the header's
+       bottom edge and the card can swing anywhere below it. */
+    align-self: stretch;
+    width: 34rem;
+    --swing: 12rem;
     margin-right: calc(var(--space-8) * -1);
   }
 
@@ -208,10 +209,7 @@ import SearchTree from './SearchTree.astro';
     .badge-slot {
       width: 20rem;
       margin-right: 0;
-    }
-
-    .badge-slot :global(.badge) {
-      width: 100%;
+      --swing: 6rem;
     }
 
     .tree-area {
@@ -250,6 +248,7 @@ import SearchTree from './SearchTree.astro';
       width: auto;
       height: 36rem;
       margin-inline: calc(var(--margin) * -1);
+      --swing: 0px;
       background: var(--surface);
       display: grid;
       justify-items: center;

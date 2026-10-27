@@ -1147,3 +1147,83 @@ separat.
 Verificare: `astro check` dă 0 erori, `taste-skill lint` dă 0 FAIL, iar `inspect` dă 0 FAIL, cu
 aceleași 4 avertismente justificate. La patru lățimi nu apare scroll orizontal, consola e curată,
 fără JavaScript tot textul se vede, iar ordinea din tastatură e neschimbată.
+
+## Faza 16 — Lanyard React Bits, pagina Software pe negru, titlul Design cu TechText
+
+### Badge-ul: Lanyard din React Bits
+
+- **Ce s-a schimbat.** Badge-ul meu din DOM, cu fizică Verlet, a fost înlocuit cu
+  [Lanyard](https://reactbits.dev/components/lanyard) din React Bits. E un card 3D în three.js
+  pe un șnur, cu fizica lui (frânghie din patru segmente plus un corp rigid). Cardul se poate
+  apuca și balansa, iar o atingere scurtă îl întoarce pe spate.
+- **Portarea** (`src/scripts/lanyard.ts`). Componenta React a devenit funcția
+  `initLanyard(container, options)`, care întoarce `{ update, destroy }`. Ca la GradientASCII,
+  restul codului e neschimbat: fizica, geometria, shaderele. Am scos un singur lucru:
+  verificarea proprie a `prefers-reduced-motion`, pentru că acum decide butonul „Motion”.
+  Licența MIT + Commons Clause e păstrată în antet.
+- **Fața cardului se pictează în browser** (`src/scripts/badge.ts`). Poza, numele, rolul și
+  „ID 2028·CSIE” sunt citite din cardul HTML și desenate pe un canvas cu fontul Literata.
+  Canvasul devine imaginea de pe față. Pe spate e albastrul șnurului, cu numele și ID-ul. Pe
+  șnur e țesut numele tău. Textul există o singură dată, în HTML, deci nu se poate desincroniza.
+- **De ce three.js se încarcă doar în modul cu animații.** Pachetul are aproximativ 138 KB
+  comprimat, iar pragul de Performance ≥ 90 se măsoară în modul redus. În modul redus, fără
+  JavaScript sau fără WebGL rămâne cardul HTML, nemișcat: același obiect, doar că nu se
+  balansează.
+- **Schimbare față de înainte:** în modul redus cardul nu mai răspunde la tras. Ar fi cerut să
+  încarc three.js și acolo.
+- **Accesibilitate.** Canvasul e `aria-hidden`. Cât rulează Lanyard-ul, cardul HTML iese de pe
+  ecran, dar rămâne în arborele de accesibilitate, deci un cititor de ecran aude în continuare
+  poza (cu `alt`) și textul.
+- **Zona în care se poate balansa.** Canvasul e cu 12rem mai lat decât coloana badge-ului, spre
+  stânga, ca un card tras spre nume să nu fie tăiat la marginea coloanei. Stă sub textul din
+  hero, deci butoanele și linkurile rămân clicabile.
+
+### Pagina Software: fundal negru, text albastru deschis
+
+- `BaseLayout` primește `theme="night"`, care pune `data-theme="night"` pe `<html>`. În
+  `tokens.css`, sub `:root[data-theme='night']`, se schimbă doar tokenii semantici: fundalul,
+  suprafața, cerneala, textul secundar și accentul. Componentele nu știu de temă și urmează
+  singure, inclusiv headerul, cardurile și butonul.
+- **Contrast măsurat cu formula WCAG:**
+  - textul albastru deschis `#a9c8f5` pe negru `#05070c`: 11.77:1;
+  - textul secundar: 7.17:1;
+  - accentul: 9.96:1;
+  - marginea controalelor: 3.72:1.
+- Am folosit cheia internă `dev`, nu slug-ul `software`, pentru că după ea se generează pagina.
+
+### Pagina Design: titlul cu TechText
+
+- [TechText](https://reactbits.dev/text-animations/tech-text), portat la fel, în
+  `src/scripts/tech-text.ts`. Titlul „UI/UX & Graphic Design” e desenat pe canvas. Sub cursor,
+  fiecare literă își arată cutia, dimensiunile și liniile tipografice (baseline, x-height, cap
+  height). Literele se pot trage și „lovi”. La încărcare, liniile se desenează o dată (intro
+  `metrics`).
+- **Ce am schimbat la port:**
+  - etichetele sunt în Literata la 13px, nu monospace la 10px, pentru că site-ul n-are
+    monospace și nici text sub 13px;
+  - textul aliniat la stânga pornește din marginea containerului, ca să se alinieze cu
+    paragraful de dedesubt.
+- **h1 rămâne text real.** Cât canvasul desenează cuvântul, textul primește `sr-only`. Fără
+  JavaScript și pe telefon (sub 40rem) se vede titlul obișnuit: acolo cuvântul, pus pe un rând,
+  ar ieși mai mic decât titlul normal.
+- În modul redus nu rulează intro-ul, nici plimbarea automată a lupei, nici „lovitura”. Lupa
+  urmează totuși cursorul, pentru că răspunde la mâna ta și nu pornește singură.
+
+### Verificare
+
+- `astro check`: 0 erori.
+- `taste-skill lint`: 0 FAIL, 0 WARN.
+- `inspect` pe landing: 0 FAIL, cu aceleași 4 avertismente justificate.
+- La 1440, 1366, 390 și 360 de pixeli lățime:
+  - nicio pagină nu are scroll orizontal;
+  - consola e curată;
+  - ordinea din tastatură e neschimbată;
+  - fără JavaScript se vede tot textul.
+- **Lanyard-ul**, filmat cu WebGL în Chromium:
+  - atârnă de sub header;
+  - se lasă tras cu mouse-ul;
+  - se balansează peste spațiul liber dintre nume și coloană;
+  - în modul redus rămâne cardul HTML.
+- **Inspectorul pe paginile Software și Design** dă 3 FAIL-uri: nu au poze, nu au mișcare la
+  scroll și n-au un element dominant. Pe Design, inspectorul nu vede canvasul ca text.
+  - Sunt aceleași probleme ca pe pagina Data: paginile interioare n-au fost redesenate.
