@@ -98,6 +98,11 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
   /* Borders here bound an interactive control, so they use the token that
      clears the 3:1 required for non-text UI — not the decorative hairline. */
   .action {
+    /* 44px is the floor for anything a finger has to hit. Padding alone left
+       these at about 40px, which is a miss often enough to matter. */
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: var(--space-3) var(--space-6);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);

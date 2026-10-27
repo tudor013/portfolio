@@ -139,8 +139,63 @@ Implementare (componenta `ScrollVideo` + `scripts/scroll-video.ts`):
 - Buget: fiecare fișier < 25 MiB (limita Cloudflare per fișier), ideal tot fundalul animat < 5–8 MB. Dacă trece, mutăm media pe Cloudflare R2.
 - Textul de deasupra trebuie să rămână lizibil (contrast verificat, overlay dacă e nevoie).
 
+## Ghidul de frontend — `ghid-claude/GHID-SITE-URI.md`
+
+Distilarea muncii de la Energy Intelligence (ITFest 2026). **Se citește înainte de orice lucru de
+UI.** Secțiunea 11 („greșeli deja făcute") merită citită prima: ne-a prins deja un gol real aici.
+
+### Ce NU am făcut, și de ce
+
+Secțiunea 2.3 a ghidului propune un `CLAUDE.md` scurt, de 5 rânduri, pentru un proiect nou.
+**Nu l-am pus în locul acestuia.** Fișierul de față conține decizii luate în timp — regula
+telefonului, limba, libertatea creativă, cerințele pentru badge, rezolvarea conflictului
+performanță/animație. Înlocuit cu varianta de 5 rânduri, toate s-ar fi pierdut tăcut, iar o
+sesiune viitoare ar fi refăcut greșeli deja rezolvate. Ghidul e **adăugat**, nu substituit.
+
+### Unde ghidul descrie alt proiect
+
+Ghidul a fost scris pentru **React + Vite + Tailwind 4**. Aici avem **Astro + CSS simplu**, iar
+secțiunea „Stack" de mai sus interzice explicit Tailwind. Deci:
+
+| Ghidul spune | Aici |
+|---|---|
+| tokenii în `src/index.css`, cu `@theme inline` | `src/styles/tokens.css`, CSS pur |
+| clase Tailwind (`bg-background`) | clase proprii + variabile CSS |
+| `lazy()` + `Suspense` pentru pagini grele | Astro livrează pagini statice; nu se aplică |
+| `lucide-react` pentru iconițe | nu folosim librărie de iconițe |
+
+Principiile din ghid (tokeni, buget de culoare, ritm, mișcare, verificare) se aplică integral.
+Implementarea lor nu.
+
+### Skill-uri: ce există efectiv
+
+Ghidul listează patru skilluri instalate pe laptopul lui Tudor. **În sesiunile din cloud e
+disponibil doar `ui-ux-pro-max`** (ca plugin). `taste-skill`, `design-motion-principles` și
+`awesome-design-claude` **nu există aici** — nu le revendica și nu raporta că le-ai folosit.
+
+### Ce am verificat din ghid la integrare (27.10.2026)
+
+| Regula ghidului | Starea aici |
+|---|---|
+| nicio culoare hex în componente | **respectată** — zero apariții în afara `tokens.css` |
+| doar `transform` / `opacity` / `filter` animate | respectată |
+| un singur cititor de scroll → variabile CSS | respectată (`scroll-light.ts`) |
+| `overflow-x: clip`, nu `hidden` | respectată |
+| mișcarea redusă lasă pagina vie, nu moartă | respectată — **aceeași greșeală o făcusem la badge** (greșeala 1 din ghid) |
+| contrast măsurat numeric | respectată |
+| **ținte de minimum 44px** | **era încălcată peste tot** — reparată la integrare |
+| verificare la 4 lățimi | adăugată: 1440×900, 1366×768, 390×844, 360×740 |
+| 4 stări pe ecranele cu date | nu se aplică încă — site-ul n-are ecrane cu date live |
+| backup înainte de redesign | nu se aplică — istoricul git acoperă asta |
+
+**Excepție documentată la 44px:** linkul din footer („Source on GitHub") stă în mijlocul unei
+propoziții. WCAG 2.5.8 exceptează linkurile inline din text curent, iar mărirea lui ar rupe
+rândul. Toate celelalte controale au fost ridicate la 44px.
+
 ## Calitate (verifică înainte de fiecare deploy)
 - Lighthouse: Performance ≥ 90, Accessibility ≥ 95 pe mobil
 - Navigare completă din tastatură, `alt` pe toate imaginile, contrast WCAG AA
+- **Ținte de atingere ≥ 44px** pe controale de sine stătătoare (linkurile inline din text sunt exceptate)
+- **Verificare la patru lățimi:** 1440×900, 1366×768, 390×844, 360×740 — zero scroll orizontal, consolă curată
 - Meta tags + Open Graph (preview frumos când linkul e trimis pe LinkedIn)
 - Site funcțional și fără JavaScript (fără animații, dar cu tot conținutul)

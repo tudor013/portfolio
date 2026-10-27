@@ -89,6 +89,9 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
   }
 
   .wordmark {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: var(--text-primary);
     font-weight: var(--weight-medium);
     text-decoration: none;
@@ -104,10 +107,12 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
   }
 
   nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: var(--text-muted);
     font-size: var(--text-secondary);
     text-decoration: none;
-    padding-block: var(--space-1);
     border-bottom: 2px solid transparent;
     transition:
       color var(--duration-fast) var(--ease-out),
@@ -125,6 +130,9 @@ const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
   }
 
   .cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);

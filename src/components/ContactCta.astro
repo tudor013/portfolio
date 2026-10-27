@@ -49,4 +49,13 @@ const GITHUB = 'https://github.com/tudor013';
     padding: 0;
     list-style: none;
   }
+
+  /* Standalone contact targets, not links inside a sentence, so they take the
+     44px floor. The footer's "Source on GitHub" sits mid-sentence and is
+     exempt under WCAG 2.5.8 — padding it to 44px would break the line. */
+  .channels a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 </style>
