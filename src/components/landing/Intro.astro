@@ -7,7 +7,7 @@
 ---
 
 <section class="intro frame" aria-labelledby="intro-heading">
-  <div class="lead" data-enter>
+  <div class="lead screen centred" data-enter>
     <h2 id="intro-heading">Systems with moving parts</h2>
     <p class="statement">
       I study economic cybernetics, how systems steer themselves through
@@ -16,7 +16,7 @@
     </p>
   </div>
 
-  <div class="columns" data-enter>
+  <div class="columns screen centred" data-enter>
     <p>
       <strong>Who.</strong> Tudor-Andrei Ifrim, studying Economic Informatics at
       the Faculty of Cybernetics, Statistics and Economic Informatics in
@@ -51,21 +51,11 @@
 <style>
   /* Generous air on both sides of the lead: after the dense blueprint above,
      the page breathes before the four columns start. */
-  .intro {
-    display: grid;
-    gap: var(--space-24);
-    padding-block: var(--section-gap) 0;
-  }
-
-  /* The lead gets a screen of its own, centred in it: with the lead in view
-     the four columns are still below the fold, and a short scroll brings
-     them in. Tudor did not want the two on screen at once. */
+  /* Two screens: the lead, then the four columns. Tudor did not want them
+     on screen at once. */
   .lead {
-    display: grid;
-    align-content: center;
     gap: var(--space-6);
-    min-height: calc(100svh - 4rem);
-    padding-left: var(--column-start);
+    --content: 48rem;
   }
 
   .statement {
@@ -75,10 +65,8 @@
   }
 
   .columns {
-    display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-12) var(--space-8);
-    padding-left: var(--column-start);
   }
 
   .columns p {
@@ -92,11 +80,6 @@
   }
 
   @media (max-width: 40rem) {
-    .lead,
-    .columns {
-      padding-left: 0;
-    }
-
     .columns {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-8);

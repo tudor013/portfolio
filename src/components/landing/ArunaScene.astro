@@ -81,20 +81,23 @@ const FRAMES = [
 
 <style>
   .aruna {
-    padding-top: var(--section-gap);
+    padding-block: var(--space-16);
   }
 
   .stage {
     display: grid;
     gap: var(--space-12);
     padding-inline: var(--margin);
+    /* Centred, like every section: on a wide screen the text and the
+       picture stay together instead of drifting to the edges. */
+    width: min(100%, calc(var(--content) + 2 * var(--margin)));
+    margin-inline: auto;
   }
 
   .text {
     display: grid;
     align-content: start;
     gap: var(--space-8);
-    padding-left: var(--column-start);
   }
 
   .copy {
@@ -157,7 +160,7 @@ const FRAMES = [
 
   .aruna.is-live {
     height: calc((var(--hold) + 1) * 100svh);
-    padding-top: 0;
+    padding-block: 0;
   }
 
   .aruna.is-live .stage {

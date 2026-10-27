@@ -58,6 +58,13 @@ starts just below the fold, which Tudor asked for.
 Also fixed: the schema title is now placed 48px below PASAGERI at every measured size, and falls
 back to the finished composition when the labels would drop under 13px.
 
+## ROUND 4 (one section per screen, centred; inspect.mjs: 0 FAIL, 4 WARN)
+
+At Tudor's request each landing section now fills a screen with its content centred. That
+departs from the dealt quiet-instrument column on purpose: his rule decides it. The new warning,
+`off-centre` (63px against 47px at 1440), comes from the percentile the meter takes over block
+edges. No screenshot shows it.
+
 ### Warnings defended
 - `no-footage`: no honest clip exists. The Spline scenes cannot be recorded from here, and stock
   footage would show someone else's world. The moving pictures are the live market and the Aruna

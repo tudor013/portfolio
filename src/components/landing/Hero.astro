@@ -4,9 +4,9 @@
  * right the ID badge hangs; below the text, on a drafting sheet, a binary
  * search tree builds itself when the page opens (SearchTree).
  *
- * The first screen holds only the name, the sentence and the two actions;
- * the line about availability sits just below it, so the opening is not
- * crowded and there is room for the tree to move.
+ * The first screen holds only the name, the sentence, the two actions, the
+ * tree and the badge. Availability is said in the intro's "Where" and in the
+ * contact section; here it would only crowd the opening.
  *
  * The load sequence of the text is CSS only, so it runs from the first frame
  * and never waits on a script.
@@ -53,23 +53,18 @@ import SearchTree from './SearchTree.astro';
     <IdBadge />
   </div>
 
-  <p class="status" data-enter>
-    <span>
-      Open to an internship, a part-time role or a junior position, and
-      available now. Studying Economic Informatics, graduating in 2028.
-    </span>
-  </p>
 </section>
 
 <style>
   .hero {
+    --hero-start: calc(var(--column-start) * 0.35);
     isolation: isolate;
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    /* The first row is the whole first screen below the header; the
-       availability line waits in the second, just out of view. */
-    grid-template-rows: minmax(calc(100svh - 4rem), auto) auto;
+    /* Exactly the first screen below the header: the next section starts
+       where the screen ends. */
+    grid-template-rows: minmax(calc(100svh - 4rem), auto);
     column-gap: var(--space-8);
   }
 
@@ -115,7 +110,9 @@ import SearchTree from './SearchTree.astro';
     display: grid;
     align-content: start;
     gap: var(--space-6);
-    padding-left: var(--column-start);
+    /* Closer to the left than the other sections' content, so the name and
+       the badge are not squeezed together. */
+    padding-left: var(--hero-start);
     padding-block: clamp(1.5rem, 5vh, 3rem);
   }
 
@@ -169,22 +166,10 @@ import SearchTree from './SearchTree.astro';
     align-self: end;
     max-width: 34rem;
     height: clamp(10rem, 24vh, 15rem);
-    margin: 0 0 var(--space-8) var(--column-start);
+    margin: 0 0 var(--space-8) var(--hero-start);
     container: tree / inline-size;
   }
 
-  .status {
-    position: relative;
-    z-index: 1;
-    grid-row: 2;
-    grid-column: 1;
-    padding: var(--space-8) 0 var(--space-16) var(--column-start);
-  }
-
-  .status span {
-    display: block;
-    max-width: 36ch;
-  }
 
   /* ---- Load sequence ---------------------------------------------------- */
 
@@ -210,7 +195,7 @@ import SearchTree from './SearchTree.astro';
   @media (max-width: 60rem) {
     .hero {
       column-gap: var(--space-4);
-      grid-template-rows: minmax(calc(100svh - 6.5rem), auto) auto;
+      grid-template-rows: minmax(calc(100svh - 6.5rem), auto);
       /* A card swung to the edge must never widen the page. `clip` cuts the
          sideways overflow only, so the strap can still drop in from above. */
       overflow-x: clip;
@@ -234,9 +219,6 @@ import SearchTree from './SearchTree.astro';
       margin-left: 0;
     }
 
-    .status {
-      padding-left: 0;
-    }
 
     .drafting-sheet {
       opacity: 0.42;
@@ -279,10 +261,6 @@ import SearchTree from './SearchTree.astro';
       margin-bottom: var(--space-8);
     }
 
-    .status {
-      grid-row: auto;
-      grid-column: auto;
-    }
 
     .drafting-sheet {
       opacity: 0.3;

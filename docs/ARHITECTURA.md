@@ -1067,3 +1067,61 @@ Reach) nu se mai văd în același timp. Paragraful are acum un ecran întreg, c
 (`min-height: calc(100svh - 4rem)` în `Intro.astro`), plus 6rem distanță până la coloane. Când
 paragraful e vizibil, coloanele încep sub marginea de jos a ecranului; le aduce un scroll scurt.
 Am verificat la 1850×935, 1440×900, 1366×768 și 390×844.
+
+## Faza 14 — O secțiune pe ecran, conținut centrat, câmp ASCII pe pagina Data
+
+### Regula nouă (a ta)
+
+„Nu vreau să apară două secțiuni diferite din landing page în același timp pe pagină.” Fiecare
+secțiune a landing-ului ocupă acum cel puțin un ecran (sub header), cu conținutul centrat pe
+verticală și spațiu deasupra și dedesubt. Când o secțiune e pe ecran, vecinele ei sunt în afara
+lui, iar următoarea apare cu scroll.
+
+Regula e implementată prin două clase din `src/styles/global.css`:
+
+- `.screen`: înălțimea minimă a unui ecran, conținutul centrat pe verticală, padding sus și jos;
+- `.centred`: lățime maximă `--content` (72rem, definit în `tokens.css`), centrată pe orizontală.
+
+Le folosesc intro-ul (două ecrane: paragraful, apoi cele patru coloane), piața, lista de
+proiecte, scrisoarea și contactul. Schema și Aruna erau deja scene de câte un ecran, fixate la
+scroll. Pe Aruna am centrat și textul cu imaginea, ca să nu fugă spre margini pe ecranele late.
+
+### Hero
+
+- **Textul și arborele s-au mutat mai la stânga.** Folosesc `--hero-start`, cât 35% din
+  indentarea celorlalte secțiuni. Badge-ul a rămas pe loc, deci numele nu mai stă înghesuit
+  lângă el.
+- **Am scos rândul „Open to an internship…” din hero.** Cu regula nouă ar fi rămas un fragment
+  între două secțiuni, iar aceeași informație apare deja în coloana „Where” din intro și în
+  secțiunea de contact.
+
+### Pagina Data: GradientASCII
+
+Fundalul vine din React Bits (gradient-ascii). E un câmp de gradient WebGL2 desenat ca grilă de
+caractere ASCII; mouse-ul amestecă caracterele pe unde trece. L-am portat din React în
+TypeScript simplu (`src/scripts/gradient-ascii.ts`):
+
+- `useEffect`/`useRef` au devenit o funcție `initGradientAscii(container, canvas, opțiuni)`;
+- verificarea de mișcare redusă ascultă acum butonul „Motion”: cu mișcarea oprită, câmpul se
+  desenează o dată și rămâne nemișcat;
+- shaderele și randarea sunt neschimbate.
+
+Pe pagină (`src/pages/[category].astro`, doar pentru `data`), câmpul e o bandă pe toată lățimea,
+lipită sub header, în albastrurile paletei (`--chalk-300`, `--blue-400`, `--blue-700`,
+`--blue-800`). Titlul stă pe o placă de hârtie peste marginea ei de jos, ca să rămână lizibil.
+Codul se descarcă doar pe pagina Data (`import()` dinamic).
+
+**Licența:** React Bits e „MIT + Commons Clause”. Componenta se poate folosi ca parte dintr-un
+site, cu notița de copyright păstrată (e în capul fișierului). Nu se poate vinde sau redistribui
+separat.
+
+### Verificare
+
+- `astro check`: 0 erori. `taste-skill lint`: 0 FAIL, 0 WARN. Fontul monospace al glifelor e o
+  excepție marcată: grila de caractere are nevoie de lățimi egale.
+- `taste-skill inspect` pe landing: 0 FAIL, 4 avertismente. Cel nou e `off-centre`: inspectorul
+  măsoară marginile pe percentile ale blocurilor și găsește 63px vs 47px. Diferența nu se vede.
+- Pagina Data: câmpul randează în Chromium cu WebGL2, fără erori în consolă și fără scroll
+  orizontal, la 1440 și la 390. Inspectorul dă pe ea 2 FAIL-uri care țin de pagina interioară,
+  nu de câmp: nu are imagini, iar o pagină desenată pe canvas nu are elemente care să „se
+  miște” în sensul lui. Paginile interioare n-au fost redesenate încă.

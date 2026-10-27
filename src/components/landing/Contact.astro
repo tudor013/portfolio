@@ -5,7 +5,7 @@
  */
 ---
 
-<section class="contact frame" id="contact" aria-labelledby="contact-heading">
+<section class="contact frame screen" id="contact" aria-labelledby="contact-heading">
   <p class="statement" data-enter>
     <span>
       An internship, part-time work alongside my degree or a junior role: I can
@@ -29,12 +29,12 @@
     grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: start;
     gap: var(--space-8);
-    padding-block: var(--section-gap);
+    width: min(100%, calc(64rem + 2 * var(--margin)));
+    margin-inline: auto;
   }
 
   .statement {
     grid-column: 1 / span 6;
-    padding-left: var(--column-start);
     max-width: none;
   }
 
@@ -47,7 +47,7 @@
   }
 
   .reach {
-    grid-column: 9 / span 4;
+    grid-column: 8 / span 5;
     display: grid;
     gap: var(--space-4);
   }
@@ -69,7 +69,9 @@
     align-items: center;
     min-height: 44px;
     font-size: var(--step-lead);
+    /* Breaks only if a phone is too narrow for the whole address. */
     overflow-wrap: anywhere;
+    white-space: nowrap;
   }
 
   .place {
@@ -81,12 +83,11 @@
      left edge. */
   @media (max-width: 60rem) {
     .statement {
-      grid-column: 1 / span 7;
-      padding-left: 0;
+      grid-column: 1 / span 6;
     }
 
     .reach {
-      grid-column: 8 / span 5;
+      grid-column: 7 / span 6;
     }
   }
 

@@ -25,6 +25,7 @@
   --paper-200: #e4e9f0; /* one tone down, for panels */
   --ink-900: #0f1724;
   --ink-600: #4c5668;
+  --blue-400: #4b86e8; /* mid blue, for the Data page's ASCII field only */
   --blue-700: #1549a6;
   --blue-800: #123a7e; /* blueprint field */
   --blue-750: #1c4c9c; /* a table drawn on the field */
@@ -107,6 +108,8 @@
   /* The quiet instrument's column starts about 22% in on a desktop. */
   --column-start: clamp(0rem, -6rem + 26vw, 20rem);
   --column: 36rem;
+  /* The width landing sections centre their content in. */
+  --content: 72rem;
   --measure: 62ch;
 
   /* One corner for the whole page: square. A drafting table has no pills. */

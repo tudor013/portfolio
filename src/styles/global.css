@@ -193,6 +193,24 @@ a:hover {
   transform: translateY(0);
 }
 
+/* ---- One section per screen (Tudor's rule for the landing page) ---------
+
+   Each section of the landing page is at least one screen tall, below the
+   header, with its content centred in it and air above and below. With one
+   section in view, its neighbours are off screen; the reader scrolls from
+   one to the next. --content is the width sections centre their content in. */
+.screen {
+  display: grid;
+  align-content: center;
+  min-height: calc(100svh - 4rem);
+  padding-block: var(--space-16);
+}
+
+.centred {
+  width: min(100%, var(--content));
+  margin-inline: auto;
+}
+
 /* Visually hidden, still read aloud. */
 .sr-only {
   position: absolute;

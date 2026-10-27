@@ -152,8 +152,15 @@ la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
   decorative” și e limitată la hero. **Casa a fost scoasă** la cererea lui Tudor („nu are niciun
   sens”). În locul ei e arborele binar de căutare (`SearchTree`), care se construiește singur cu
   algoritmul real de inserare.
-- **Primul ecran conține doar numele, propoziția, butoanele, arborele și badge-ul.** Rândul cu
-  disponibilitatea stă intenționat sub fold, cerut de Tudor: „lăsăm loc să mai animăm”.
+- **Primul ecran conține doar numele, propoziția, butoanele, arborele și badge-ul** („lăsăm loc
+  să mai animăm”). Rândul cu disponibilitatea a fost scos din hero (faza 14); îl spun coloana
+  „Where” și secțiunea de contact.
+- **Regula lui Tudor: o singură secțiune a landing-ului pe ecran.** Fiecare secțiune are cel
+  puțin înălțimea unui ecran (`.screen`) și conținut centrat pe orizontală (`.centred`,
+  `--content`). Secțiunile noi o respectă și ele. Asta înlocuiește, la cererea lui, coloana
+  „quiet instrument” plasată la 22% din stânga.
+- **Pagina Data are fundalul GradientASCII** (React Bits, portat în `scripts/gradient-ascii.ts`,
+  licență MIT + Commons Clause, cu notița păstrată în fișier).
 
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).

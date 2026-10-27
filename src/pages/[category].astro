@@ -38,9 +38,20 @@ const blurb = CATEGORY_BLURBS[category];
 
 <BaseLayout title={`${label} — Tudor-Andrei Ifrim`} description={blurb}>
 
-  <section class="direction" aria-labelledby="direction-heading">
-    <h1 id="direction-heading">{label}</h1>
-    <p class="blurb">{blurb}</p>
+  <section class:list={['direction', category === 'data' && 'with-field']} aria-labelledby="direction-heading">
+    {/* Data only: a field of ASCII glyphs over a moving gradient, behind the
+        title (GradientASCII, from React Bits). Decorative, so hidden from
+        assistive technology; without a script the band is plain paper. */}
+    {category === 'data' && (
+      <div class="field" data-ascii aria-hidden="true">
+        <canvas></canvas>
+      </div>
+    )}
+
+    <header class="title">
+      <h1 id="direction-heading">{label}</h1>
+      <p class="blurb">{blurb}</p>
+    </header>
 
     {
       projects.length === 0 ? (
@@ -62,9 +73,55 @@ const blurb = CATEGORY_BLURBS[category];
     padding-block: var(--space-16) var(--space-12);
   }
 
+  .title {
+    position: relative;
+    z-index: 1;
+  }
+
   h1 {
     margin-block: 0 var(--space-4);
     font-size: var(--step-head);
+  }
+
+  /* ---- Data: the ASCII field ------------------------------------------- */
+
+  .with-field {
+    position: relative;
+    padding-top: 0;
+  }
+
+  /* Full width, whatever the page's frame: a band across the top. */
+  .field {
+    position: relative;
+    height: min(62svh, 36rem);
+    /* Straight under the header: cancels the page's top padding. */
+    margin-top: calc(var(--space-16) * -1);
+    margin-inline: calc(50% - 50vw);
+  }
+
+  .field canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The title sits on a plate of paper that overlaps the band's bottom
+     edge, so it reads cleanly whatever the glyphs behind it are doing. */
+  .with-field .title {
+    width: fit-content;
+    max-width: 44rem;
+    margin-top: -7rem;
+    padding: var(--space-8) var(--space-8) var(--space-2) 0;
+    background: var(--ground);
+  }
+
+  .with-field .title::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 0 calc(var(--margin) * -1);
+    z-index: -1;
+    background: var(--ground);
   }
 
   .blurb {
@@ -89,3 +146,29 @@ const blurb = CATEGORY_BLURBS[category];
     max-width: none;
   }
 </style>
+
+<script>
+  // Loaded only on the page that has the field.
+  const field = document.querySelector<HTMLElement>('[data-ascii]');
+  const canvas = field?.querySelector('canvas');
+
+  if (field && canvas) {
+    const tokens = getComputedStyle(document.documentElement);
+    const token = (name: string) => tokens.getPropertyValue(name).trim();
+
+    void import('../scripts/gradient-ascii').then(({ initGradientAscii }) =>
+      initGradientAscii(field, canvas, {
+        lightMode: true,
+        shape: 'horizon',
+        // The page's own blues, lightest to deepest.
+        colors: [token('--chalk-300'), token('--blue-400'), token('--blue-700'), token('--blue-800')],
+        cellSize: 16,
+        density: 0.85,
+        glow: 0.15,
+        grain: 0.05,
+        flow: 0.6,
+        speed: 0.8,
+      }),
+    );
+  }
+</script>

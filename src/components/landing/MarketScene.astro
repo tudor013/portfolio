@@ -31,7 +31,7 @@ const CONTROLS = [
 ] as const;
 ---
 
-<section class="market frame" id="market" aria-labelledby="market-heading" data-market data-seed={SEED}>
+<section class="market frame screen" id="market" aria-labelledby="market-heading" data-market data-seed={SEED}>
   <div class="head" data-enter>
     <h2 id="market-heading">Two kinds of trader</h2>
     <p>
@@ -116,8 +116,14 @@ const CONTROLS = [
   .market {
     display: grid;
     gap: var(--space-8);
-    padding-block: var(--section-gap) 0;
-    padding-left: calc(var(--margin) + var(--column-start));
+    /* Centred in the screen it occupies. */
+    justify-items: center;
+  }
+
+  .head,
+  .panel,
+  .source {
+    width: min(100%, var(--content));
   }
 
   .head {
@@ -334,7 +340,6 @@ const CONTROLS = [
 
   @media (max-width: 60rem) {
     .market {
-      padding-left: var(--margin);
     }
 
     .panel {

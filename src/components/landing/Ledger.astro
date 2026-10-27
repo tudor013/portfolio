@@ -22,7 +22,7 @@ const groups = CATEGORIES.map((category) => ({
 }));
 ---
 
-<section class="ledger frame" id="work" aria-labelledby="work-heading">
+<section class="ledger frame screen" id="work" aria-labelledby="work-heading">
   <div class="column">
     <h2 id="work-heading">All the work</h2>
 
@@ -67,14 +67,14 @@ const groups = CATEGORIES.map((category) => ({
 
 <style>
   .ledger {
-    padding-block: var(--section-gap) 0;
+
   }
 
   .column {
     display: grid;
     gap: var(--space-12);
-    width: min(40rem, 100% - var(--column-start));
-    margin-left: var(--column-start);
+    width: min(40rem, 100%);
+    margin-inline: auto;
   }
 
   .group {
@@ -144,8 +144,8 @@ const groups = CATEGORIES.map((category) => ({
   .preview {
     position: absolute;
     top: 0;
-    left: calc(100% + var(--space-16));
-    width: 20rem;
+    left: calc(100% + var(--space-8));
+    width: 18rem;
     opacity: 0;
     transform: translateY(6px);
     pointer-events: none;
