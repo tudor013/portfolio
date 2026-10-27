@@ -70,6 +70,8 @@
   --badge-card: var(--paper-0); /* ink 17.97 · muted 7.40 */
   --badge-strap: var(--blue-800);
   --badge-shadow: 0 2px 4px rgb(15 23 36 / 0.06), 0 18px 40px rgb(15 23 36 / 0.14); /* taste-skill-ignore */
+  /* A Design-page tile lifted off the drift wall under the pointer. */
+  --lift-shadow: 0 24px 60px -18px rgb(15 23 36 / 0.45); /* taste-skill-ignore */
 
   /* ---- SEMANTIC: type --------------------------------------------------- */
 

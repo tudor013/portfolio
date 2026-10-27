@@ -1,0 +1,173 @@
+---
+/**
+ * The Design page's opening band: React Bits' DriftWall, filled with Tudor's
+ * own Aruna Coffee stills (brand, cup, Spline scenes), never stock photos.
+ *
+ * The wall is built here, at build time, so it is a finished picture without
+ * a script; scripts/drift-wall.ts only sets it drifting. It is decorative:
+ * the same pictures, with their descriptions, are on the Aruna project page,
+ * so the band is hidden from assistive technology and its tiles are not
+ * keyboard stops.
+ */
+import { getImage } from 'astro:assets';
+import wordmark from '../assets/landing/aruna-1-wordmark.webp';
+import cup from '../assets/landing/aruna-2-cup.webp';
+import swan from '../assets/landing/aruna-3-swan.webp';
+import lit from '../assets/landing/aruna-4-product.webp';
+import product from '../assets/scenes/aruna-product.png';
+import retro from '../assets/scenes/aruna-retrofuturism.png';
+import retroClose from '../assets/scenes/aruna-retrofuturism-close.webp';
+import retroMid from '../assets/scenes/aruna-retrofuturism-mid.webp';
+
+const COLUMNS = 6;
+/** Copies of each column's sequence; the track loops by one copy's height. */
+const COPIES = 2;
+
+const sources = [wordmark, retroClose, swan, product, cup, retroMid, lit, retro];
+const pictures = await Promise.all(
+  sources.map((src) => getImage({ src, width: 480, height: 360, fit: 'cover', format: 'webp' })),
+);
+
+// Every column runs the whole set, each starting at a different picture, so
+// neighbouring columns never show the same still side by side.
+const columns = Array.from({ length: COLUMNS }, (_, c) =>
+  pictures.map((_, i) => pictures[(i + c * 3) % pictures.length]),
+);
+---
+
+<div class="drift-wall" data-drift-wall data-ui aria-hidden="true">
+  <div class="drift-wall__plane">
+    {
+      columns.map((column, c) => (
+        <div class="drift-wall__col">
+          <div class="drift-wall__track" data-copies={COPIES}>
+            {Array.from({ length: COPIES }, () =>
+              column.map((picture) => (
+                <div class="drift-wall__tile" data-col={c}>
+                  <span class="drift-wall__inner">
+                    <img
+                      src={picture.src}
+                      width="240"
+                      height="180"
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      draggable="false"
+                    />
+                    <span class="drift-wall__overlay" />
+                  </span>
+                </div>
+              )),
+            )}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  /* The component's stylesheet, with the site's tokens in place of its
+     colours: unlit tiles fade towards the paper rather than towards black,
+     and the tiles are square like every corner on the site. */
+  .drift-wall {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    perspective: 1200px;
+    perspective-origin: 50% 50%;
+    --dw-tile-w: 240px;
+    --dw-tile-h: 180px;
+    --dw-gap: 18px;
+    --dw-lift: 64px;
+    --dw-dim: 0.88;
+    --dw-edge: 40%;
+    /* The wall dissolves into the page at its edges instead of stopping at
+       a hard line. Gradients are allowed by Tudor; this one is a mask. */
+    -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 46%, black var(--dw-edge), transparent 100%), linear-gradient(to top, black var(--dw-edge), transparent 100%); /* taste-skill-ignore */
+    -webkit-mask-composite: source-in;
+    mask-image: radial-gradient(ellipse 78% 82% at 50% 46%, black var(--dw-edge), transparent 100%), linear-gradient(to top, black var(--dw-edge), transparent 100%); /* taste-skill-ignore */
+    mask-composite: intersect;
+  }
+
+  .drift-wall__plane {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    transform-style: preserve-3d;
+    transform-origin: 50% 50%;
+    /* The resting pose, for no script and before the first frame. */
+    transform: translate(-50%, -50%) scale(1.18) rotateX(16deg) rotateY(-14deg) translateZ(-120px);
+  }
+
+  .is-live .drift-wall__plane,
+  .is-live .drift-wall__track {
+    will-change: transform;
+  }
+
+  .drift-wall__col {
+    position: relative;
+    width: calc(var(--dw-tile-w) + var(--dw-gap));
+    transform-style: preserve-3d;
+  }
+
+  .drift-wall__track {
+    display: flex;
+    flex-direction: column;
+    transform-style: preserve-3d;
+  }
+
+  .drift-wall__tile {
+    position: relative;
+    display: block;
+    height: calc(var(--dw-tile-h) + var(--dw-gap));
+    flex: 0 0 auto;
+    transform-style: preserve-3d;
+  }
+
+  .drift-wall__inner {
+    position: absolute;
+    inset: calc(var(--dw-gap) / 2);
+    display: block;
+    overflow: hidden;
+    background: var(--surface);
+    opacity: var(--dw-dim);
+    transform: translateZ(0);
+    pointer-events: none;
+    transition:
+      transform 0.42s var(--ease-out),
+      opacity 0.42s var(--ease-out),
+      box-shadow 0.42s var(--ease-out);
+  }
+
+  .drift-wall__tile img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .drift-wall__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--ground);
+    opacity: 0.14;
+    transition: opacity 0.42s var(--ease-out);
+  }
+
+  /* The tile under the pointer lifts off the wall; the dark edge under it
+     is what says it left the surface (deliberate, see tokens.css). */
+  .drift-wall__tile:global(.is-active) .drift-wall__inner {
+    opacity: 1;
+    transform: translateZ(var(--dw-lift));
+    box-shadow: var(--lift-shadow); /* taste-skill-ignore */
+  }
+
+  .drift-wall__tile:global(.is-active) .drift-wall__overlay {
+    opacity: 0;
+  }
+</style>

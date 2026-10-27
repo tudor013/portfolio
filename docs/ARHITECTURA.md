@@ -1227,3 +1227,43 @@ fără JavaScript tot textul se vede, iar ordinea din tastatură e neschimbată.
 - **Inspectorul pe paginile Software și Design** dă 3 FAIL-uri: nu au poze, nu au mișcare la
   scroll și n-au un element dominant. Pe Design, inspectorul nu vede canvasul ca text.
   - Sunt aceleași probleme ca pe pagina Data: paginile interioare n-au fost redesenate.
+
+## Faza 17 — Topography pe Software, DriftWall pe Design
+
+Fiecare pagină de direcție se deschide acum cu o bandă din React Bits, pe toată lățimea, sub
+header. Titlul stă pe o „placă” în culoarea fundalului, care intră peste marginea de jos a
+benzii. Așa se citește curat orice s-ar întâmpla în spate. E același tipar ca pe pagina Data.
+Toate trei benzile sunt decorative (`aria-hidden`).
+
+- **Software: [Topography](https://reactbits.dev/backgrounds/topography)**, portat în
+  `src/scripts/topography.ts`. E un relief desenat din curbe de nivel, în WebGL2:
+  - curbele se ridică sub cursor, iar un click trimite un puls;
+  - culoarea vine din token-ul `--accent`, albastrul deschis al temei de noapte;
+  - modul redus folosește setarea „Motion” a site-ului, nu `prefers-reduced-motion`: relieful
+    nu mai curge și nu mai are intro;
+  - dacă browserul pierde contextul WebGL și apoi îl primește înapoi, scena se montează din
+    nou, cum făcea componenta React.
+- **Design: [DriftWall](https://reactbits.dev/components/drift-wall)**, portat în
+  `src/components/DriftWall.astro` (HTML-ul) și `src/scripts/drift-wall.ts` (mișcarea). E un
+  perete înclinat de imagini, cu coloane care curg fiecare cu viteza ei; imaginea de sub cursor
+  se ridică spre tine.
+  - **Imaginile sunt ale tale:** cele opt cadre Aruna (marca, paharul, lebăda, scenele Spline).
+    Nicio poză stock: componenta originală folosea poze aleatorii de pe picsum.photos.
+  - **Peretele se construiește la build.** Fără JavaScript e o imagine fixă, iar scriptul doar
+    îl pune în mișcare.
+  - **Am scos butoanele de pe imagini.** În original, fiecare copie repetată a unei imagini era
+    un buton focusabil, deci ar fi fost zeci de opriri la Tab care nu duc nicăieri. Aici peretele
+    e o imagine. Aceleași poze, cu descrieri, sunt pe pagina proiectului Aruna.
+  - Culorile componentei au fost înlocuite cu tokenii site-ului: imaginile inactive se
+    estompează spre hârtie, nu spre negru, iar colțurile sunt drepte.
+  - Umbra imaginii ridicate e în `tokens.css` (`--lift-shadow`) și e o excepție marcată: ea
+    arată că imaginea s-a desprins de perete.
+- **TechText desena cu Arial.** Lista de fonturi a paginii include fontul de rezervă generat
+  de Astro, care n-are fișier. Când browserul primea cererea s-o încarce, refuza toată cererea.
+  Acum îi dau doar familia Literata.
+
+Verificare:
+- `astro check`: 0 erori.
+- `taste-skill lint`: 0 FAIL.
+- La patru lățimi: nicio pagină nu are scroll orizontal și consola e curată.
+- Ambele benzi au fost filmate cu WebGL în Chromium, la 1440 și la 390.

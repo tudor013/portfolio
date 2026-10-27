@@ -165,6 +165,9 @@ la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
   puțin înălțimea unui ecran (`.screen`) și conținut centrat pe orizontală (`.centred`,
   `--content`). Secțiunile noi o respectă și ele. Asta înlocuiește, la cererea lui, coloana
   „quiet instrument” plasată la 22% din stânga.
+- **Fiecare pagină de direcție are o bandă React Bits sus** (faza 17): Software → Topography
+  (`scripts/topography.ts`), Design → DriftWall cu cadrele Aruna ale lui Tudor
+  (`components/DriftWall.astro`, fără poze stock), Data → GradientASCII. Toate sunt decorative.
 - **Pagina Data are fundalul GradientASCII** (React Bits, portat în `scripts/gradient-ascii.ts`,
   licență MIT + Commons Clause, cu notița păstrată în fișier).
 

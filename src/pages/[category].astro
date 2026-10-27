@@ -9,6 +9,7 @@ import {
 } from '../content.config';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import DriftWall from '../components/DriftWall.astro';
 
 // One page per direction. Each is generated from the same template, so a new
 // category means one entry in CATEGORIES rather than a new file.
@@ -43,10 +44,23 @@ const blurb = CATEGORY_BLURBS[category];
   theme={category === 'dev' ? 'night' : 'paper'}
 >
 
-  <section class:list={['direction', category === 'data' && 'with-field']} aria-labelledby="direction-heading">
-    {/* Data only: a field of ASCII glyphs over a moving gradient, behind the
-        title (GradientASCII, from React Bits). Decorative, so hidden from
-        assistive technology; without a script the band is plain paper. */}
+  <section class="direction with-field" aria-labelledby="direction-heading">
+    {/* Each direction opens on a band of its own, from React Bits, behind
+        the title. All three are decorative and hidden from assistive
+        technology; without a script the bands stay still or empty.
+          Software: Topography, contour lines that rise under the cursor.
+          Design:   DriftWall, Tudor's Aruna stills drifting on a tilted wall.
+          Data:     GradientASCII, glyphs over a moving gradient. */}
+    {category === 'dev' && (
+      <div class="field" data-topography aria-hidden="true">
+        <canvas></canvas>
+      </div>
+    )}
+    {category === 'design' && (
+      <div class="field">
+        <DriftWall />
+      </div>
+    )}
     {category === 'data' && (
       <div class="field" data-ascii aria-hidden="true">
         <canvas></canvas>
@@ -101,7 +115,7 @@ const blurb = CATEGORY_BLURBS[category];
     font-size: var(--step-head);
   }
 
-  /* ---- Data: the ASCII field ------------------------------------------- */
+  /* ---- The opening band, on every direction page ------------------------ */
 
   .with-field {
     position: relative;
@@ -218,6 +232,10 @@ const blurb = CATEGORY_BLURBS[category];
       const tokens = getComputedStyle(document.documentElement);
       stop = initTechText(stage, techCanvas, {
         text: word?.textContent?.trim() ?? '',
+        // Only the real family: the generated metric fallback after it has
+        // no file, so asking the browser to load it fails the whole load and
+        // the canvas would draw in Arial.
+        fontFamily: getComputedStyle(title).fontFamily.split(',')[0],
         fontWeight: 600,
         fontSize: 200,
         letterSpacing: -0.02,
@@ -231,6 +249,20 @@ const blurb = CATEGORY_BLURBS[category];
     wide.addEventListener('change', () => void sync());
     void sync();
   }
+
+  // Software: the contour field, in the page's light blue on black.
+  const topo = document.querySelector<HTMLElement>('[data-topography]');
+  const topoCanvas = topo?.querySelector('canvas');
+  if (topo && topoCanvas) {
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    void import('../scripts/topography').then(({ initTopography }) =>
+      initTopography(topo, topoCanvas, { color: accent, lineCount: 22, glow: 0.5, fog: 0.4 }),
+    );
+  }
+
+  // Design: the drift wall is already on the page; this sets it moving.
+  const wall = document.querySelector<HTMLElement>('[data-drift-wall]');
+  if (wall) void import('../scripts/drift-wall').then(({ initDriftWall }) => initDriftWall(wall));
 
   // Loaded only on the page that has the field.
   const field = document.querySelector<HTMLElement>('[data-ascii]');
