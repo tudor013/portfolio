@@ -636,3 +636,60 @@ Sub-skill-ul `ui-styling` al acelui plugin presupune **shadcn/ui + Tailwind**,
 ceea ce contrazice regula din `CLAUDE.md` („CSS simplu cu variabile, fără
 Tailwind"). Se folosesc `design-system` și catalogul de stiluri; `ui-styling`
 nu se aplică acestui proiect.
+
+---
+
+## Faza 10 — Fizica badge-ului, refăcută
+
+Tudor a raportat că la click vârful sare instant pe cursor. Avea dreptate, și
+erau **două** cauze — amândouă în codul meu, nu în senzația lui.
+
+### Cauza 1: interpolarea era în bucla greșită
+
+Scrisesem „vârful se apropie de cursor cu 22% pe cadru". Dar am pus-o
+**înăuntrul buclei de relaxare**, care rulează de 8 ori pe cadru:
+
+```
+1 − 0.78⁸ ≈ 0.86
+```
+
+86% din distanță parcursă într-un singur cadru. O teleportare deghizată în
+interpolare. Acum rulează **o dată pe pas**, nu o dată pe trecere.
+
+### Cauza 2: nu reținea unde ai apucat
+
+Oriunde ai fi apăsat pe card, vârful funiei (care e în capul cardului) era
+tras spre cursor. Dacă apucai de jos, cardul sărea cu jumătate din înălțimea
+lui, instantaneu.
+
+Acum, la `pointerdown` se reține **decalajul** dintre cursor și clemă, iar
+trasul păstrează acel decalaj. Cardul nu se mișcă deloc la apucare — urmează
+doar ce faci după.
+
+Măsurat: **0.7px salt la apucare**, cu apucarea de marginea de jos (cazul cel
+mai prost).
+
+### Realismul: cardul nu mai e lipit de bandă
+
+Înainte, unghiul cardului se lua direct din ultimul segment al funiei — adică
+era **sudat** de bandă. Un ecuson real atârnă *de* bandă și are inerția lui:
+rămâne în urmă când pornește și trece dincolo când se oprește.
+
+Acum cardul are o a doua masă (`tail`), ținută la distanță fixă sub clemă.
+Unghiul vine din linia dintre cele două puncte, deci cardul se leagănă
+singur, cu întârziere față de bandă.
+
+### Pas de timp fix
+
+Simularea rulează la **120 pași/secundă**, independent de cât de des
+desenează browserul. Înainte, un ecran la 144Hz se comporta altfel decât unul
+la 60Hz — mai multă gravitație pe secundă, deci o fizică diferită. Acumulatorul
+e limitat la 5 pași pe cadru, ca un tab lăsat în fundal să nu revină și să
+ruleze o mie de pași deodată.
+
+### Referințe consultate
+
+Căutarea a confirmat abordarea canonică (badge-ul Vercel Ship '24, cu
+react-three-fiber + Rapier și `useRopeJoint`), dar **articolul în sine e
+blocat de proxy-ul containerului**, deci nu i-am putut citi codul de drag.
+Corecțiile de mai sus vin din citirea propriului cod, nu dintr-o copiere.

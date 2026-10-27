@@ -1,12 +1,12 @@
 /**
  * Verlet-integrated lanyard for the hero ID badge.
  *
- * Why this and not a 3D physics library: the usual implementation of this
- * effect pulls in React, three.js and a rapier WASM build — roughly half a
- * megabyte before the badge draws a single pixel. The rope here is a chain of
- * points integrated by position rather than velocity, which fits in a few
- * hundred bytes of logic, and the badge itself stays a real DOM element, so
- * its text is selectable, translatable and reachable by a screen reader.
+ * Why not a 3D physics engine: the usual build of this effect (Vercel's Ship
+ * '24 badge and the many copies of it) pulls in React, three.js and a Rapier
+ * WASM build — roughly half a megabyte before anything draws. The rope here
+ * is a chain of points integrated by position rather than velocity, which
+ * fits in a few hundred bytes of logic, and the badge stays a real DOM
+ * element, so its text is selectable and reachable by a screen reader.
  */
 
 interface Point {
@@ -18,39 +18,34 @@ interface Point {
 }
 
 const SEGMENTS = 14;
-const GRAVITY = 0.75;
-/**
- * How much of the distance to the cursor the badge closes each frame while
- * dragging. Pinning the tip straight onto the pointer — which is what this
- * did before — teleports it, and Verlet reads that jump as enormous velocity,
- * so the rope cracks like a whip on any quick mouse move. Easing toward the
- * cursor instead keeps the badge heavy and the motion readable.
- */
-const DRAG_FOLLOW = 0.22;
-/** How far sideways the badge starts, so it swings into place on load instead
- *  of appearing already at rest where nothing ever moves. Capped against the
- *  container because a transformed element still extends the page's scroll
- *  area: a fixed 150px swing pushed a horizontal scrollbar onto narrow
- *  screens. */
-const ENTRANCE_OFFSET_MAX = 150;
-const ENTRANCE_OFFSET_RATIO = -0.16;
-/** A slow, shallow sway. Without it the rope settles and the badge looks like
- *  a static image, which gives a visitor no reason to try grabbing it. */
-const SWAY_AMPLITUDE = 0.011;
-const SWAY_PERIOD_MS = 4200;
-/** Impulse given to a click, in pixels of instantaneous velocity. */
-const NUDGE = 17;
-/** Below 1 so the swing loses energy and settles instead of oscillating forever. */
-const DAMPING = 0.955;
-/** More passes mean a stiffer, less rubbery strap. Eight is past the point of
- *  visible improvement for this length. */
+const GRAVITY = 0.55;
+const DAMPING = 0.975;
 const RELAX_PASSES = 8;
+
+/**
+ * Fraction of the remaining distance the grabbed point closes per *step*.
+ *
+ * This has to be applied once per step, not inside the relaxation loop: at
+ * eight passes, a 0.22 follow closes 1 - 0.78^8 ≈ 86% of the gap every frame,
+ * which is a teleport wearing a lerp's clothing. That bug is what made the
+ * badge snap to the cursor on click.
+ */
+const DRAG_FOLLOW = 0.16;
+
+/** Physics runs at a fixed rate so a 144Hz display behaves like a 60Hz one. */
+const STEP_MS = 1000 / 120;
+const MAX_STEPS_PER_FRAME = 5;
+
+const SWAY_AMPLITUDE = 0.009;
+const SWAY_PERIOD_MS = 5200;
+/** Velocity, in pixels per step, given to the card when it is clicked. */
+const NUDGE = 13;
 
 export interface BadgeOptions {
   /**
-   * Suppresses the entrance swing and the ambient sway, leaving only motion
-   * the visitor asks for by dragging. Reduced-motion means no unprompted
-   * animation — it does not mean the thing stops answering a pointer.
+   * Suppresses the entrance swing and the idle sway, leaving only motion the
+   * visitor asks for. Reduced motion means no unprompted animation; it does
+   * not mean the badge stops answering a pointer.
    */
   calm?: boolean;
 }
@@ -62,156 +57,174 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
   if (!strap || !card) return () => {};
 
   const anchorX = root.clientWidth / 2;
-  const restLength = (root.clientHeight * 0.42) / SEGMENTS;
+  const ropeLength = root.clientHeight * 0.34;
+  const restLength = ropeLength / SEGMENTS;
 
-  // Displacing the lower points gives the rope stored energy, so the first
-  // thing a visitor sees is the badge swinging down and settling.
-  // Math.min on a negative ratio would pick the larger magnitude, so the cap
-  // is applied to the magnitude and the direction restored afterwards.
-  const entrance = calm
-    ? 0
-    : -Math.min(ENTRANCE_OFFSET_MAX, root.clientWidth * Math.abs(ENTRANCE_OFFSET_RATIO));
+  /** How far below the clip the card's weight acts. */
+  const cardDrop = Math.max(60, card.offsetHeight * 0.45);
 
-  const points: Point[] = Array.from({ length: SEGMENTS + 1 }, (_, i) => {
+  const entrance = calm ? 0 : -Math.min(130, root.clientWidth * 0.14);
+
+  const rope: Point[] = Array.from({ length: SEGMENTS + 1 }, (_, i) => {
     const lean = (i / SEGMENTS) ** 2 * entrance;
     return { x: anchorX + lean, y: i * restLength, px: anchorX + lean, py: i * restLength };
   });
 
+  /**
+   * The card is not glued to the strap's last segment — it hangs from it.
+   *
+   * `tail` is a second mass a little below the clip, held at a fixed distance
+   * from it. The card's tilt comes from the line between the two, so it lags
+   * the strap on the way out and overshoots on the way back, the way a real
+   * badge does. Deriving the angle straight from the rope made the card feel
+   * welded to the lanyard.
+   */
+  const clip = () => rope[rope.length - 1]!;
+  const tail: Point = { x: anchorX, y: ropeLength + cardDrop, px: anchorX, py: ropeLength + cardDrop };
+
+  /** Set on pointerdown: where the clip should sit relative to the cursor. */
+  let grab: { dx: number; dy: number } | null = null;
   let pointer: { x: number; y: number } | null = null;
+  let travelled = 0;
+
   let frame = 0;
-  let started = 0;
-  /** Smoothed horizontal speed, used to turn the card in 3D. */
+  let lastTime = 0;
+  let accumulator = 0;
+  let elapsed = 0;
   let turn = 0;
 
-  function step(now: number) {
-    if (!started) started = now;
-    const sway =
-      pointer || calm
-        ? 0
-        : Math.sin(((now - started) / SWAY_PERIOD_MS) * Math.PI * 2) * SWAY_AMPLITUDE;
+  function integrate(p: Point, sway: number) {
+    const vx = (p.x - p.px) * DAMPING;
+    const vy = (p.y - p.py) * DAMPING;
+    p.px = p.x;
+    p.py = p.y;
+    p.x += vx + sway;
+    p.y += vy + GRAVITY;
+  }
 
-    for (let i = 1; i < points.length; i++) {
-      const p = points[i]!;
-      const vx = (p.x - p.px) * DAMPING;
-      const vy = (p.y - p.py) * DAMPING;
-      p.px = p.x;
-      p.py = p.y;
-      p.x += vx + sway * i;
-      p.y += vy + GRAVITY;
+  function link(a: Point, b: Point, length: number, pinA: boolean, pinB: boolean) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const dist = Math.hypot(dx, dy) || 0.0001;
+    const correction = (dist - length) / dist;
+    // A pinned end does not move, so the free end takes the whole correction.
+    const shareA = pinA ? 0 : pinB ? 1 : 0.5;
+    const shareB = pinB ? 0 : pinA ? 1 : 0.5;
+    a.x += dx * correction * shareA;
+    a.y += dy * correction * shareA;
+    b.x -= dx * correction * shareB;
+    b.y -= dy * correction * shareB;
+  }
+
+  function step() {
+    elapsed += STEP_MS;
+    const sway =
+      pointer || calm ? 0 : Math.sin((elapsed / SWAY_PERIOD_MS) * Math.PI * 2) * SWAY_AMPLITUDE;
+
+    for (let i = 1; i < rope.length; i++) integrate(rope[i]!, sway * i);
+    integrate(tail, sway * SEGMENTS);
+
+    // Once per step, not once per relaxation pass.
+    if (pointer && grab) {
+      const end = clip();
+      end.x += (pointer.x + grab.dx - end.x) * DRAG_FOLLOW;
+      end.y += (pointer.y + grab.dy - end.y) * DRAG_FOLLOW;
     }
 
     for (let pass = 0; pass < RELAX_PASSES; pass++) {
-      // The top point is the clip on the wall: it never moves.
-      points[0]!.x = anchorX;
-      points[0]!.y = 0;
-
-      // While dragging, the far end is pinned to the cursor and the rope is
-      // solved between the two fixed ends.
-      if (pointer) {
-        const last = points[points.length - 1]!;
-        last.x += (pointer.x - last.x) * DRAG_FOLLOW;
-        last.y += (pointer.y - last.y) * DRAG_FOLLOW;
+      rope[0]!.x = anchorX;
+      rope[0]!.y = 0;
+      for (let i = 0; i < rope.length - 1; i++) {
+        link(rope[i]!, rope[i + 1]!, restLength, i === 0, false);
       }
-
-      for (let i = 0; i < points.length - 1; i++) {
-        const a = points[i]!;
-        const b = points[i + 1]!;
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const dist = Math.hypot(dx, dy) || 0.0001;
-        // Each pass moves both points half of the error, which converges on
-        // segments of the right length without any point dominating.
-        const correction = (dist - restLength) / dist / 2;
-        const ox = dx * correction;
-        const oy = dy * correction;
-        if (i > 0) {
-          a.x += ox;
-          a.y += oy;
-        }
-        if (i + 1 < points.length - 1 || !pointer) {
-          b.x -= ox;
-          b.y -= oy;
-        }
-      }
+      link(clip(), tail, cardDrop, false, false);
     }
 
-    // The card hangs off the last point, so confining that point to the
-    // badge's own box is what keeps the card inside it however hard it swings.
-    const last = points[points.length - 1]!;
+    // Keep the whole assembly inside its own box. Moving the previous
+    // position to the wall as well is what stops the boundary behaving like a
+    // trampoline: a stale `px` reads as a large velocity.
     const margin = card!.offsetWidth / 2;
-    const bounded = Math.max(margin, Math.min(root.clientWidth - margin, last.x));
-    if (bounded !== last.x) {
-      // Carry the previous position to the wall as well. Clamping only the
-      // current position leaves a stale `px`, which Verlet reads as a large
-      // velocity and turns the boundary into a trampoline.
-      last.px = bounded;
-      last.x = bounded;
+    for (const p of [clip(), tail]) {
+      const bounded = Math.max(margin, Math.min(root.clientWidth - margin, p.x));
+      if (bounded !== p.x) {
+        p.px = bounded;
+        p.x = bounded;
+      }
     }
-
-    render();
-    frame = requestAnimationFrame(step);
   }
 
   function render() {
-    strap!.setAttribute('d', points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
+    strap!.setAttribute(
+      'd',
+      rope.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '),
+    );
 
-    const tip = points[points.length - 1]!;
-    const prev = points[points.length - 2]!;
+    const end = clip();
+    const angle = (Math.atan2(tail.x - end.x, tail.y - end.y) * 180) / Math.PI;
 
     // A real badge turns edge-on as it swings, which is most of what makes it
-    // read as an object rather than a picture. The turn follows horizontal
-    // speed, smoothed so it leads the swing instead of jittering with it.
-    const speed = tip.x - tip.px;
-    turn += (Math.max(-28, Math.min(28, speed * 2.4)) - turn) * 0.1;
-    // The card hangs along the last segment, so it tilts with the rope rather
-    // than staying stubbornly upright while the strap swings.
-    const angle = (Math.atan2(tip.x - prev.x, tip.y - prev.y) * 180) / Math.PI;
+    // read as an object rather than a picture.
+    const speed = tail.x - tail.px;
+    turn += (Math.max(-26, Math.min(26, speed * 2.2)) - turn) * 0.08;
+
     const half = card!.offsetWidth / 2;
     card!.style.transform =
-      `translate(${tip.x - half}px, ${tip.y}px) rotateZ(${-angle}deg) rotateY(${turn.toFixed(2)}deg)`;
+      `translate(${(end.x - half).toFixed(1)}px, ${end.y.toFixed(1)}px) ` +
+      `rotateZ(${(-angle).toFixed(2)}deg) rotateY(${turn.toFixed(2)}deg)`;
+  }
+
+  function loop(now: number) {
+    if (!lastTime) lastTime = now;
+    // Clamped so a backgrounded tab does not return and run a thousand steps.
+    accumulator = Math.min(accumulator + (now - lastTime), STEP_MS * MAX_STEPS_PER_FRAME);
+    lastTime = now;
+
+    while (accumulator >= STEP_MS) {
+      step();
+      accumulator -= STEP_MS;
+    }
+
+    render();
+    frame = requestAnimationFrame(loop);
   }
 
   function toLocal(event: PointerEvent) {
     const rect = root.getBoundingClientRect();
-    const half = card!.offsetWidth / 2;
-    return {
-      // Kept inside the badge's own box so a dragged card can never extend
-      // the document's scroll width.
-      x: Math.max(half, Math.min(rect.width - half, event.clientX - rect.left)),
-      y: Math.max(0, Math.min(rect.height - 40, event.clientY - rect.top)),
-    };
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
 
-  let pressOrigin: { x: number; y: number } | null = null;
-
   function onDown(event: PointerEvent) {
-    pointer = toLocal(event);
-    pressOrigin = pointer;
+    const local = toLocal(event);
+    const end = clip();
+    // Remember where the clip sits relative to the cursor, so grabbing the
+    // card does not move it at all — it only follows what the hand does next.
+    grab = { dx: end.x - local.x, dy: end.y - local.y };
+    pointer = local;
+    travelled = 0;
     card!.setPointerCapture(event.pointerId);
     root.dataset.dragging = 'true';
   }
+
   function onMove(event: PointerEvent) {
-    if (pointer) pointer = toLocal(event);
+    if (!pointer) return;
+    const local = toLocal(event);
+    travelled += Math.hypot(local.x - pointer.x, local.y - pointer.y);
+    pointer = local;
   }
+
   function onUp(event: PointerEvent) {
-    const released = pointer;
+    const wasPressed = pointer !== null;
     pointer = null;
+    grab = null;
     card!.releasePointerCapture(event.pointerId);
     delete root.dataset.dragging;
 
-    // A press that never travelled is a click. Pinning the rope to a point it
-    // already occupied changes nothing, so give it a push instead — otherwise
-    // the most obvious way to try the badge appears to do nothing at all.
-    if (pressOrigin && released) {
-      const travelled = Math.hypot(released.x - pressOrigin.x, released.y - pressOrigin.y);
-      if (travelled < 4) {
-        const tip = points[points.length - 1]!;
-        // Nudges away from the side that was pressed, so the badge swings the
-        // way a real one would when you flick it.
-        tip.px = tip.x + (released.x < root.clientWidth / 2 ? -NUDGE : NUDGE);
-      }
+    // A press that never travelled is a click. Holding a point where it
+    // already was changes nothing, so give it a push instead — otherwise the
+    // most obvious way to try the badge appears to do nothing.
+    if (wasPressed && travelled < 5) {
+      tail.px = tail.x + (tail.x < root.clientWidth / 2 ? -NUDGE : NUDGE);
     }
-    pressOrigin = null;
   }
 
   card.addEventListener('pointerdown', onDown);
@@ -220,7 +233,7 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
   card.addEventListener('pointercancel', onUp);
 
   root.dataset.live = 'true';
-  frame = requestAnimationFrame(step);
+  frame = requestAnimationFrame(loop);
 
   return () => {
     cancelAnimationFrame(frame);
