@@ -77,12 +77,11 @@ Aceste trei cerințe se bat cap în cap cu pragurile din secțiunea „Calitate"
 | Cadre pentru video scrubbing | 5–8 MB imagini | consum de date și decodare pe telefon |
 | Embed Spline | câțiva MB runtime | același efect |
 
-**Regula de lucru:** un singur moment „curajos" pe pagină. Badge-ul are prioritate față de
-fundalurile scrubbing, pentru că e personal (poza și numele lui), e deasupra fold-ului, și
-pentru că fundalurile decorative sunt exact lucrul pe care cititorul e instruit să-l ignore.
+**Regula de implementare:** cât mai ușor posibil (canvas 2D sau Three.js vanilla înainte de
+orice stivă React), măsurat cu Lighthouse **înainte și după**, decizia pe cifre.
 
-Se implementează cât mai ușor posibil (canvas 2D sau Three.js vanilla înainte de orice stivă
-React), se măsoară cu Lighthouse **înainte și după**, iar decizia finală se ia pe cifre.
+Regula „un singur moment curajos pe pagină" a fost **retrasă** la cererea lui Tudor
+(27.10.2026): îl reținea creativ. Vezi secțiunea „Libertate creativă" de mai jos.
 
 ### Decizia lui Tudor asupra conflictului (desktop-first, două moduri)
 - **Ne axăm pe desktop.** Versiunea de mobil se regândește separat, mai târziu.
@@ -97,6 +96,35 @@ React), se măsoară cu Lighthouse **înainte și după**, iar decizia finală s
   nu îl atinge, asta e o alegere asumată, nu o scăpare.
 
 Fără JavaScript, badge-ul se degradează la o imagine statică — conținutul rămâne complet.
+
+## Libertate creativă — ce e liber și ce nu (27.10.2026)
+
+Tudor a cerut ca acest fișier să nu mai frâneze partea creativă. Regulile se împart în două,
+și distincția contează:
+
+### Liber — experimentează fără să întrebi
+- **Câte momente vizuale vrei pe pagină.** Regula „unul singur" e retrasă.
+- **Lista de interdicții estetice** din `.ux-profile.md` (glassmorphism, gradienți, carduri
+  rotunjite, ALL-CAPS) devine **listă de valori implicite, nu lege.** Se calcă deliberat, nu din
+  neatenție. Dacă o calci, spune în commit de ce.
+- **JavaScript pentru efecte.** Cerința „site funcțional fără JS" se relaxează la:
+  **conținutul și navigarea trebuie citibile fără JS; efectele nu trebuie să funcționeze.**
+  Asta deblochează scroll immersiv, WebGL, scrubbing.
+- **Bugetul de performanță în modul complet.** Pragul ≥ 90 se măsoară în modul redus. Modul
+  complet poate costa mai mult, conștient.
+
+### Nu se negociază — și nu astea te rețineau
+- **Contrast WCAG AA, navigare din tastatură, `alt` pe imagini.** Astea nu fac designul plictisitor,
+  fac site-ul utilizabil. Un angajator care îl deschide pe telefon, în soare, pe un ecran prost
+  calibrat, e exact cazul pe care îl protejează. Un design spectaculos pe care nu-l poate citi
+  nu e un design mai curajos, e unul care a eșuat.
+- **Nu inventa conținut.** Pe un portofoliu, o afirmație umflată se sparge la primul interviu
+  care sapă în ea. Asta e protecție pentru Tudor, nu constrângere estetică.
+- **Datele personale** (secțiunea de mai sus).
+
+**Cum se procedează de acum:** propune varianta curajoasă, verific dacă trece podeaua de
+accesibilitate, și dacă nu trece caut o cale să obțin același efect fără să cadă — nu renunț
+la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
 
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).

@@ -82,12 +82,14 @@ const { poster, alt, title, sceneUrl } = Astro.props;
     transform: translateX(-50%);
 
     padding: var(--space-3) var(--space-6);
-    background: var(--glass-fill);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    /* Opaque, not glass. This button sits over whatever the scene happens to
+       show, and a translucent fill takes its contrast from that image: over
+       the dark product scene the label went grey-on-grey. Glass is fine over
+       a background this design controls; it is not fine over arbitrary art. */
+    background: var(--glass-fill-opaque);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    box-shadow: var(--glass-sheen);
+    box-shadow: var(--shadow-lift);
 
     color: var(--text-primary);
     font: inherit;
@@ -95,12 +97,6 @@ const { poster, alt, title, sceneUrl } = Astro.props;
     font-weight: var(--weight-medium);
     cursor: pointer;
     transition: border-color var(--duration-fast) var(--ease-out);
-  }
-
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .play {
-      background: var(--glass-fill-opaque);
-    }
   }
 
   .play:hover {

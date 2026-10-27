@@ -4,8 +4,9 @@ category: design
 year: 2025
 role: >-
   Designed the brand and drew the interface in Illustrator, then used those
-  drawings as the brief the build was generated from. Built the interactive
-  landing scenes in Spline.
+  drawings as the brief the build was generated from. Built the animated
+  backgrounds in Spline — the scenes are the moving layer, with the shop's
+  real controls laid over them in the site's own code.
 stack:
   - Illustrator
   - Photoshop
@@ -18,11 +19,22 @@ results: >-
   lansare. Feedback, recunoaștere, rată de revenire.
 order: 20
 draft: false
-links:
-  - label: 'Spline scene — product'
-    url: 'https://app.spline.design/file/296e3532-03cb-4024-891f-651eeadf6aff'
-  - label: 'Spline scene — retrofuturist background'
-    url: 'https://app.spline.design/file/e093d995-3fda-48ac-b53f-cbc885ea397f'
+links: []
+
+scenes:
+  - poster: '../../assets/scenes/aruna-product.png'
+    alt: >-
+      A paper coffee cup lit from one side on a dark brown background, beside
+      the line "Cu sau fără zahăr? Indiferent de alegere, gustul autentic
+      rămâne același."
+    title: 'Product scene — the lit background behind the shop copy'
+    url: 'https://my.spline.design/untitled-jS8PYLZPYq4Pxo7ue2cRPYKN/'
+  - poster: '../../assets/scenes/aruna-retrofuturism.png'
+    alt: >-
+      The Aruna Coffee wordmark above a small paper cup carrying the swan mark,
+      on white.
+    title: 'Retrofuturist background — the cup travels as the page scrolls'
+    url: 'https://my.spline.design/retrofuturismbganimation-qZwVlCDGNASAGtQbOTX19rfb/'
 ---
 
 ## Drawing before building
@@ -30,9 +42,16 @@ links:
 TODO(conținut): arată schițele din Illustrator lângă rezultatul final. E cea
 mai bună dovadă din tot portofoliul că designul a venit de la tine.
 
-## The 3D scenes
+## Background, not decoration
 
-TODO(conținut): două scene în Spline — una de produs, una de fundal
-retrofuturist. Spune ce rol are fiecare pe site și de ce ai ales 3D în loc de
-fotografie. **Pune capturi**: linkurile Spline cer cont, iar un angajator nu
-va face unul ca să-ți vadă munca.
+The two scenes below are **backgrounds**. Each one animates as the page
+scrolls, and the shop's real controls — buttons, navigation, the cart — sit
+over them in the site's own code rather than inside the 3D scene.
+
+TODO(conținut): de ce 3D și nu fotografie? Un răspuns onest: fotografia de
+produs cere produs, lumini și timp, iar o scenă se poate re-randa cu alt
+unghi, altă culoare sau alt text în câteva minute. Dacă ăsta a fost motivul,
+spune-l — e un argument de decizie, nu de gust.
+
+TODO(conținut): ce s-a schimbat după ce ai pus scenele? Dacă n-ai o cifră,
+spune ce ai observat.
