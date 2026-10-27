@@ -8,10 +8,10 @@ import portrait from '../assets/tudor.png';
 ---
 
 <div class="badge" data-badge>
-  <svg class="rope" viewBox="0 0 300 440" aria-hidden="true" preserveAspectRatio="none">
+  <svg class="rope" viewBox="0 0 420 560" aria-hidden="true" preserveAspectRatio="none">
     {/* The static d is what renders before (or without) the script: a strap
         hanging straight down. The simulation overwrites it each frame. */}
-    <path data-strap d="M150,0 L150,185" />
+    <path data-strap d="M210,0 L210,215" />
   </svg>
 
   <div class="card" data-card>
@@ -37,8 +37,8 @@ import portrait from '../assets/tudor.png';
 <style>
   .badge {
     position: relative;
-    width: 300px;
-    height: 440px;
+    width: 420px;
+    height: 560px;
     perspective: 1100px;
     perspective-origin: 50% 20%;
     /* Keeps a dragged badge from selecting the text around it. */
@@ -74,7 +74,7 @@ import portrait from '../assets/tudor.png';
     backface-visibility: visible;
     /* Static placement for the no-script and reduced-motion cases. The
        simulation replaces this transform once it starts. */
-    transform: translate(55px, 185px) rotate(-3deg);
+    transform: translate(115px, 215px) rotate(-3deg);
 
     display: flex;
     flex-direction: column;

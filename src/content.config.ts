@@ -15,6 +15,21 @@ export const CATEGORY_LABELS: Record<(typeof CATEGORIES)[number], string> = {
   data: 'Data Science',
 };
 
+/** The URL segment each category lives at, kept here so links cannot drift. */
+export const CATEGORY_SLUGS: Record<(typeof CATEGORIES)[number], string> = {
+  dev: 'software',
+  design: 'design',
+  data: 'data',
+};
+
+/** One line per category, in Tudor's own words. Used on the landing page and
+ *  at the top of each category page, so the two cannot disagree. */
+export const CATEGORY_BLURBS: Record<(typeof CATEGORIES)[number], string> = {
+  dev: 'Mostly C and C++, C#, Python, MariaDB and Oracle SQL, with AI tooling in the loop. I build software that is pleasant to use and solves a problem someone actually has.',
+  design: 'Brand design, UI/UX and interface work in Figma, Illustrator, Photoshop and Spline, with motion in Premiere Pro and DaVinci Resolve. I design interfaces around the person using them.',
+  data: 'Inferential and macroeconomic statistics, and the economic cybernetics I study: resource allocation, correlation between series, and models whose results have to survive being checked.',
+};
+
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
 

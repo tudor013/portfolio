@@ -19,6 +19,14 @@ interface Point {
 
 const SEGMENTS = 14;
 const GRAVITY = 0.75;
+/**
+ * How much of the distance to the cursor the badge closes each frame while
+ * dragging. Pinning the tip straight onto the pointer — which is what this
+ * did before — teleports it, and Verlet reads that jump as enormous velocity,
+ * so the rope cracks like a whip on any quick mouse move. Easing toward the
+ * cursor instead keeps the badge heavy and the motion readable.
+ */
+const DRAG_FOLLOW = 0.22;
 /** How far sideways the badge starts, so it swings into place on load instead
  *  of appearing already at rest where nothing ever moves. Capped against the
  *  container because a transformed element still extends the page's scroll
@@ -28,12 +36,12 @@ const ENTRANCE_OFFSET_MAX = 150;
 const ENTRANCE_OFFSET_RATIO = -0.16;
 /** A slow, shallow sway. Without it the rope settles and the badge looks like
  *  a static image, which gives a visitor no reason to try grabbing it. */
-const SWAY_AMPLITUDE = 0.03;
+const SWAY_AMPLITUDE = 0.011;
 const SWAY_PERIOD_MS = 4200;
 /** Impulse given to a click, in pixels of instantaneous velocity. */
-const NUDGE = 26;
+const NUDGE = 17;
 /** Below 1 so the swing loses energy and settles instead of oscillating forever. */
-const DAMPING = 0.985;
+const DAMPING = 0.955;
 /** More passes mean a stiffer, less rubbery strap. Eight is past the point of
  *  visible improvement for this length. */
 const RELAX_PASSES = 8;
@@ -101,8 +109,8 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
       // solved between the two fixed ends.
       if (pointer) {
         const last = points[points.length - 1]!;
-        last.x = pointer.x;
-        last.y = pointer.y;
+        last.x += (pointer.x - last.x) * DRAG_FOLLOW;
+        last.y += (pointer.y - last.y) * DRAG_FOLLOW;
       }
 
       for (let i = 0; i < points.length - 1; i++) {
@@ -131,7 +139,14 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
     // badge's own box is what keeps the card inside it however hard it swings.
     const last = points[points.length - 1]!;
     const margin = card!.offsetWidth / 2;
-    last.x = Math.max(margin, Math.min(root.clientWidth - margin, last.x));
+    const bounded = Math.max(margin, Math.min(root.clientWidth - margin, last.x));
+    if (bounded !== last.x) {
+      // Carry the previous position to the wall as well. Clamping only the
+      // current position leaves a stale `px`, which Verlet reads as a large
+      // velocity and turns the boundary into a trampoline.
+      last.px = bounded;
+      last.x = bounded;
+    }
 
     render();
     frame = requestAnimationFrame(step);

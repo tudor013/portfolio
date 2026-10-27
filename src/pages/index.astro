@@ -1,12 +1,17 @@
 ---
 import { getCollection } from 'astro:content';
-import { CATEGORIES, CATEGORY_LABELS } from '../content.config';
+import {
+  CATEGORIES,
+  CATEGORY_LABELS,
+  CATEGORY_SLUGS,
+  CATEGORY_BLURBS,
+} from '../content.config';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import Hero from '../components/Hero.astro';
-import SkillCategory from '../components/SkillCategory.astro';
 import Profile from '../components/Profile.astro';
 import Skills from '../components/Skills.astro';
+import DirectionCard from '../components/DirectionCard.astro';
 import Experience from '../components/Experience.astro';
 import ContactCta from '../components/ContactCta.astro';
 import SiteFooter from '../components/SiteFooter.astro';
@@ -14,22 +19,14 @@ import SiteFooter from '../components/SiteFooter.astro';
 // Drafts are excluded at build time so an unfinished case study cannot ship.
 const published = (await getCollection('projects')).filter((p) => !p.data.draft);
 
-/** One line per category, in Tudor's own terms. */
-const BLURBS: Record<(typeof CATEGORIES)[number], string> = {
-  dev: 'Mostly C and C++, C#, Python, MariaDB and Oracle SQL, with AI tooling in the loop. I build software that is pleasant to use and solves a problem someone actually has.',
-  design: 'Brand design, UI/UX and interface work in Figma, Illustrator, Photoshop and Spline, with motion in Premiere Pro and DaVinci Resolve. I design interfaces around the person using them.',
-  data: 'Inferential and macroeconomic statistics, and the economic cybernetics I study: resource allocation, correlation between series, and models whose results have to survive being checked.',
-};
-
-// Group once rather than filtering inside the template three times. CATEGORIES
-// is ordered dev-first, which is also the order the sections appear in.
-const sections = CATEGORIES.map((category) => ({
-  category,
+// The landing page points at the three directions rather than listing every
+// project: the page's job is to say who Tudor is, and the depth lives one
+// click away on a page dedicated to each.
+const directions = CATEGORIES.map((category) => ({
+  href: `/${CATEGORY_SLUGS[category]}/`,
   label: CATEGORY_LABELS[category],
-  blurb: BLURBS[category],
-  projects: published
-    .filter((p) => p.data.category === category)
-    .sort((a, b) => a.data.order - b.data.order || b.data.year - a.data.year),
+  blurb: CATEGORY_BLURBS[category],
+  count: published.filter((p) => p.data.category === category).length,
 }));
 ---
 
@@ -40,26 +37,19 @@ const sections = CATEGORIES.map((category) => ({
   <SiteHeader />
   <Hero />
 
-  <div id="profile">
-    <Profile />
-  </div>
+  <Profile />
+
+  <section id="work" aria-labelledby="work-heading">
+    <div class="head">
+      <h2 id="work-heading">Work</h2>
+    </div>
+
+    <ul class="directions">
+      {directions.map((direction) => <DirectionCard {...direction} />)}
+    </ul>
+  </section>
 
   <Skills />
-
-  <div id="work">
-    {
-      sections.map(({ category, label, blurb, projects }) => (
-        <SkillCategory
-          id={`cat-${category}`}
-          label={label}
-          blurb={blurb}
-          projects={projects}
-          primary={category === 'dev'}
-        />
-      ))
-    }
-  </div>
-
   <Experience />
 
   <div id="contact">
@@ -68,3 +58,27 @@ const sections = CATEGORIES.map((category) => ({
 
   <SiteFooter />
 </BaseLayout>
+
+<style>
+  section[id='work'] {
+    padding-block: var(--space-12);
+  }
+
+  .head {
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  h2 {
+    margin: 0;
+  }
+
+  .directions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-4);
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

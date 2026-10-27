@@ -1,0 +1,96 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import {
+  CATEGORIES,
+  CATEGORY_LABELS,
+  CATEGORY_SLUGS,
+  CATEGORY_BLURBS,
+} from '../content.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+// One page per direction. Each is generated from the same template, so a new
+// category means one entry in CATEGORIES rather than a new file.
+export const getStaticPaths: GetStaticPaths = async () => {
+  const published = (await getCollection('projects')).filter((p) => !p.data.draft);
+
+  return CATEGORIES.map((category) => ({
+    params: { category: CATEGORY_SLUGS[category] },
+    props: {
+      category,
+      projects: published
+        .filter((p) => p.data.category === category)
+        .sort((a, b) => a.data.order - b.data.order || b.data.year - a.data.year),
+    },
+  }));
+};
+
+type Props = {
+  category: (typeof CATEGORIES)[number];
+  projects: Awaited<ReturnType<typeof getCollection<'projects'>>>;
+};
+
+const { category, projects } = Astro.props;
+const label = CATEGORY_LABELS[category];
+const blurb = CATEGORY_BLURBS[category];
+---
+
+<BaseLayout title={`${label} — Tudor-Andrei Ifrim`} description={blurb}>
+  <SiteHeader />
+
+  <section class="direction" aria-labelledby="direction-heading">
+    <h1 id="direction-heading">{label}</h1>
+    <p class="blurb">{blurb}</p>
+
+    {
+      projects.length === 0 ? (
+        <p class="empty">TODO(conținut): niciun proiect în această direcție încă.</p>
+      ) : (
+        <ul class="grid">
+          {projects.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </ul>
+      )
+    }
+  </section>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .direction {
+    padding-block: var(--space-16) var(--space-12);
+  }
+
+  h1 {
+    margin-block: 0 var(--space-4);
+    font-size: var(--text-h1);
+  }
+
+  .blurb {
+    margin-block: 0 var(--space-12);
+    color: var(--text-muted);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .empty {
+    padding: var(--space-8);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    max-width: none;
+  }
+</style>

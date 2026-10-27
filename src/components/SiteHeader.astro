@@ -1,12 +1,23 @@
 ---
 // Wayfinding and one action. A portfolio has few destinations worth naming,
 // and crowding them makes the one that matters harder to find.
-const SECTIONS = [
-  { id: 'profile', label: 'Profile' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'work', label: 'Work' },
-  { id: 'experience', label: 'Experience' },
-];
+import { CATEGORIES, CATEGORY_SLUGS } from '../content.config';
+
+/** Short names: the nav is wayfinding, not a heading. */
+const NAV_LABELS: Record<(typeof CATEGORIES)[number], string> = {
+  dev: 'Software',
+  design: 'Design',
+  data: 'Data',
+};
+
+const LINKS = CATEGORIES.map((category) => ({
+  href: `/${CATEGORY_SLUGS[category]}/`,
+  label: NAV_LABELS[category],
+}));
+
+// Trailing slashes vary between the dev server and the built output, so the
+// comparison is made on a normalised path rather than on the raw string.
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
 ---
 
 <header class="bar" data-header>
@@ -14,23 +25,26 @@ const SECTIONS = [
       technology — the document outline already conveys position. */}
   <div class="progress" aria-hidden="true"></div>
 
-  <a class="wordmark" href="#top">Tudor-Andrei Ifrim</a>
+  <a class="wordmark" href="/">Tudor-Andrei Ifrim</a>
 
-  <nav aria-label="Sections">
+  <nav aria-label="Main">
     <ul>
       {
-        SECTIONS.map((section) => (
-          <li>
-            <a href={`#${section.id}`} data-spy={section.id}>
-              {section.label}
-            </a>
-          </li>
-        ))
+        LINKS.map((link) => {
+          const current = here === link.href.replace(/\/+$/, '');
+          return (
+            <li>
+              <a href={link.href} aria-current={current ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          );
+        })
       }
     </ul>
   </nav>
 
-  <a class="cta" href="#contact">Get in touch</a>
+  <a class="cta" href="/#contact">Get in touch</a>
 </header>
 
 <style>
@@ -104,8 +118,8 @@ const SECTIONS = [
     color: var(--text-primary);
   }
 
-  /* The active section is marked by colour and a rule, never by colour alone. */
-  nav a[aria-current='true'] {
+  /* The current page is marked by colour and a rule, never by colour alone. */
+  nav a[aria-current='page'] {
     color: var(--text-accent);
     border-bottom-color: var(--text-accent);
   }
@@ -143,10 +157,3 @@ const SECTIONS = [
     }
   }
 </style>
-
-<script>
-  import { initNavSpy } from '../scripts/nav-spy';
-
-  const links = document.querySelectorAll<HTMLAnchorElement>('[data-spy]');
-  if (links.length) initNavSpy(links);
-</script>

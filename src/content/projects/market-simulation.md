@@ -3,12 +3,14 @@ title: 'Agent-based market simulation'
 category: data
 year: 2026
 role: >-
-  Built the simulation: a stock market driven by news events of varying
-  impact, with agents running one of two strategies, so the two could be
-  compared under identical conditions.
+  Built the model in NetLogo: a market where two populations of agents —
+  fundamentalists, who price against an underlying value, and technical
+  traders, who follow the trend — meet in the same order book, so the two
+  strategies can be compared under identical conditions. Grounded in Chen,
+  Zheng and Tan's agent-based model of asymmetric trading and herding
+  (PLOS One, 2013), reviewed as part of the same course.
 stack:
-  - Python
-  - 'TODO(conținut): ce biblioteci'
+  - NetLogo
 problem: >-
   Fundamentals-based analysis and herd behaviour are usually argued about
   rather than measured. A simulation lets both run against the same sequence
@@ -19,7 +21,9 @@ results: >-
   măsurat.
 order: 10
 draft: false
-links: []
+links:
+  - label: 'Chen, Zheng & Tan (2013) — the paper the model follows'
+    url: 'https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0079531'
 ---
 
 ## How the market is modelled

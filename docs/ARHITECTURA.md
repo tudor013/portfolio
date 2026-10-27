@@ -536,3 +536,51 @@ portofoliu, diferența asta e totul.
 
 După rescriere: **0/10 invizibil în toate cele cinci scenarii**, iar cele 10
 elemente încă își joacă animația la derulare normală.
+
+---
+
+## Faza 8 — Pagini separate pe direcție, și materialele noi
+
+### Arhitectura s-a schimbat
+
+Înainte: o singură pagină lungă, navbarul sărea la secțiuni din ea.
+Acum: **trei pagini dedicate**, una per direcție.
+
+| Rută | Ce conține |
+|---|---|
+| `/` | hero, profil, cele trei direcții ca punți, competențe, experiență, contact |
+| `/software` | toate proiectele `dev` |
+| `/design` | toate proiectele `design` |
+| `/data` | toate proiectele `data` |
+| `/projects/<slug>` | studiul de caz al unui proiect |
+
+Cele trei pagini vin dintr-un **singur fișier**, `src/pages/[category].astro`.
+Parantezele pătrate îi spun Astro că e un șablon; `getStaticPaths()` îi dă
+lista categoriilor, iar Astro îl rulează o dată pentru fiecare. O categorie
+nouă înseamnă o linie în `CATEGORIES`, nu un fișier nou.
+
+Etichetele, slug-urile și descrierile stau toate în `src/content.config.ts`.
+Dacă ar fi scrise în două locuri, într-o zi ar începe să difere.
+
+### Badge-ul: de ce se smucea
+
+Tudor a raportat că se „glitchuiește" la orice mișcare de mouse. Cauza era în
+felul în care trasul era implementat: **vârful funiei era fixat instantaneu pe
+poziția cursorului**. Verlet deduce viteza din diferența dintre poziția
+curentă și cea anterioară — deci o teleportare de 200px într-un cadru e citită
+ca o viteză de 200px/cadru, iar funia pocnește ca un bici.
+
+Trei corecții:
+
+1. **Vârful se apropie de cursor treptat** (22% din distanță pe cadru), nu
+   sare pe el. Badge-ul rămâne greu, mișcarea rămâne lizibilă.
+2. **Mai multă amortizare** (0.985 → 0.955): energia se pierde mai repede.
+3. **Zona de mișcare a crescut** de la 300×440 la 420×560. Înainte, limita
+   laterală se activa aproape continuu, iar fiecare atingere a ei adăuga o
+   smucitură.
+
+Plus o corecție subtilă: când poziția e limitată la margine, se mută **și**
+poziția anterioară acolo. Altfel Verlet vede o diferență mare între ele și
+transformă peretele în trambulină.
+
+Măsurat după: mișcare proprie **81px** (era 208px), **0px** cu reduced-motion.
