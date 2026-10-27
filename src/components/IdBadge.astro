@@ -88,7 +88,8 @@ import portrait from '../assets/tudor.png';
     box-shadow: var(--shadow-lift);
   }
 
-  /* Only offer the grab cursor once the simulation is actually running. */
+  /* The grab cursor appears once the simulation is running — which is now
+     also the case under reduced motion, where dragging still works. */
   .badge[data-live] .card {
     cursor: grab;
   }
@@ -157,9 +158,10 @@ import portrait from '../assets/tudor.png';
   import { initBadge } from '../scripts/badge';
 
   const root = document.querySelector<HTMLElement>('[data-badge]');
-  // Someone who asked their system to reduce motion gets the badge exactly as
-  // it renders without scripting: present, readable, still.
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Reduced motion silences the entrance and the idle sway, but the badge
+  // still answers a pointer: motion a person asks for is not the motion that
+  // setting is about, and freezing it entirely makes the badge look broken.
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (root && !still) initBadge(root);
+  if (root) initBadge(root, { calm });
 </script>

@@ -30,13 +30,25 @@ const ENTRANCE_OFFSET_RATIO = -0.16;
  *  a static image, which gives a visitor no reason to try grabbing it. */
 const SWAY_AMPLITUDE = 0.03;
 const SWAY_PERIOD_MS = 4200;
+/** Impulse given to a click, in pixels of instantaneous velocity. */
+const NUDGE = 26;
 /** Below 1 so the swing loses energy and settles instead of oscillating forever. */
 const DAMPING = 0.985;
 /** More passes mean a stiffer, less rubbery strap. Eight is past the point of
  *  visible improvement for this length. */
 const RELAX_PASSES = 8;
 
-export function initBadge(root: HTMLElement): () => void {
+export interface BadgeOptions {
+  /**
+   * Suppresses the entrance swing and the ambient sway, leaving only motion
+   * the visitor asks for by dragging. Reduced-motion means no unprompted
+   * animation — it does not mean the thing stops answering a pointer.
+   */
+  calm?: boolean;
+}
+
+export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => void {
+  const calm = options.calm ?? false;
   const strap = root.querySelector<SVGPathElement>('[data-strap]');
   const card = root.querySelector<HTMLElement>('[data-card]');
   if (!strap || !card) return () => {};
@@ -46,7 +58,11 @@ export function initBadge(root: HTMLElement): () => void {
 
   // Displacing the lower points gives the rope stored energy, so the first
   // thing a visitor sees is the badge swinging down and settling.
-  const entrance = Math.min(ENTRANCE_OFFSET_MAX, root.clientWidth * ENTRANCE_OFFSET_RATIO);
+  // Math.min on a negative ratio would pick the larger magnitude, so the cap
+  // is applied to the magnitude and the direction restored afterwards.
+  const entrance = calm
+    ? 0
+    : -Math.min(ENTRANCE_OFFSET_MAX, root.clientWidth * Math.abs(ENTRANCE_OFFSET_RATIO));
 
   const points: Point[] = Array.from({ length: SEGMENTS + 1 }, (_, i) => {
     const lean = (i / SEGMENTS) ** 2 * entrance;
@@ -61,9 +77,10 @@ export function initBadge(root: HTMLElement): () => void {
 
   function step(now: number) {
     if (!started) started = now;
-    const sway = pointer
-      ? 0
-      : Math.sin(((now - started) / SWAY_PERIOD_MS) * Math.PI * 2) * SWAY_AMPLITUDE;
+    const sway =
+      pointer || calm
+        ? 0
+        : Math.sin(((now - started) / SWAY_PERIOD_MS) * Math.PI * 2) * SWAY_AMPLITUDE;
 
     for (let i = 1; i < points.length; i++) {
       const p = points[i]!;
@@ -150,8 +167,11 @@ export function initBadge(root: HTMLElement): () => void {
     };
   }
 
+  let pressOrigin: { x: number; y: number } | null = null;
+
   function onDown(event: PointerEvent) {
     pointer = toLocal(event);
+    pressOrigin = pointer;
     card!.setPointerCapture(event.pointerId);
     root.dataset.dragging = 'true';
   }
@@ -159,9 +179,24 @@ export function initBadge(root: HTMLElement): () => void {
     if (pointer) pointer = toLocal(event);
   }
   function onUp(event: PointerEvent) {
+    const released = pointer;
     pointer = null;
     card!.releasePointerCapture(event.pointerId);
     delete root.dataset.dragging;
+
+    // A press that never travelled is a click. Pinning the rope to a point it
+    // already occupied changes nothing, so give it a push instead — otherwise
+    // the most obvious way to try the badge appears to do nothing at all.
+    if (pressOrigin && released) {
+      const travelled = Math.hypot(released.x - pressOrigin.x, released.y - pressOrigin.y);
+      if (travelled < 4) {
+        const tip = points[points.length - 1]!;
+        // Nudges away from the side that was pressed, so the badge swings the
+        // way a real one would when you flick it.
+        tip.px = tip.x + (released.x < root.clientWidth / 2 ? -NUDGE : NUDGE);
+      }
+    }
+    pressOrigin = null;
   }
 
   card.addEventListener('pointerdown', onDown);

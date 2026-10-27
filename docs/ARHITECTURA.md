@@ -423,3 +423,51 @@ Un diagnostic separat, care enumera elementele ieșite din viewport, a arătat
 
 Morala: când un test raportează un bug, verifică întâi testul. Măsurătoarea
 trebuie să spună care element și unde, nu doar un număr.
+
+---
+
+## Faza 6b — „Badge-ul nu se mișcă deloc"
+
+Tudor a raportat că nu se mișcă la click. Măsurat local, se mișca mult
+(110px legănare, 85° rotație), deci codul nu era mort. Două cauze reale, și
+amândouă erau greșeli de design, nu de implementare:
+
+### 1. `prefers-reduced-motion` îngheța tot
+
+Codul verifica setarea și **nu pornea simularea deloc**. Dacă ai oprit
+„Animation effects" în Windows (Setări → Accesibilitate → Efecte vizuale),
+badge-ul era complet mort.
+
+Asta era o înțelegere greșită a setării. „Reduced motion" înseamnă *fără
+animație pe care n-am cerut-o* — nu *fără reacție la ce fac eu*. Acum
+simularea pornește mereu; setarea doar oprește intrarea și legănarea de la
+sine. Trasul și clickul funcționează oricum.
+
+### 2. Un click nu făcea nimic
+
+Apăsarea fixa funia exact unde era deja, deci un click fără mișcare nu
+schimba nimic. Dar clickul e **primul lucru pe care îl încearcă oricine**.
+Un element care nu răspunde la click pare stricat, indiferent cât de bine
+funcționează trasul.
+
+Acum, o apăsare care nu s-a deplasat mai mult de 4px e tratată ca un click și
+primește un impuls lateral — în direcția opusă părții pe care ai apăsat, ca la
+un ecuson real pe care îl plesnești cu degetul.
+
+### Măsurat
+
+| | mișcare normală | reduced motion |
+|---|---|---|
+| simularea pornește | da | **da** (înainte: nu) |
+| legănare de la sine, 2.5s | 110px | 0px |
+| deplasare după un **click** | 96px | **90px** |
+
+### Lecția
+
+Prima dată am „verificat" badge-ul măsurând dacă traseul funiei se schimbă
+între două cadre. Răspunsul a fost „da" — pentru câțiva pixeli de așezare.
+Testul trecea, produsul era mort.
+
+Un test care întreabă *„s-a schimbat ceva?"* nu e același lucru cu unul care
+întreabă *„se vede?"*. Acum se măsoară amplitudinea în pixeli, nu existența
+schimbării.
