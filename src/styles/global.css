@@ -17,6 +17,12 @@ html {
   scroll-padding-top: 4rem;
 }
 
+/* With Lenis smoothing the wheel, the browser must not smooth as well: two
+   smoothers fight and the page lurches. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
 /* Below desktop width the header has two rows (name and motion control,
    then the links), so it is taller. */
 @media (max-width: 60rem) {

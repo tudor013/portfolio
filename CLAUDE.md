@@ -136,8 +136,10 @@ la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
   date (`SchemaScene`), modelul NetLogo (`MarketScene`), cadrele Spline Aruna (`ArunaScene`).
 - **Modelul de piață e portat fidel** (`scripts/market-model.ts`). Nu îl „repara”: traderii
   tehnici chiar tranzacționează pe baza unei monede aruncate.
-- **Scenele nu folosesc GSAP.** Un singur cititor de scroll (`scripts/scenes.ts`) dă fiecărei
-  scene un număr 0–1. Motivul e explicat în `docs/ARHITECTURA.md`, faza 11.
+- **Scenele de scroll nu folosesc GSAP.** Un singur cititor de scroll (`scripts/scenes.ts`) dă
+  fiecărei scene un număr 0–1. Motivul e explicat în `docs/ARHITECTURA.md`, faza 11.
+- **GSAP rulează arborele binar din hero, iar Lenis face scroll-ul lin** (faza 13, la cererea lui
+  Tudor). Amândouă se încarcă doar în modul cu animații. Lenis nu pornește pe touch.
 - **Badge-ul** e singurul obiect cu umbră și singurul alb pur. Excepția e deliberată și marcată
   `taste-skill-ignore`.
 - **Verificare înainte de commit:** `taste-skill lint` și `inspect` cu 0 FAIL. Critica rundei
@@ -146,8 +148,12 @@ la efect. Dacă nu există cale, spun clar ce se pierde și decide Tudor.
   `scripts/motion.ts`, starea pe `<html data-motion>`, alegerea în `localStorage`
   (`portfolio-motion`). Orice animație nouă citește `motionIsFull()` și ascultă
   `onMotionChange()`, nu direct `prefers-reduced-motion`.
-- **Foaia de desen din hero** (grilă + elevație, din patch-ul ChatGPT) e singura excepție de
-  la „fără linii decorative”. E limitată la hero și stă în spatele badge-ului.
+- **Foaia de desen din hero** (grila din patch-ul ChatGPT) e singura excepție de la „fără linii
+  decorative” și e limitată la hero. **Casa a fost scoasă** la cererea lui Tudor („nu are niciun
+  sens”). În locul ei e arborele binar de căutare (`SearchTree`), care se construiește singur cu
+  algoritmul real de inserare.
+- **Primul ecran conține doar numele, propoziția, butoanele, arborele și badge-ul.** Rândul cu
+  disponibilitatea stă intenționat sub fold, cerut de Tudor: „lăsăm loc să mai animăm”.
 
 ## Video scrubbing — DOAR pentru fundaluri decorative
 Video scrubbing = animația de fundal avansează/derulează înapoi în funcție de scroll. Se aplică **numai** elementelor de fundal ale paginii, **niciodată** proiectelor prezentate (acelea rămân exact cum sunt).

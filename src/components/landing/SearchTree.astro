@@ -1,0 +1,126 @@
+---
+/**
+ * A binary search tree on the hero's drafting sheet, behind the badge. With
+ * motion on it builds itself when the page opens, one real insertion at a
+ * time, then keeps looking keys up and lighting the path it takes. With
+ * motion off, or without a script, it is the finished tree, drawn.
+ *
+ * It is decoration and says so to assistive technology (aria-hidden): the
+ * page's content does not depend on it.
+ */
+import { NODES, INSERT_ORDER, placeOf } from '../../data/search-tree';
+
+const placed = NODES.map((node) => ({ ...node, ...placeOf(node) }));
+const byKey = new Map(placed.map((n) => [n.key, n]));
+---
+
+<div class="tree" data-search-tree data-order={INSERT_ORDER.join(',')} data-ui aria-hidden="true">
+  <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+    {
+      placed
+        .filter((n) => n.parent !== null)
+        .map((n) => {
+          const parent = byKey.get(n.parent!)!;
+          return (
+            <line
+              x1={parent.x}
+              y1={parent.y}
+              x2={n.x}
+              y2={n.y}
+              pathLength="1"
+              data-edge={n.key}
+            />
+          );
+        })
+    }
+  </svg>
+
+  {
+    placed.map((n) => (
+      <span class="node figures" style={`left: ${n.x}%; top: ${n.y}%`} data-node={n.key}>
+        {n.key}
+      </span>
+    ))
+  }
+
+  <p class="caption" data-tree-caption>Binary search tree, ten keys</p>
+</div>
+
+<style>
+  .tree {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .edges {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  line {
+    stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  line.is-path {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+  }
+
+  /* A node is a key on a disc of paper, so the lines stop at its edge. */
+  .node {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: -1.125rem 0 0 -1.125rem;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    background: var(--ground);
+    color: var(--ink);
+    font-size: var(--step-small);
+    font-weight: var(--weight-head);
+    line-height: 1;
+  }
+
+  .node.is-compared {
+    border-width: 2.5px;
+    color: var(--accent);
+  }
+
+  .node.is-found {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .caption {
+    position: absolute;
+    left: 0;
+    bottom: -0.25rem;
+    max-width: none;
+    color: var(--muted);
+    font-size: var(--step-small);
+  }
+
+  /* A narrow column: smaller discs, so neighbours never touch. */
+  @container tree (max-width: 26rem) {
+    .node {
+      width: 1.75rem;
+      height: 1.75rem;
+      margin: -0.875rem 0 0 -0.875rem;
+    }
+  }
+</style>
+
+<script>
+  import { initSearchTree } from '../../scripts/search-tree';
+
+  const root = document.querySelector<HTMLElement>('[data-search-tree]');
+  if (root) initSearchTree(root);
+</script>

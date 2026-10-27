@@ -1,54 +1,33 @@
 ---
 /**
- * The first screen: who this is, what he does, and how to act on it, with the
- * ID badge hanging on the right as the screen's one physical object. The
- * blueprint field of the next chapter peeks in along the bottom edge.
+ * The first screen: who this is, what he does, and how to act on it. On the
+ * right the ID badge hangs; below the text, on a drafting sheet, a binary
+ * search tree builds itself when the page opens (SearchTree).
  *
- * The load sequence is CSS only, so it runs from the first frame and never
- * waits on a script: the name rises, then the sentence, then the actions.
+ * The first screen holds only the name, the sentence and the two actions;
+ * the line about availability sits just below it, so the opening is not
+ * crowded and there is room for the tree to move.
+ *
+ * The load sequence of the text is CSS only, so it runs from the first frame
+ * and never waits on a script.
  */
 import IdBadge from '../IdBadge.astro';
+import SearchTree from './SearchTree.astro';
 ---
 
 <section class="hero frame" aria-labelledby="hero-heading">
   <div class="drafting-sheet" aria-hidden="true">
-    <svg viewBox="0 0 700 500" focusable="false" preserveAspectRatio="xMidYMid meet">
+    <svg focusable="false">
       <defs>
-        <pattern id="hero-blueprint-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+        <pattern id="hero-grid" width="32" height="32" patternUnits="userSpaceOnUse">
           <path class="grid" d="M32 0H0V32" />
         </pattern>
-        <pattern id="hero-blueprint-grid-major" width="160" height="160" patternUnits="userSpaceOnUse">
+        <pattern id="hero-grid-major" width="160" height="160" patternUnits="userSpaceOnUse">
           <path class="grid-major" d="M160 0H0V160" />
         </pattern>
       </defs>
-
-      <rect width="700" height="500" fill="url(#hero-blueprint-grid)" />
-      <rect width="700" height="500" fill="url(#hero-blueprint-grid-major)" />
-
-      <g class="guides">
-        <path d="M337 46V448M96 258H592" />
-        <path d="M138 414V190M536 414V190" />
-      </g>
-
-      <g class="structure">
-        <path d="M166 414V201L337 82L508 201V414Z" />
-        <path d="M207 414V247H467V414M207 292H467M337 247V414" />
-        <path d="M263 414V330H337V414M383 414V330H437V414" />
-        <path d="M237 247V210H303V247M370 247V210H436V247" />
-        <path d="M153 201L337 74L521 201" />
-      </g>
-
-      <g class="dimensions">
-        <path d="M166 178H508M166 170V186M508 170V186" />
-        <path d="M126 201V414M118 201H134M118 414H134" />
-        <path d="M337 64L345 72M337 64L329 72M337 448L345 440M337 448L329 440" />
-      </g>
-
-      <g class="registration">
-        <circle cx="166" cy="201" r="3" />
-        <circle cx="508" cy="201" r="3" />
-        <circle cx="337" cy="414" r="3" />
-      </g>
+      <rect width="100%" height="100%" fill="url(#hero-grid)" />
+      <rect width="100%" height="100%" fill="url(#hero-grid-major)" />
     </svg>
   </div>
 
@@ -64,16 +43,22 @@ import IdBadge from '../IdBadge.astro';
       <a class="button" href="#work">See the work</a>
       <a class="go" href="#contact">Get in touch</a>
     </p>
+  </div>
 
-    <p class="status">
-      Open to an internship, a part-time role or a junior position, and
-      available now. Studying Economic Informatics, graduating in 2028.
-    </p>
+  <div class="tree-area">
+    <SearchTree />
   </div>
 
   <div class="badge-slot">
     <IdBadge />
   </div>
+
+  <p class="status" data-enter>
+    <span>
+      Open to an internship, a part-time role or a junior position, and
+      available now. Studying Economic Informatics, graduating in 2028.
+    </span>
+  </p>
 </section>
 
 <style>
@@ -82,25 +67,24 @@ import IdBadge from '../IdBadge.astro';
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    /* The first row is the whole first screen below the header; the
+       availability line waits in the second, just out of view. */
+    grid-template-rows: minmax(calc(100svh - 4rem), auto) auto;
     column-gap: var(--space-8);
-    /* One screen, less the header and the strip of blueprint that peeks in
-       below to say the page goes on. */
-    min-height: calc(100svh - 4rem - 5.5rem);
-    min-height: max(36rem, calc(100svh - 4rem - 5.5rem));
   }
 
+  /* A faint drafting grid behind the badge and the tree. The only decorative
+     lines on the page, and only here (.ux-profile.md). */
   .drafting-sheet {
     position: absolute;
     z-index: 0;
-    inset: 0 0 0 auto;
-    /* The right half only, behind the badge: wider, and the roof line ran
-       through the end of the sentence. */
-    width: min(52%, 50rem);
+    inset: 0;
     pointer-events: none;
     opacity: 0.58;
-    /* A mask, not a fill: the sheet fades out before it reaches the name.
-       Gradients are allowed by Tudor; this is the only one on the page. */
-    mask-image: linear-gradient(90deg, transparent 0%, black 16%, black 100%); /* taste-skill-ignore */
+    /* A mask, not a fill: the sheet stays clear around the name and the
+       sentence and shows under the tree and the badge. Gradients are allowed
+       by Tudor; these masks are the only ones. */
+    mask-image: radial-gradient(ellipse 48% 42% at 30% 28%, transparent 55%, black 100%); /* taste-skill-ignore */
   }
 
   .drafting-sheet svg {
@@ -120,43 +104,18 @@ import IdBadge from '../IdBadge.astro';
     stroke-width: 0.9;
   }
 
-  .guides,
-  .dimensions,
-  .registration {
-    fill: none;
-    stroke: var(--draft-line);
-    stroke-width: 1;
-    vector-effect: non-scaling-stroke;
-  }
-
-  .guides {
-    stroke-dasharray: 3 6;
-  }
-
-  .structure {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 1.35;
-    vector-effect: non-scaling-stroke;
-  }
-
-  .registration circle {
-    fill: var(--ground);
-    stroke: var(--accent);
-    stroke-width: 1.2;
-  }
-
   /* Above the badge's box: the name runs a little into the badge column, and
      the transparent box the strap is drawn in must not sit over it. */
   .column {
     position: relative;
-    z-index: 1;
+    /* Above the badge's slot as well as the sheet. */
+    z-index: 2;
+    grid-row: 1;
+    grid-column: 1;
     display: grid;
-    grid-template-rows: auto auto auto 1fr;
     align-content: start;
     gap: var(--space-6);
     padding-left: var(--column-start);
-    /* Less on a short screen, so the blueprint still peeks in at 768px. */
     padding-block: clamp(1.5rem, 5vh, 3rem);
   }
 
@@ -187,17 +146,44 @@ import IdBadge from '../IdBadge.astro';
     gap: var(--space-4) var(--space-8);
   }
 
-  /* Sits on the hero's floor: the first thing a recruiter wants after the
-     name is whether he is available, so it is on the first screen. */
-  .status {
-    align-self: end;
-    max-width: 36ch;
-  }
-
+  /* Spans both rows: the badge's box is 760px tall, and in the first row
+     alone it would stretch the first screen past the bottom of a short
+     window. */
   .badge-slot {
+    position: relative;
+    z-index: 1;
+    grid-row: 1 / -1;
+    grid-column: 2;
     /* The strap hangs from the header's bottom edge. */
     align-self: start;
     margin-right: calc(var(--space-8) * -1);
+  }
+
+  /* The room under the text that the availability line left: the tree is
+     drawn there, on the sheet, clear of the name and of the badge. */
+  .tree-area {
+    position: relative;
+    z-index: 1;
+    grid-row: 1;
+    grid-column: 1;
+    align-self: end;
+    max-width: 34rem;
+    height: clamp(10rem, 24vh, 15rem);
+    margin: 0 0 var(--space-8) var(--column-start);
+    container: tree / inline-size;
+  }
+
+  .status {
+    position: relative;
+    z-index: 1;
+    grid-row: 2;
+    grid-column: 1;
+    padding: var(--space-8) 0 var(--space-16) var(--column-start);
+  }
+
+  .status span {
+    display: block;
+    max-width: 36ch;
   }
 
   /* ---- Load sequence ---------------------------------------------------- */
@@ -208,7 +194,6 @@ import IdBadge from '../IdBadge.astro';
 
   :global(html[data-motion='full']) .column > :nth-child(2) { animation-delay: 90ms; }
   :global(html[data-motion='full']) .column > :nth-child(3) { animation-delay: 180ms; }
-  :global(html[data-motion='full']) .column > :nth-child(4) { animation-delay: 320ms; }
 
   @keyframes rise {
     from {
@@ -225,6 +210,7 @@ import IdBadge from '../IdBadge.astro';
   @media (max-width: 60rem) {
     .hero {
       column-gap: var(--space-4);
+      grid-template-rows: minmax(calc(100svh - 6.5rem), auto) auto;
       /* A card swung to the edge must never widen the page. `clip` cuts the
          sideways overflow only, so the strap can still drop in from above. */
       overflow-x: clip;
@@ -243,21 +229,32 @@ import IdBadge from '../IdBadge.astro';
       width: 100%;
     }
 
+    .tree-area {
+      width: 100%;
+      margin-left: 0;
+    }
+
+    .status {
+      padding-left: 0;
+    }
+
     .drafting-sheet {
-      width: 74%;
-      opacity: 0.38;
+      opacity: 0.42;
     }
   }
 
   /* A phone has no room beside the text, so the badge gets a band of its own
-     under it, one tone down, and hangs from the band's top edge. */
+     under it, one tone down, and hangs from the band's top edge; the tree
+     sits at the top of the band. */
   @media (max-width: 40rem) {
     .hero {
       grid-template-columns: minmax(0, 1fr);
-      min-height: 0;
+      grid-template-rows: auto;
     }
 
     .column {
+      grid-row: auto;
+      grid-column: auto;
       padding-block: var(--space-8);
     }
 
@@ -266,6 +263,8 @@ import IdBadge from '../IdBadge.astro';
     }
 
     .badge-slot {
+      grid-row: auto;
+      grid-column: auto;
       width: auto;
       height: 36rem;
       margin-inline: calc(var(--margin) * -1);
@@ -274,13 +273,20 @@ import IdBadge from '../IdBadge.astro';
       justify-items: center;
     }
 
+    .tree-area {
+      grid-row: auto;
+      height: 12rem;
+      margin-bottom: var(--space-8);
+    }
+
+    .status {
+      grid-row: auto;
+      grid-column: auto;
+    }
+
     .drafting-sheet {
-      top: 5rem;
-      bottom: auto;
-      width: 100%;
-      height: 22rem;
-      opacity: 0.22;
-      mask-image: linear-gradient(180deg, black 0%, transparent 100%); /* taste-skill-ignore */
+      opacity: 0.3;
+      mask-image: none;
     }
   }
 </style>

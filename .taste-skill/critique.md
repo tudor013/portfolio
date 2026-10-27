@@ -47,6 +47,17 @@ says nothing about Tudor's work, and a reader may take it for architecture. A dr
 his own material (the schema's outline, for instance) would carry the idea further. Left as
 the patch drew it, because Tudor asked for that work to go in as made.
 
+## ROUND 3 (house replaced by a search tree; inspect.mjs: 0 FAIL, 3 WARN)
+
+The finding from round 2 is resolved. The house is gone. In its place, a binary search tree on the
+drafting sheet, under the actions, builds itself on load by real insertions and then keeps
+searching. It is the subject's own discipline drawn in the page's line language, not a generic
+effect. The first screen is now name, sentence, actions, tree and badge. The availability line
+starts just below the fold, which Tudor asked for.
+
+Also fixed: the schema title is now placed 48px below PASAGERI at every measured size, and falls
+back to the finished composition when the labels would drop under 13px.
+
 ### Warnings defended
 - `no-footage`: no honest clip exists. The Spline scenes cannot be recorded from here, and stock
   footage would show someone else's world. The moving pictures are the live market and the Aruna

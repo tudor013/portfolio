@@ -184,7 +184,8 @@ const description =
 
   svg {
     width: 100%;
-    min-width: 62rem;
+    /* Wide enough that every label is at least 13px. */
+    min-width: 78rem;
     height: auto;
     font-family: var(--font);
   }
@@ -210,11 +211,11 @@ const description =
 
   text {
     fill: var(--field-ink);
-    font-size: 21px;
+    font-size: 22px;
   }
 
   .name {
-    font-size: 22px;
+    font-size: 23px;
     font-weight: var(--weight-strong);
   }
 
@@ -253,19 +254,26 @@ const description =
     align-self: start;
   }
 
+  /* schema-scene.ts sets the drawing's height and the title block's place
+     from the measured screen, so the two never touch. */
   .schema.is-live svg {
     min-width: 0;
-    max-height: calc(100svh - 4rem - var(--space-16));
   }
 
   /* The title block sits in the drawing's own empty corner, bottom right,
-     where a real blueprint keeps its title block. */
+     where a real blueprint keeps its title block: below PASAGERI, right of
+     the last line. */
   .schema.is-live .title-block {
-    grid-area: 1 / 1;
+    position: absolute;
     z-index: 1;
-    align-self: end;
-    justify-self: end;
-    width: min(38rem, 44vw);
+    max-width: none;
+    gap: var(--space-4);
+  }
+
+  /* Held, the title is a blueprint's title block, not a chapter opening:
+     a size smaller, so the drawing keeps more of the screen. */
+  .schema.is-live h2 {
+    font-size: clamp(2rem, 0.9rem + 2.4vw, 3.5rem);
   }
 
   /* One statement at a time: the captions share one cell and cross over. */

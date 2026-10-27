@@ -49,10 +49,12 @@
 </section>
 
 <style>
+  /* Generous air on both sides of the lead: after the dense blueprint above,
+     the page breathes before the four columns start. */
   .intro {
     display: grid;
-    gap: var(--space-16);
-    padding-block: var(--section-gap) 0;
+    gap: clamp(5rem, 2rem + 7vw, 10rem);
+    padding-block: calc(var(--section-gap) * 1.3) 0;
   }
 
   .lead {

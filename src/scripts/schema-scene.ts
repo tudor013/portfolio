@@ -9,7 +9,7 @@
  * Only transform, opacity and the stroke offset of the lines change; nothing
  * is laid out again while scrolling.
  */
-import { RULES } from '../data/airline-schema';
+import { RULES, TABLES, VIEWBOX, heightOf } from '../data/airline-schema';
 import { addScene, beat, easeOut } from './scenes';
 import { motionIsFull, onMotionChange } from './motion';
 
@@ -26,6 +26,17 @@ const RULE_LENGTH = (1 - RULES_FROM) / RULES.length;
 
 const SELF_REFERENCE = 'fk_d2026_ang_manager';
 
+// The drawing's empty corner, in drawDB units: everything below the bottom of
+// PASAGERI and right of the last line (the crew-to-flight key ends at x 816).
+const PASAGERI = TABLES.find((t) => t.id === 'PASAGERI')!;
+const CORNER_TOP = PASAGERI.y + heightOf(PASAGERI);
+const CORNER_LEFT = 850;
+/** Clear space between the drawing and its title block, in pixels. */
+const AIR = 48;
+const TITLE_MAX = 640;
+/** Below this scale the 22-unit labels would drop under 13px. */
+const MIN_SCALE = 13 / 22;
+
 export function initSchemaScene(root: HTMLElement): void {
   // Holding needs a wide screen (the drawing is wide) and a reader who has
   // not asked for less motion. Everyone else gets the finished drawing.
@@ -41,6 +52,52 @@ export function initSchemaScene(root: HTMLElement): void {
     if (progress < RULES_FROM) return 'keys';
     const index = Math.min(RULES.length - 1, Math.floor((progress - RULES_FROM) / RULE_LENGTH));
     return RULES[index].id;
+  }
+
+  const stage = root.querySelector<HTMLElement>('.stage')!;
+  const svg = root.querySelector<SVGSVGElement>('.drawing svg')!;
+  const title = root.querySelector<HTMLElement>('.title-block')!;
+
+  /**
+   * Places the title block in the drawing's empty bottom-right corner with
+   * AIR to spare, shrinking the drawing if the screen is too short for both.
+   * The block's height depends on its width, and its width on the drawing's
+   * size, so it settles in a few passes.
+   */
+  function fit(): number {
+    if (!root.classList.contains('is-live')) return 0;
+
+    const style = getComputedStyle(stage);
+    const padTop = parseFloat(style.paddingTop);
+    const padBottom = parseFloat(style.paddingBottom);
+    const padX = parseFloat(style.paddingLeft);
+    const innerWidth = stage.clientWidth - padX * 2;
+    const innerBottom = stage.clientHeight - padBottom;
+
+    const ratio = VIEWBOX.height / VIEWBOX.width;
+    const cornerShare = (CORNER_TOP - VIEWBOX.y) / VIEWBOX.height;
+    let height = Math.min(innerWidth * ratio, innerBottom - padTop);
+
+    for (let pass = 0; pass < 3; pass++) {
+      const scale = height / VIEWBOX.height;
+      const drawingLeft = padX + (innerWidth - VIEWBOX.width * scale) / 2;
+      const left = Math.max(drawingLeft + (CORNER_LEFT - VIEWBOX.x) * scale, padX + innerWidth - TITLE_MAX);
+      title.style.left = `${left}px`;
+      title.style.width = `${padX + innerWidth - left}px`;
+
+      const room = (innerBottom - padTop - AIR - title.offsetHeight) / cornerShare;
+      if (room >= height) break;
+      height = room;
+    }
+
+    svg.style.height = `${height}px`;
+    title.style.top = `${padTop + height * cornerShare + AIR}px`;
+    return height / VIEWBOX.height;
+  }
+
+  function unfit(): void {
+    svg.style.removeProperty('height');
+    for (const prop of ['top', 'left', 'width']) title.style.removeProperty(prop);
   }
 
   function render(progress: number): void {
@@ -86,12 +143,22 @@ export function initSchemaScene(root: HTMLElement): void {
   const redraw = addScene(root, render);
 
   function sync(): void {
-    const live = canRun.matches && motionIsFull();
-    root.classList.toggle('is-live', live);
-    if (!live) rest();
+    root.classList.toggle('is-live', canRun.matches && motionIsFull());
+    // A screen too short to hold the drawing and its title at a readable
+    // size gets the finished composition instead, as a tablet does.
+    if (root.classList.contains('is-live') && fit() < MIN_SCALE) root.classList.remove('is-live');
+    if (!root.classList.contains('is-live')) {
+      rest();
+      unfit();
+    }
     redraw();
   }
 
+  // The window, not the stage: holding and letting go change the stage's own
+  // size, and observing it would loop.
+  window.addEventListener('resize', sync);
+  // The title's height depends on the real font, which may arrive late.
+  void document.fonts.ready.then(sync);
   canRun.addEventListener('change', sync);
   onMotionChange(sync);
   sync();

@@ -987,3 +987,75 @@ Propunerea și patch-ul vin de la ChatGPT; le-am aplicat, verificat și reparat 
   - al doilea click o inversează.
 - Fără JavaScript butonul nu apare (are `hidden` până pornește scriptul) și tot textul e vizibil.
 - Din tastatură butonul e în ordinea Tab, după „Get in touch”, și are inel de focus.
+
+## Faza 13 — Arborele binar din hero, aer, GSAP și Lenis
+
+Ce ai cerut: să scot casa, să pun în loc ceva de informatică ce se animă singur când intri pe
+pagină, să dai mai mult aer titlului schemei și secțiunii albe de după ea, să cobori rândul cu
+disponibilitatea sub primul ecran și să folosim GSAP și Lenis.
+
+### De ce un arbore binar de căutare, nu ceva de pe React Bits
+
+M-am uitat prin catalogul React Bits. Componentele cu aer „de informatică” sunt efecte WebGL
+generice (LetterGlitch, FaultyTerminal): litere care pâlpâie, un terminal cu zgomot. Arată a
+„hacker”, se bat cap în cap cu stilul blueprint și nu spun nimic despre ce știi tu. În plus, sunt
+componente React, iar site-ul nu folosește React.
+
+În locul lor, un **arbore binar de căutare**, desenat ca pe o foaie de calcul tehnic:
+
+- Zece chei intră una câte una, prin algoritmul real de inserare: mai mic la stânga, mai mare la
+  dreapta. Cheile cu care se compară noua cheie se aprind pe drum. Apoi muchia crește din
+  părinte, iar nodul nou se așază la capătul ei.
+- După construcție caută, la câteva secunde, câte o cheie și luminează drumul. Legenda spune ce
+  face, de exemplu „Searching for 62: 4 comparisons”.
+- Totul e calculat cu aceeași funcție (`src/data/search-tree.ts`): la build, ca să așeze arborele
+  final, și în browser, ca să reia fiecare pas. Desenul și animația nu pot spune lucruri diferite.
+
+| Fișier | Rol |
+|---|---|
+| `src/data/search-tree.ts` | cheile, inserarea reală, drumul până la o cheie, poziția fiecărui nod |
+| `src/components/landing/SearchTree.astro` | arborele final, desenat (ce vezi fără JavaScript sau cu mișcarea oprită) |
+| `src/scripts/search-tree.ts` | cronologia GSAP: construcția, o dată, apoi căutările în buclă |
+
+Arborele stă sub butoane, în spațiul eliberat de rândul cu disponibilitatea, nu în spatele
+badge-ului. Acolo nu atinge numele și nu e acoperit de card. Se oprește când nu e pe ecran sau
+când tab-ul e ascuns.
+
+### GSAP și Lenis
+
+- **GSAP** rulează animația arborelui. O cronologie e exact unealta potrivită pentru o secvență
+  cu pași care așteaptă unul după altul. Scenele de scroll rămân pe `scenes.ts`, pentru motivul
+  din faza 11.
+- **Lenis** face scroll-ul cu rotița lin. Tot fereastra derulează, deci scenele, tastatura și bara
+  de scroll merg ca înainte. Pe touch nu pornește, pentru că telefonul are deja scroll lin.
+  Linkurile din pagină alunecă și se opresc sub header.
+- Amândouă se descarcă **doar în modul cu animații** (`import()` dinamic). Modul redus, în care
+  se măsoară pragul de Performance, nu le încarcă deloc. Butonul „Motion” le pornește și le
+  oprește pe amândouă.
+
+### Titlul schemei și aerul
+
+- **„A seat sold once”** era lipit de jos, iar desenul își schimba înălțimea după ecran. De
+  aceea, pe unele ecrane, titlul ajungea peste tabelul PASAGERI. Acum `schema-scene.ts`
+  măsoară desenul și pune titlul la 48px sub PASAGERI, în dreapta ultimei linii. Dacă ecranul
+  e prea scund pentru amândouă, desenul se micșorează. Dacă textul din tabele ar scădea sub
+  13px (la 1280×720, de exemplu), scena nu mai stă fixată și arată compoziția finală, ca pe
+  tabletă.
+- **Secțiunea albă** de după schemă („Systems with moving parts”) are mult mai mult spațiu, și
+  deasupra, și între paragraf și cele patru coloane.
+- **Rândul „Open to an internship…”** a ieșit din primul ecran. Hero-ul are acum două rânduri:
+  primul cât ecranul (nume, propoziție, butoane, arbore, badge), al doilea doar cu acest rând.
+
+### Verificare
+
+- `astro check`: 0 erori. `taste-skill lint`: 0 FAIL, 0 WARN.
+- `taste-skill inspect`: 0 FAIL, cu aceleași 3 avertismente justificate.
+- **Titlul schemei,** măsurat la 1280×720, 1366×768, 1440×900, 1850×935, 1920×1080 și 2560×1300:
+  48px sub PASAGERI peste tot, iar textul din tabele are cel puțin 14px. La 1280×720 scena trece
+  pe compoziția finală.
+- **Hero-ul,** măsurat la aceleași rezoluții: arborele încape deasupra fold-ului fără să atingă
+  butoanele, iar rândul cu disponibilitatea începe sub fold.
+- **Lenis:** o rotiță de 600px alunecă în circa o jumătate de secundă. Cu „Motion” oprit, Lenis
+  dispare, iar arborele rămâne întreg, la locul lui.
+- **Patru lățimi, 7 rute:** zero scroll orizontal și consolă curată. Fără JavaScript, tot textul e
+  vizibil. Ordinea din tastatură e neschimbată.

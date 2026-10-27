@@ -81,9 +81,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <script>
   import { initMotionToggle } from '../scripts/motion';
   import { initEnter } from '../scripts/enter';
+  import { initSmoothScroll } from '../scripts/smooth-scroll';
 
   initMotionToggle();
   initEnter();
+  initSmoothScroll();
 </script>
 
 <style>
