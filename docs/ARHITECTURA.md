@@ -721,15 +721,22 @@ draggable={false}
 deci nimic din interiorul lui nu primește pointerul separat. Nu contează de
 unde îl apuci.
 
-### Căderea de deasupra paginii
+### Căderea: de la „coborâre" la cădere liberă
 
-Prima variantă îl arunca lateral. Acum **ancora însăși coboară** de la 900px
-deasupra viewportului până la locul ei, pe o curbă `easeOutCubic`, în 900ms.
+Prima variantă cobora **ancora** pe o curbă `easeOutCubic` în 900ms. Tudor a
+spus că nu e ce voia, și avea dreptate: aia e o **coborâre controlată**, nu o
+cădere. Viteza era aproape constantă, banda nu se întindea niciodată, deci nu
+exista momentul de prindere.
 
-Diferența e că gravitația și funia fac restul: cardul rămâne în urma clemei
-la coborâre și se leagănă când ajunge — exact ce face un ecuson lăsat să cadă
-pe un lanyard. Dacă aș fi animat direct poziția cardului, ar fi fost o
-animație; așa, e o consecință.
+Acum tot ansamblul — banda inclusă — pornește cu 1100px deasupra și e lăsat
+în **cădere liberă**: ancora **nu e fixată** cât timp cade, deci accelerează
+ca orice altă masă din simulare. În momentul în care ajunge la cârlig, se
+fixează, banda se întinde brusc, iar cardul continuă din inerție și se
+leagănă înainte să se așeze.
+
+Diferența se măsoară: cardul coboară până la **308px** și se așază la
+**265px** — adică trece 43px dincolo și revine. **Acel supraavans e prinderea.**
+Varianta cu easing nu avea așa ceva, pentru că nimic nu se întindea.
 
 Cu `prefers-reduced-motion`, badge-ul e deja la locul lui la încărcare.
 
@@ -752,3 +759,21 @@ Zona de mișcare a crescut de la 420×560 la **560×760**.
 | apucat **de poză** | mișcă badge-ul, 117px |
 | ancoră bandă vs header | **0px** |
 | overflow orizontal | 0px |
+
+---
+
+## Faza 10c — Spațierea de sus
+
+Navbarul era prea jos, iar între el și nume erau **265px**.
+
+Cauza nu era padding-ul, ci alinierea: textul era centrat vertical față de
+coloana badge-ului, care are 760px. Centrat într-o coloană atât de înaltă,
+numele ajungea la o treime din pagină.
+
+Acum textul e aliniat **sus** (`align-self: start`), iar padding-ul de sus al
+paginii a scăzut de la `--space-12` la `--space-6`. Rezultat: **32px** între
+header și nume.
+
+Marginea negativă a badge-ului și padding-ul de sus al hero-ului vin acum
+dintr-**o singură variabilă** (`--hero-top`). Dacă ar fi scrise separat, o
+schimbare a uneia ar face banda să înceapă în aer.

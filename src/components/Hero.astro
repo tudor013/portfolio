@@ -37,11 +37,19 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
 </section>
 
 <style>
+  /* Top-aligned, not centred: the badge column is far taller than the text,
+     so centring pushed the name a third of the way down the page. The name
+     is the first thing to read, so it starts where the reader's eye does. */
   .intro {
-    align-self: center;
+    align-self: start;
   }
 
   .hero {
+    /* One source for the gap under the header: the badge cancels exactly this
+       much to hang from the header's edge, and a mismatch would show as the
+       strap starting in mid-air. */
+    --hero-top: var(--space-8);
+
     display: grid;
     /* The badge keeps its intrinsic width; the text takes what is left. */
     grid-template-columns: minmax(0, 1fr) auto;
@@ -50,7 +58,7 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
        hangs from just under the header; the text stays optically centred
        against it. */
     align-items: start;
-    padding-block: var(--space-16) var(--space-12);
+    padding-block: var(--hero-top) var(--space-12);
   }
 
   /* Below the two-column threshold the badge moves under the text rather than
@@ -111,7 +119,7 @@ const TRACE_CAPTION = 'TODO(conținut): ce reprezintă seria.';
   /* Pulls the badge up through the hero's own top padding, so the strap
      begins immediately below the header rather than part-way down the page. */
   .badge-slot {
-    margin-top: calc(var(--space-16) * -1);
+    margin-top: calc(var(--hero-top) * -1);
   }
 
   @media (max-width: 60rem) {

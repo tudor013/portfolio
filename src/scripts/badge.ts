@@ -37,13 +37,20 @@ const STEP_MS = 1000 / 120;
 const MAX_STEPS_PER_FRAME = 5;
 
 /**
- * The badge enters by having its anchor descend from above the viewport
- * rather than by being displaced sideways. Gravity and the rope do the rest,
- * so the card trails the clip on the way down and swings as it arrives —
- * which is what a badge dropped on a lanyard actually does.
+ * The badge falls from above the page and the lanyard catches it.
+ *
+ * The whole assembly — strap included — starts this far above its resting
+ * place and is left in **free fall**: the anchor is not pinned while it
+ * drops, so everything accelerates under the same gravity as anything else
+ * in the simulation. The moment the anchor reaches its hook, it pins, the
+ * strap snaps taut, and the card carries on under its own momentum and
+ * swings out before settling.
+ *
+ * An earlier version eased the anchor down on a timing curve. That is a
+ * controlled descent, not a fall: it arrived at a constant-ish speed and the
+ * strap never went taut, so there was no catch.
  */
-const DROP_HEIGHT = 900;
-const DROP_MS = 900;
+const DROP_HEIGHT = 1100;
 
 const SWAY_AMPLITUDE = 0.009;
 const SWAY_PERIOD_MS = 5200;
@@ -75,6 +82,8 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
   // Reduced motion gets the badge already in place; everyone else watches it
   // arrive.
   const dropFrom = calm ? 0 : -DROP_HEIGHT;
+  /** False until the anchor reaches its hook, after which it is pinned. */
+  let landed = calm;
 
   const rope: Point[] = Array.from({ length: SEGMENTS + 1 }, (_, i) => {
     const y = dropFrom + i * restLength;
@@ -133,8 +142,13 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
     const sway =
       pointer || calm ? 0 : Math.sin((elapsed / SWAY_PERIOD_MS) * Math.PI * 2) * SWAY_AMPLITUDE;
 
+    // While falling, the anchor is just another mass: it accelerates with
+    // everything else. Pinning it is what ends the fall.
+    if (!landed) integrate(rope[0]!, 0);
     for (let i = 1; i < rope.length; i++) integrate(rope[i]!, sway * i);
     integrate(tail, sway * SEGMENTS);
+
+    if (!landed && rope[0]!.y >= 0) landed = true;
 
     // Once per step, not once per relaxation pass.
     if (pointer && grab) {
@@ -143,15 +157,11 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
       end.y += (pointer.y + grab.dy - end.y) * DRAG_FOLLOW;
     }
 
-    // The anchor travels down over DROP_MS, carrying everything with it.
-    // easeOutCubic so it arrives without a hard stop.
-    const t = Math.min(1, elapsed / DROP_MS);
-    const eased = 1 - (1 - t) ** 3;
-    const anchorY = dropFrom * (1 - eased);
-
     for (let pass = 0; pass < RELAX_PASSES; pass++) {
+      // Held horizontally throughout so the drop stays on its hook, but held
+      // vertically only once it has landed.
       rope[0]!.x = anchorX;
-      rope[0]!.y = anchorY;
+      if (landed) rope[0]!.y = 0;
       for (let i = 0; i < rope.length - 1; i++) {
         link(rope[i]!, rope[i + 1]!, restLength, i === 0, false);
       }
@@ -161,6 +171,8 @@ export function initBadge(root: HTMLElement, options: BadgeOptions = {}): () => 
     // Keep the whole assembly inside its own box. Moving the previous
     // position to the wall as well is what stops the boundary behaving like a
     // trampoline: a stale `px` reads as a large velocity.
+    if (!landed) return;
+
     const margin = card!.offsetWidth / 2;
     for (const p of [clip(), tail]) {
       const bounded = Math.max(margin, Math.min(root.clientWidth - margin, p.x));
