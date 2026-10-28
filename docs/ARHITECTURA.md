@@ -1305,3 +1305,30 @@ lor e blocat în mediul de lucru.
 
 **Ce nu am putut verifica aici:** dacă scena reală răspunde la rotiță în interiorul ei.
 Asta se vede doar pe site.
+
+## Faza 19 — Capturi din magazinul Aruna Coffee
+
+Pe pagina proiectului `/projects/aruna-coffee/` a apărut o secțiune nouă, „Inside the shop”. Are
+șase capturi din ultima versiune a magazinului, făcute cu un browser automat pe site-ul de pe
+Vercel:
+
+1. prima pagină;
+2. colecția, cu profilul de gust al fiecărei cafele;
+3. coșul deschis;
+4. Aruna Club;
+5. login-ul cu Google;
+6. pagina pentru companii.
+
+- **Cum funcționează.** În `content.config.ts` există un câmp nou, `screens`, cu imagine, `alt`
+  și o descriere sub poză. Șablonul `projects/[...slug].astro` le afișează câte două pe rând
+  (una pe telefon), iar fiecare se deschide la mărime întreagă la click. Câmpul e la fel de
+  folosibil pentru orice alt proiect.
+- **Imaginile** stau în `src/assets/aruna-shop/`. Două sunt decupate: colecția și formularul de
+  login. Astro le livrează în trei mărimi.
+- **Fără date personale.** Am refuzat cookie-urile neesențiale înainte de capturi și nu m-am
+  logat. Login-ul arată doar formularul, cu butonul Google.
+- **Descrierile spun ce se vede**, nu cifre: cifrele de pe pagina pentru companii („5+ companii”,
+  „10.000+ cafele”) sunt ale magazinului și nu le-am preluat. Singura afirmație despre rolul tău
+  e că login-ul cu Google l-ai adăugat tu. Asta scria deja în proiect.
+- **Detaliu tehnic.** Site-ul de pe Vercel e o aplicație cu o singură pagină, fără rescrieri de
+  rute: `/shop` deschis direct dă 404. Capturile s-au făcut navigând din meniu.

@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
@@ -74,6 +75,33 @@ const data = project.data;
               </li>
             ))}
           </ul>
+        </section>
+      )
+    }
+
+    {
+      data.screens.length > 0 && (
+        <section class="screens" aria-labelledby="screens-heading">
+          <h2 id="screens-heading">Inside the shop</h2>
+          <div class="screen-grid">
+            {data.screens.map((screen) => (
+              <figure>
+                {/* The picture opens at full size: at half the column a
+                    screenshot's own text is too small to read. */}
+                <a class="shot" href={screen.src.src}>
+                  <Image
+                    src={screen.src}
+                    alt={screen.alt}
+                    widths={[640, 960, 1440]}
+                    sizes="(min-width: 60rem) 36rem, 92vw"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+                <figcaption>{screen.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
         </section>
       )
     }
@@ -162,6 +190,46 @@ const data = project.data;
 
   .links {
     padding-left: var(--space-4);
+  }
+
+  /* Two screenshots to a row; each sits on the surface tone, so a dark
+     screenshot on the paper page reads as a picture, not a hole. */
+  .screen-grid {
+    display: grid;
+    /* Two to a row at most: three made the screenshots unreadable. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8) var(--space-6);
+    margin-block: var(--space-6) var(--space-12);
+  }
+
+  .screen-grid figure {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .screen-grid img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: contain;
+    background: var(--surface);
+  }
+
+  .screen-grid figcaption {
+    max-width: none;
+  }
+
+  .shot {
+    display: block;
+  }
+
+  @media (max-width: 40rem) {
+    .screen-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .scene-grid {

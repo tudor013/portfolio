@@ -62,6 +62,21 @@ const projects = defineCollection({
     /** A concrete outcome: a number, a decision it drove, feedback received. */
     results: z.string(),
 
+    /**
+     * Screenshots of the finished product, shown on the case study page as
+     * "Inside the …". Taken from the live site, with nothing personal in
+     * them (no account, no customer data).
+     */
+    screens: z
+      .array(
+        z.object({
+          src: image(),
+          alt: z.string(),
+          caption: z.string(),
+        }),
+      )
+      .default([]),
+
     /** A still of the work itself, shown beside its row in the ledger. */
     cover: z
       .object({
