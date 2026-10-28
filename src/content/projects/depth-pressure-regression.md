@@ -3,8 +3,8 @@ title: 'Depth and pressure: a regression from first principles'
 category: data
 year: 2026
 role: >-
-  Wrote this as one of seven exercises I prepared for the students who came
-  to Soft Tehnica for their internship. It generates 25 depth readings with a
+  Wrote this as an exercise for the students who came to Soft Tehnica for
+  their internship. It generates 25 depth readings with a
   known pressure gradient and noise, fits a linear regression, and draws the
   points, the fitted line and the axes by hand on a turtle canvas rather than
   handing the plot to a charting library.
@@ -54,19 +54,3 @@ places a dot for each reading and the fitted line between the smallest and
 the largest depth, inside two axes drawn along the edges. Writing the scaling
 by hand shows what a charting library usually hides: where each value lands,
 and why.
-
-## Part of a set
-
-The regression is the last of seven exercises in the internship notebook,
-each one a small program with a written explanation:
-
-1. A hollow diamond drawn with text characters.
-2. Two circles drawn with text characters, corrected for characters being
-   taller than they are wide.
-3. A frequency table: absolute, relative and cumulative.
-4. An analogue wall clock in turtle, redrawn every second from the system
-   time.
-5. The A\* algorithm finding the shortest path through a grid with
-   obstacles.
-6. Bubble sort animated in Matplotlib, one frame per swap.
-7. This regression.

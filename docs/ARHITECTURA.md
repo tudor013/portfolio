@@ -1514,3 +1514,13 @@ Soft Tehnica (proiectul START, cofinanțat din FSE+). L-am citit doar ca sursă.
   - **Secțiune nouă, „Part of a set”:** lista celor șapte exerciții (romb ASCII, două cercuri
     ASCII, tabel de frecvențe, ceas analogic în turtle, A*, bubble sort animat, regresia).
 - **Mandelbrot:** caietul nu are nimic despre el, deci pagina rămâne cum era.
+
+## Faza 27 — Fără lista din caiet; verificarea finală a TODO-urilor
+
+- **Lista celor șapte exerciții a fost scoasă** de pe pagina regresiei, la cererea ta. Rămâne
+  doar faptul că regresia e un exercițiu pregătit pentru stagiarii de la Soft Tehnica.
+- **Mesajul pentru o categorie fără proiecte** („TODO… niciun proiect”) apare acum doar în
+  `astro dev`. Pe site nu poate apărea, chiar dacă o categorie rămâne goală.
+- **Verificare pe site-ul construit:** niciun „TODO”, nicio notiță în română, niciun proiect
+  ascuns. Singurul proiect cu câmpuri încă de scris e rețeaua Mandelbrot, iar câmpurile acelea
+  nu apar pe pagină.

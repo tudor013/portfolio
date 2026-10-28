@@ -87,7 +87,8 @@ const blurb = CATEGORY_BLURBS[category];
 
     {
       projects.length === 0 ? (
-        <p class="empty">TODO(conținut): niciun proiect în această direcție încă.</p>
+        // A note to Tudor while working; the published page shows nothing.
+        import.meta.env.DEV && <p class="empty">TODO(conținut): niciun proiect în această direcție încă.</p>
       ) : (
         <ul class="grid">
           {projects.map((project) => (
