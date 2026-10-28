@@ -1410,3 +1410,34 @@ Am scris pagina `/projects/energy-om-platform/` din ce mi-ai spus. Proiectul nu 
 - **Datele:** prototipul rulează pe date publice (StoreNet, OPSD, PVGIS) și pe date sintetice,
   nu pe instalații live. Pagina spune asta.
 - **Coechipierii** nu sunt numiți pe site. Dacă vor să apară, se adaugă ușor.
+
+## Faza 22 — Demo-ul cu agenți AI (Pergament AI), scris și vizibil
+
+Am citit repo-ul `tudor013/Demo-Website-Care-Prezinta-Agenti-AI` și am scris pagina
+`/projects/ai-agents-demo/` din ce face codul efectiv.
+
+**Ce e proiectul:** Pergament AI, un site care prezintă ideea de avatare AI ale patru
+domnitori români (Tudor Vladimirescu, Ștefan cel Mare, Mihai Viteazul, Vlad Țepeș). Clienții
+vizați sunt muzeele, platformele educaționale și companiile.
+
+**Ce face site-ul:**
+- șapte capitole pe tot ecranul, cu scroll care se fixează pe fiecare;
+- o statuie 3D (model glTF) care urcă și coboară odată cu scroll-ul;
+- un fundal care își schimbă culoarea la fiecare capitol;
+- o pagină pentru fiecare domnitor;
+- o pagină de prețuri cu trei planuri.
+
+**Cu ce e făcut:** React, Vite, React Three Fiber (three.js), GSAP, React Router. Acestea sunt
+acum în câmpul „Stack”.
+
+**Ce am scris cu grijă:**
+- **Pe pagină scrie clar că site-ul prezintă produsul.** Avatarele nu există în el: codul nu
+  are niciun backend AI, nicio cerere spre un model.
+- **Cifrele din demo nu sunt preluate.** „Precizie AI 96,2%” și prețurile planurilor sunt text
+  de prezentare, nu rezultate.
+- **Rezultatul** (ce s-a decis pe baza demo-ului) e încă TODO și nu apare pe site. Proiectul e
+  vizibil pentru că are rol, problemă și conținut.
+
+**O observație:** adresa de pe Vercel care conține același nume
+(`demo-website-care-prezinta-agenti-a-mu.vercel.app`) servește acum magazinul Aruna, nu acest
+demo. De aceea pagina are doar linkul spre GitHub.

@@ -212,6 +212,14 @@ const results = shown(data.results);
     padding-left: var(--space-4);
   }
 
+  /* Each link stands on its own line, so it is a control, not a link in
+     running text: it gets the 44px target. */
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
   /* Two screenshots to a row; each sits on the surface tone, so a dark
      screenshot on the paper page reads as a picture, not a hole. */
   .screen-grid {
