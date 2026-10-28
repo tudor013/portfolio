@@ -100,6 +100,18 @@ const projects = defineCollection({
           alt: z.string(),
           title: z.string(),
           url: z.url().optional(),
+          /**
+           * The width, in CSS pixels, the live scene is laid out at before it
+           * is scaled down into its frame. A scene framed for a full browser
+           * window shows only a corner when it gets a 700px iframe; laying it
+           * out at its own width and shrinking the result shows all of it.
+           */
+          viewport: z.number().int().min(320).optional(),
+          /**
+           * The scene animates with the wheel, so the page must stand still
+           * while the pointer is over it, or the page scrolls away instead.
+           */
+          holdScroll: z.boolean().default(false),
         }),
       )
       .default([]),

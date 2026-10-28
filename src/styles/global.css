@@ -23,6 +23,14 @@ html.lenis {
   scroll-behavior: auto;
 }
 
+/* The page holds still while a wheel-driven scene is under the pointer
+   (holdPageScroll in scripts/smooth-scroll.ts). The gutter stays, so the
+   page does not jump sideways when the scrollbar is taken away. */
+html.scroll-held {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
 /* Below desktop width the header has two rows (name and motion control,
    then the links), so it is taller. */
 @media (max-width: 60rem) {

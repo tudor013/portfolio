@@ -34,12 +34,16 @@ scenes:
       rămâne același."
     title: 'Product scene: the lit background behind the shop copy'
     url: 'https://my.spline.design/untitled-jS8PYLZPYq4Pxo7ue2cRPYKN/'
+    # Framed for a full window: laid out at 1920px and shrunk to fit.
+    viewport: 1920
   - poster: '../../assets/scenes/aruna-retrofuturism.png'
     alt: >-
       The Aruna Coffee wordmark above a small paper cup carrying the swan mark,
       on white.
     title: 'Retrofuturist background: the cup travels as the page scrolls'
     url: 'https://my.spline.design/retrofuturismbganimation-qZwVlCDGNASAGtQbOTX19rfb/'
+    # Driven by the wheel: the page holds still while the pointer is over it.
+    holdScroll: true
 ---
 
 ## Drawing before building

@@ -12,9 +12,26 @@ import { motionIsFull, onMotionChange } from './motion';
 
 type LenisInstance = InstanceType<typeof import('lenis').default>;
 
+let lenis: LenisInstance | null = null;
+
+/**
+ * Stops the page scrolling until the returned function is called. Used while
+ * the pointer is over an embedded scene that animates with the wheel: a wheel
+ * over a cross-origin iframe that cannot scroll is passed on to the page, so
+ * without this the page moves instead of the scene.
+ */
+export function holdPageScroll(): () => void {
+  const root = document.documentElement;
+  root.classList.add('scroll-held');
+  lenis?.stop();
+  return () => {
+    root.classList.remove('scroll-held');
+    lenis?.start();
+  };
+}
+
 export function initSmoothScroll(): void {
   const finePointer = window.matchMedia('(pointer: fine)');
-  let lenis: LenisInstance | null = null;
   let loading = false;
 
   async function start(): Promise<void> {

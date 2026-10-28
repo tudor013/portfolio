@@ -1267,3 +1267,41 @@ Verificare:
 - `taste-skill lint`: 0 FAIL.
 - La patru lățimi: nicio pagină nu are scroll orizontal și consola e curată.
 - Ambele benzi au fost filmate cu WebGL în Chromium, la 1440 și la 390.
+
+## Faza 18 — Scenele Spline de pe pagina Aruna
+
+Trei probleme raportate de tine, toate în `src/components/SplineScene.astro`:
+
+- **O singură scenă activă.** Fiecare scenă e un runtime WebGL întreg. Când încarci a doua,
+  prima se descarcă și revine la poster cu butonul ei, deci nu mai rulează două deodată.
+- **Scena din stânga era tăiată.** Era făcută pentru o fereastră întreagă de browser. Pusă
+  într-un dreptunghi de ~700px, camera ei vedea doar un colț.
+  - Acum scena se randează la 1920px lățime, cum a fost gândită, și imaginea rezultată se
+    micșorează cu `transform: scale(...)` până intră în dreptunghi.
+  - Se setează din `aruna-brand.md` (`viewport: 1920`), deci se poate face la fel pentru orice
+    altă scenă.
+- **Pagina mergea mai departe în loc de animația din dreapta.** Rotița deasupra unui iframe de
+  pe alt domeniu care nu are scroll al lui trece la pagina de dedesubt.
+  - Pentru scenele marcate `holdScroll: true`, pagina stă pe loc cât timp cursorul e deasupra
+    lor (`holdPageScroll` din `smooth-scroll.ts`: oprește Lenis și pune `overflow: hidden` pe
+    `<html>`).
+  - Spațiul barei de scroll rămâne rezervat (`scrollbar-gutter: stable`), deci pagina nu sare în
+    lateral.
+  - Când scoți cursorul de pe scenă, scroll-ul revine.
+  - Cazul care ne prinsese: după click pe „Load interactive scene”, cursorul e deja deasupra
+    scenei și browserul nu trimite niciun eveniment de intrare. Starea se verifică deci și la
+    încărcare.
+- Toate dreptunghiurile au acum aceeași formă (16:10), cu sau fără scenă încărcată. Posterul
+  se vede întreg, netăiat.
+
+**Verificare:** testul a rulat cu o pagină falsă în locul celei Spline, pentru că domeniul
+lor e blocat în mediul de lucru.
+- După a doua încărcare a rămas un singur iframe, iar prima scenă a revenit la poster.
+- Scena din stânga are 1920px, scalată la 0,285.
+- Cu cursorul pe scena din dreapta, rotița nu mișcă pagina, nici când cursorul intră din nou
+  peste ea. După ce cursorul iese, pagina se derulează normal.
+- `taste-skill lint`: 0 FAIL.
+- Nu apare scroll orizontal la nicio lățime.
+
+**Ce nu am putut verifica aici:** dacă scena reală răspunde la rotiță în interiorul ei.
+Asta se vede doar pe site.

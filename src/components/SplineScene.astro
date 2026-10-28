@@ -24,12 +24,22 @@ interface Props {
    * app.spline.design/file/... editor link, which asks viewers to sign in.
    */
   sceneUrl?: string;
+  /** Width the live scene is laid out at before being scaled into the frame. */
+  viewport?: number;
+  /** Hold the page still while the pointer is over the live scene. */
+  holdScroll?: boolean;
 }
 
-const { poster, alt, title, sceneUrl } = Astro.props;
+const { poster, alt, title, sceneUrl, viewport, holdScroll = false } = Astro.props;
 ---
 
-<figure class="scene" data-scene data-src={sceneUrl}>
+<figure
+  class="scene"
+  data-scene
+  data-src={sceneUrl}
+  data-viewport={viewport}
+  data-hold-scroll={holdScroll ? '' : undefined}
+>
   <div class="frame">
     <Image src={poster} alt={alt} class="poster" loading="lazy" />
 
@@ -60,17 +70,22 @@ const { poster, alt, title, sceneUrl } = Astro.props;
     margin: 0;
   }
 
+  /* One shape for every scene, poster or live, so loading one never moves
+     the page and two scenes side by side line up. */
   .frame {
     position: relative;
     overflow: hidden;
+    aspect-ratio: 16 / 10;
     border-radius: var(--radius);
     background: var(--surface);
   }
 
+  /* The whole still, never cropped: the scenes carry text at their edges. */
   .poster {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
   }
 
   .play {
@@ -104,12 +119,22 @@ const { poster, alt, title, sceneUrl } = Astro.props;
     color: var(--ground);
   }
 
-  /* Swapped in once the scene is requested. */
+  /* Swapped in once the scene is requested. Without a viewport it fills the
+     frame; with one, the script sizes it to that width and scales it down. */
   .frame :global(iframe) {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 10;
+    height: 100%;
     border: 0;
+    transform-origin: 0 0;
+  }
+
+  .frame.is-live .poster,
+  .frame.is-live .play {
+    display: none;
   }
 
   figcaption {
@@ -121,22 +146,74 @@ const { poster, alt, title, sceneUrl } = Astro.props;
   // The iframe is created on click rather than written into the page with a
   // lazy attribute: a lazy iframe still downloads as soon as it nears the
   // viewport, which on a page of scenes is every megabyte anyway.
+  //
+  // Only one scene runs at a time. Each is a full WebGL runtime, and two of
+  // them at once is what makes a laptop's fan start; loading a second scene
+  // puts the first back to its poster.
+  import { holdPageScroll } from '../scripts/smooth-scroll';
+
+  let unloadCurrent: (() => void) | null = null;
+
   document.querySelectorAll<HTMLElement>('[data-scene]').forEach((scene) => {
     const button = scene.querySelector<HTMLButtonElement>('[data-play]');
+    const frame = scene.querySelector<HTMLElement>('.frame');
     const src = scene.dataset.src;
-    if (!button || !src) return;
+    if (!button || !frame || !src) return;
 
-    button.addEventListener(
-      'click',
-      () => {
-        const frame = document.createElement('iframe');
-        frame.src = src;
-        frame.title = scene.querySelector('figcaption')?.textContent?.trim() ?? 'Spline scene';
-        frame.allow = 'fullscreen';
-        button.replaceWith(frame);
-        scene.querySelector('.poster')?.remove();
-      },
-      { once: true },
-    );
+    const viewport = Number(scene.dataset.viewport) || 0;
+    const holdScroll = 'holdScroll' in scene.dataset;
+
+    button.addEventListener('click', () => {
+      unloadCurrent?.();
+
+      const iframe = document.createElement('iframe');
+      iframe.src = src;
+      iframe.title = scene.querySelector('figcaption')?.textContent?.trim() ?? 'Spline scene';
+      iframe.allow = 'fullscreen';
+
+      // Laid out at `viewport` pixels wide, at the frame's proportions, then
+      // scaled down to the frame: the scene sees the window it was framed for.
+      const fit = () => {
+        if (!viewport) return;
+        const scale = frame.clientWidth / viewport;
+        iframe.style.width = `${viewport}px`;
+        iframe.style.height = `${frame.clientHeight / scale}px`;
+        iframe.style.transform = `scale(${scale})`;
+      };
+      const resizer = new ResizeObserver(fit);
+      resizer.observe(frame);
+      fit();
+
+      // A scene driven by the wheel: while the pointer is over it, the page
+      // stands still so the wheel moves the scene, not the page.
+      let released: (() => void) | null = null;
+      const enter = () => {
+        released ??= holdPageScroll();
+      };
+      const leave = () => {
+        released?.();
+        released = null;
+      };
+      if (holdScroll) {
+        frame.addEventListener('pointerenter', enter);
+        frame.addEventListener('pointerleave', leave);
+      }
+
+      frame.append(iframe);
+      frame.classList.add('is-live');
+      // The click that loaded the scene leaves the pointer over it already,
+      // and no pointerenter follows for a pointer that does not cross in.
+      if (holdScroll && frame.matches(':hover')) enter();
+
+      unloadCurrent = () => {
+        resizer.disconnect();
+        frame.removeEventListener('pointerenter', enter);
+        frame.removeEventListener('pointerleave', leave);
+        leave();
+        iframe.remove();
+        frame.classList.remove('is-live');
+        unloadCurrent = null;
+      };
+    });
   });
 </script>
