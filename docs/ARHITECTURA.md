@@ -1388,3 +1388,25 @@ adăugiri.
 - `astro check`: 0 erori.
 - Build-ul curat: niciun „TODO” în niciun fișier HTML.
 - Lățimile și consola sunt curate.
+
+## Faza 21 — Platforma Energy O&M, scrisă și vizibilă din nou
+
+Am scris pagina `/projects/energy-om-platform/` din ce mi-ai spus. Proiectul nu mai e ascuns.
+
+- **Rolul tău:** cercetarea de produs și de domeniu dinaintea codului, care a decis
+  funcțiile și direcția; echipă de trei, cod scris cu AI.
+- **Contextul:** hackathonul ITFest cu Innovation Labs, aproximativ o zi.
+- **Ce ai învățat:** cum se face o aplicație de la cap la coadă, lucrul în echipă, modelele
+  statistice din energie și discuțiile cu mentorii.
+
+**Ce am verificat în repo-ul ITFest** (`proiect_ITFest`), ca să nu scriu ceva greșit:
+- **Direcția aleasă e „Challenge 1 — prosumatori și O&M”**, din „AI Validation Bootcamp —
+  Challenge Briefs”.
+- **Cele trei direcții** (automatizare / prelucrare de date / informare) **nu apar nicăieri în
+  repo**, deci nu le-am pus pe site.
+- **Tranzacționarea:** repo-ul descrie platforma ca monitorizare și alerte pentru instalații
+  solare și baterii, cu prețurile OPCOM drept context. Tranzacționarea apare doar ca direcție
+  viitoare. De aceea textul nu promite „decizii de trading”.
+- **Datele:** prototipul rulează pe date publice (StoreNet, OPSD, PVGIS) și pe date sintetice,
+  nu pe instalații live. Pagina spune asta.
+- **Coechipierii** nu sunt numiți pe site. Dacă vor să apară, se adaugă ușor.
