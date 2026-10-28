@@ -9,6 +9,8 @@
  *   - the component's own prefers-reduced-motion check is gone: the caller
  *     passes intro and breeze from the site's motion setting (scripts/motion.ts),
  *     which can change while the page is open;
+ *   - one addition: `backLink`, a link painted on the card's back that a tap
+ *     opens instead of flipping the card (the hit test is in onLink);
  *   - the physics, geometry, shaders and rendering are otherwise unchanged.
  *
  * Original: https://reactbits.dev/components/lanyard
@@ -77,6 +79,12 @@ export interface LanyardSettings {
   breeze: number;
   interactive: boolean;
   intro: boolean;
+  /**
+   * Added for this site: a link painted on the card's back. `rect` is the
+   * link's area on the back face, as fractions of its width and height from
+   * the top left. A tap there opens `href` instead of flipping the card.
+   */
+  backLink?: { href: string; rect: [number, number, number, number] };
 }
 
 interface Images {
@@ -173,6 +181,8 @@ interface Press {
   y: number;
   time: number;
   point: THREE.Vector3;
+  /** The press landed on the back's link (backLink). */
+  link: boolean;
 }
 
 const CARD_SIZES: Record<string, [number, number]> = {
@@ -1315,6 +1325,16 @@ export function initLanyard(container: HTMLElement, options: LanyardOptions = {}
     raycaster.setFromCamera(pointer, camera);
   };
 
+  /** Whether a hit falls on the link painted on the back (backLink). */
+  const onLink = (hit: THREE.Intersection | null) => {
+    const link = settings.backLink;
+    if (!link || !hit || hit.object !== backMesh || !hit.uv) return false;
+    const [x0, y0, x1, y1] = link.rect;
+    const x = hit.uv.x;
+    const y = 1 - hit.uv.y;
+    return x >= x0 && x <= x1 && y >= y0 && y <= y1;
+  };
+
   const pickCard = () => {
     cardGroup.updateMatrixWorld();
     const hits = raycaster.intersectObjects([bodyMesh, frontMesh, backMesh], false);
@@ -1349,7 +1369,13 @@ export function initLanyard(container: HTMLElement, options: LanyardOptions = {}
       from: hit.point.clone(),
       target: hit.point.clone()
     };
-    press = { x: event.clientX, y: event.clientY, time: performance.now(), point: hit.point.clone() };
+    press = {
+      x: event.clientX,
+      y: event.clientY,
+      time: performance.now(),
+      point: hit.point.clone(),
+      link: onLink(hit),
+    };
     canvas.setPointerCapture?.(event.pointerId);
     setCursor('grabbing');
     event.preventDefault();
@@ -1366,14 +1392,19 @@ export function initLanyard(container: HTMLElement, options: LanyardOptions = {}
       return;
     }
     if (event.pointerType === 'touch') return;
-    hovering = !!pickCard();
-    setCursor(hovering ? 'grab' : '');
+    const hit = pickCard();
+    hovering = !!hit;
+    setCursor(onLink(hit) ? 'pointer' : hovering ? 'grab' : '');
   };
 
   const onPointerUp = (event: PointerEvent) => {
     if (!sim.grab) return;
     sim.grab = null;
-    if (press && event.type === 'pointerup' && performance.now() - press.time < 450) flip(press.point);
+    if (press && event.type === 'pointerup' && performance.now() - press.time < 450) {
+      // A tap on the back's link opens it; any other tap flips the card.
+      if (press.link && settings.backLink) window.open(settings.backLink.href, '_blank', 'noopener');
+      else flip(press.point);
+    }
     press = null;
     canvas.releasePointerCapture?.(event.pointerId);
     setCursor(hovering && event.pointerType !== 'touch' ? 'grab' : '');

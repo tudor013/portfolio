@@ -17,6 +17,14 @@ import type { Lanyard } from './lanyard';
 const FACE_WIDTH = 1024;
 const FACE_HEIGHT = 1440;
 
+/**
+ * The LinkedIn button on the back, as fractions of the face from the top
+ * left. Painted from this and hit-tested against it (lanyard.ts, backLink),
+ * so the drawing and the tap area cannot drift apart. 200px of 1440 is about
+ * 48 CSS px on the card as it hangs on a laptop.
+ */
+const LINK_RECT: [number, number, number, number] = [180 / 1024, 800 / 1440, 844 / 1024, 1000 / 1440];
+
 function token(root: HTMLElement, name: string): string {
   return getComputedStyle(root).getPropertyValue(name).trim();
 }
@@ -100,20 +108,36 @@ async function paintFaces(root: HTMLElement): Promise<Faces> {
     ctx.fillRect(80, 1130, FACE_WIDTH - 160, 14);
     ctx.font = `500 52px ${family}`;
     ctx.fillText(id, FACE_WIDTH / 2, 1250);
+
+    // Says the card has a back: the LinkedIn button is there.
+    ctx.fillStyle = muted;
+    ctx.font = `400 40px ${family}`;
+    ctx.fillText('Tap to turn it over', FACE_WIDTH / 2, 1360);
   }
 
-  // ---- Back: the strap's blue, with the name and the ID -----------------
+  // ---- Back: the strap's blue, the name, the ID and the LinkedIn button ---
   const back = surface(FACE_WIDTH, FACE_HEIGHT);
   {
     const { ctx } = back;
     ctx.fillStyle = strap;
     ctx.fillRect(0, 0, FACE_WIDTH, FACE_HEIGHT);
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = card;
     ctx.font = `600 76px ${family}`;
-    ctx.fillText(name, FACE_WIDTH / 2, 760, FACE_WIDTH - 120);
+    ctx.fillText(name, FACE_WIDTH / 2, 600, FACE_WIDTH - 120);
     ctx.font = `500 52px ${family}`;
-    ctx.fillText(id, FACE_WIDTH / 2, 850);
+    ctx.fillText(id, FACE_WIDTH / 2, 690);
+
+    // A solid button in the card's white, so it reads as something to press.
+    const [x0, y0, x1, y1] = LINK_RECT;
+    ctx.beginPath();
+    ctx.roundRect(x0 * FACE_WIDTH, y0 * FACE_HEIGHT, (x1 - x0) * FACE_WIDTH, (y1 - y0) * FACE_HEIGHT, 24);
+    ctx.fill();
+    ctx.fillStyle = strap;
+    ctx.font = `600 68px ${family}`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText('LinkedIn ↗', FACE_WIDTH / 2, ((y0 + y1) / 2) * FACE_HEIGHT + 4);
   }
 
   // ---- Strap: the name woven in, along its length ------------------------
@@ -141,6 +165,7 @@ async function paintFaces(root: HTMLElement): Promise<Faces> {
 
 export function initBadge(root: HTMLElement): void {
   const stage = root.querySelector<HTMLElement>('[data-stage]')!;
+  const link = root.querySelector<HTMLAnchorElement>('[data-linkedin]')!;
   let lanyard: Lanyard | null = null;
   let faces: Promise<Faces> | null = null;
   // Each sync supersedes the one before; a slow import must not start a
@@ -154,6 +179,7 @@ export function initBadge(root: HTMLElement): void {
       lanyard?.destroy();
       lanyard = null;
       root.removeAttribute('data-live');
+      link.removeAttribute('tabindex');
       return;
     }
     if (lanyard) return;
@@ -174,9 +200,15 @@ export function initBadge(root: HTMLElement): void {
       strapLength: 0.42,
       strapWidth: 0.8,
       cornerRadius: 0.25,
+      backLink: { href: link.href, rect: LINK_RECT },
     });
     // No WebGL: the DOM card simply stays.
-    if (lanyard) root.dataset.live = '';
+    if (lanyard) {
+      root.dataset.live = '';
+      // The DOM card is off screen now, so its link must not take a keyboard
+      // stop that shows nothing; LinkedIn stays in the contact section.
+      link.tabIndex = -1;
+    }
   }
 
   onMotionChange(() => void sync());

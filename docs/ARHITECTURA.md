@@ -1475,3 +1475,27 @@ TODO-uri rămase:
 - **Schițele Aruna** nu mai au niciun loc rezervat. Dacă le găsești, se adaugă atunci o
   secțiune nouă.
 - **Singurul proiect cu TODO-uri** rămâne rețeaua Mandelbrot, iar pe site acestea nu apar.
+
+## Faza 25 — Butonul LinkedIn pe spatele badge-ului
+
+- **Pe spatele cardului 3D** e acum un buton alb „LinkedIn ↗”, sub nume și ID. O atingere pe
+  el deschide profilul tău într-un tab nou. Atingerea oriunde altundeva întoarce cardul, ca
+  înainte. Cu mouse-ul deasupra butonului, cursorul devine „mânuță”.
+- **Cum funcționează:**
+  - Lanyard-ul (`lanyard.ts`) a primit o singură opțiune nouă, `backLink`, notată în antetul
+    fișierului.
+  - La apăsare, raza care găsește cardul îți spune și pe ce față a lovit și în ce punct al
+    imaginii (coordonatele UV).
+  - Dacă punctul cade în dreptunghiul butonului de pe spate, se deschide linkul. Altfel,
+    cardul se întoarce.
+  - Dreptunghiul e definit o singură dată (`LINK_RECT` în `badge.ts`). Din el se desenează
+    butonul și tot din el se verifică atingerea, deci desenul și zona activă nu se pot
+    nepotrivi.
+  - Butonul are ~48px înălțime pe un laptop.
+- **Pe fața cardului** scrie mic „Tap to turn it over”, ca vizitatorul să afle că are spate.
+- **Cardul HTML** (fără animații sau fără JavaScript) are și el un buton LinkedIn de 44px.
+  Când rulează cardul 3D, cardul HTML iese de pe ecran. Atunci linkul lui primește
+  `tabindex="-1"`, ca tastatura să nu se oprească pe un element invizibil; LinkedIn rămâne
+  accesibil din secțiunea de contact.
+- **Verificat în Chromium cu WebGL:** am întors cardul, cursorul devine „pointer” pe buton, iar
+  clickul a deschis `linkedin.com/in/tudor-ifrim-697b0b26a/` în tab nou.
