@@ -18,8 +18,8 @@ problem: >-
   Vladimirescu to Vlad Țepeș, offered to museums, educational platforms and
   companies. It needed a site that could present the idea to those buyers.
 results: >-
-  TODO(conținut): ce s-a decis pe baza lui. Un proof of concept e reușit dacă
-  a dus la o decizie — spune care.
+  It did its job as a proof of concept. From the demo, the team concluded
+  where AI is worth using further and where it is not.
 order: 40
 draft: false
 links:

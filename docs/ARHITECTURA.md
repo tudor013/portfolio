@@ -1441,3 +1441,29 @@ acum în câmpul „Stack”.
 **O observație:** adresa de pe Vercel care conține același nume
 (`demo-website-care-prezinta-agenti-a-mu.vercel.app`) servește acum magazinul Aruna, nu acest
 demo. De aceea pagina are doar linkul spre GitHub.
+
+## Faza 23 — Regresia adâncime–presiune și rezultatul demo-ului Pergament
+
+- **Regresia.** Am rulat scriptul tău cu același `random.seed(0)`, fără partea cu turtle, ca
+  cifrele de pe pagină să fie cele reale:
+  - panta estimată **0,6004 psi/m** față de 0,6 pusă în date, deci 0,06% eroare;
+  - eroarea standard 0,019;
+  - interceptul 25 psi, față de 0 (zgomotul e ±150 psi);
+  - r = 0,989, R² = 0,978, p ≈ 10⁻²⁰.
+
+  Pagina are trei secțiuni: datele cu răspuns cunoscut, rezultatul și graficul desenat de mână,
+  cu funcția de scalare.
+  - **Atenție:** la „problemă” n-ai spus ce voiai să înțelegi. Am scris doar ce arată exercițiul
+    (pe date cu răspuns cunoscut poți verifica regresia), nu un motiv al tău. Dacă motivul a fost
+    altul, îl schimbăm.
+  - **0,6 psi/m e o valoare aleasă pentru date.** Pagina nu pretinde că e gradientul dintr-o
+    sondă reală.
+- **Demo-ul Pergament AI.** Rezultatul e acum cel spus de tine: pe baza demo-ului, echipa a
+  stabilit unde merită folosit AI-ul în continuare și unde nu. Fără exemple, pentru că nu le-ai
+  dat.
+
+TODO-uri rămase:
+- schițele Aruna;
+- exportul SQL de la baza de date;
+- rețeaua Mandelbrot;
+- imaginea de previzualizare.
