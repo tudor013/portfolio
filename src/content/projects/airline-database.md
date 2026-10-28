@@ -25,11 +25,6 @@ cover:
 order: 30
 draft: false
 links: []
-todo:
-  - >-
-    (secțiunea „What was hard” e ascunsă până o scrii)
-  - >-
-    TODO(conținut): vezi nota din chat despre exportul SQL — e exact genul de problemă care merită povestită aici.
 ---
 
 ## Constraints that carry the rules

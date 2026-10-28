@@ -1467,3 +1467,11 @@ TODO-uri rămase:
 - exportul SQL de la baza de date;
 - rețeaua Mandelbrot;
 - imaginea de previzualizare.
+
+## Faza 24 — Curățenie în TODO-uri
+
+- **Exportul SQL** (baza de date pentru compania aeriană) a fost scos complet, la cererea ta,
+  inclusiv secțiunea ascunsă „What was hard”.
+- **Schițele Aruna** nu mai au niciun loc rezervat. Dacă le găsești, se adaugă atunci o
+  secțiune nouă.
+- **Singurul proiect cu TODO-uri** rămâne rețeaua Mandelbrot, iar pe site acestea nu apar.
