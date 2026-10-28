@@ -3,19 +3,21 @@ title: 'Depth and pressure: a regression from first principles'
 category: data
 year: 2026
 role: >-
-  Generated a dataset of 25 depth readings with a known pressure gradient and
-  added noise, fitted a linear regression to it, and drew the points, the
-  fitted line and the axes by hand on a turtle canvas rather than handing the
-  plot to a charting library.
+  Wrote this as one of seven exercises I prepared for the students who came
+  to Soft Tehnica for their internship. It generates 25 depth readings with a
+  known pressure gradient and noise, fits a linear regression, and draws the
+  points, the fitted line and the axes by hand on a turtle canvas rather than
+  handing the plot to a charting library.
 stack:
   - Python
   - SciPy
   - turtle
 kind: 'Regression from first principles'
 problem: >-
-  A regression always returns a line, whether or not it found the truth. On
-  real measurements there is no way to check it. On data whose true answer is
-  known in advance, there is.
+  An exercise had to teach linear regression in a setting the students would
+  recognise: pressure rising with depth, as in petroleum and gas engineering.
+  It also had to show that a regression always returns a line, right or not,
+  and that only data with a known answer lets you check it.
 results: >-
   The estimated gradient was 0.6004 psi per metre, against the 0.6 written
   into the data: 0.06% off, with depth explaining 97.8% of the variation in
@@ -52,3 +54,19 @@ places a dot for each reading and the fitted line between the smallest and
 the largest depth, inside two axes drawn along the edges. Writing the scaling
 by hand shows what a charting library usually hides: where each value lands,
 and why.
+
+## Part of a set
+
+The regression is the last of seven exercises in the internship notebook,
+each one a small program with a written explanation:
+
+1. A hollow diamond drawn with text characters.
+2. Two circles drawn with text characters, corrected for characters being
+   taller than they are wide.
+3. A frequency table: absolute, relative and cumulative.
+4. An analogue wall clock in turtle, redrawn every second from the system
+   time.
+5. The A\* algorithm finding the shortest path through a grid with
+   obstacles.
+6. Bubble sort animated in Matplotlib, one frame per swap.
+7. This regression.

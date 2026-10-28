@@ -1499,3 +1499,18 @@ TODO-uri rămase:
   accesibil din secțiunea de contact.
 - **Verificat în Chromium cu WebGL:** am întors cardul, cursorul devine „pointer” pe buton, iar
   clickul a deschis `linkedin.com/in/tudor-ifrim-697b0b26a/` în tab nou.
+
+## Faza 26 — Regresia, pusă în contextul ei: caietul de practică
+
+Mi-ai trimis caietul de practică pe care l-ai pregătit pentru studenții veniți în practică la
+Soft Tehnica (proiectul START, cofinanțat din FSE+). L-am citit doar ca sursă.
+- **Nu l-am copiat în repo.** Repo-ul e public, iar documentul are antetul proiectului european.
+- **Ce s-a schimbat pe pagina regresiei:**
+  - **Rolul:** regresia e unul dintre cele șapte exerciții pregătite de tine pentru stagiari.
+  - **Problema:** acum spune motivul real, nu unul ghicit de mine: un exercițiu care predă
+    regresia într-un context pe care studenții îl recunosc (presiunea crește cu adâncimea, ca
+    în ingineria de petrol și gaze) și care arată că doar datele cu răspuns cunoscut te lasă
+    să verifici dreapta.
+  - **Secțiune nouă, „Part of a set”:** lista celor șapte exerciții (romb ASCII, două cercuri
+    ASCII, tabel de frecvențe, ceas analogic în turtle, A*, bubble sort animat, regresia).
+- **Mandelbrot:** caietul nu are nimic despre el, deci pagina rămâne cum era.
