@@ -17,9 +17,9 @@ problem: >-
   rather than measured. A simulation lets both run against the same sequence
   of events and be compared directly.
 results: >-
-  TODO(conținut): ce a ieșit. Care strategie, în ce condiții, cu ce diferență?
-  Un rezultat negativ sau surprinzător e la fel de bun — contează că l-ai
-  măsurat.
+  Fundamentalists ended richer than technical traders in 93 to 100% of runs,
+  whichever setting was changed. The settings changed the size of the gap,
+  never the winner.
 cover:
   src: '../../assets/landing/market-run.webp'
   alt: >-
@@ -49,9 +49,29 @@ The run stops after 500 ticks. Four sliders set the market: the number of
 agents (10–500), the share of fundamentalists, the herding probability and the
 news impact (0–10).
 
-TODO(conținut): ce ai ținut constant între rulări și de ce.
+## How the comparison was run
+
+Each setting was changed on its own, starting from the model's defaults (500
+agents, 70% fundamentalists, 20% herding probability, news impact 8), with
+everything else held fixed. Each combination ran 40 times, every time on a
+different random sequence of news, so that one lucky sequence could not
+decide the result. A group's result is its average wealth after 500 days:
+cash plus shares at the final price, against the 15,000 every agent starts
+with.
+
+The runs used the model as rebuilt on this site, which follows the NetLogo
+code rule for rule. NetLogo draws its own random numbers, so its runs will not
+match these number for number.
 
 ## What the comparison showed
 
-TODO(conținut): aici pui cifra. Și spune față de ce — o strategie e bună doar
-în comparație cu o alternativă.
+I expected the winning strategy to depend on the settings. In this model it
+does not. At the defaults, fundamentalists ended **22.8% richer** on average
+and technical traders **2.6% poorer**, and fundamentalists finished ahead in
+all 40 runs. Changing the share of fundamentalists, the herding probability
+or the news impact moved the average gap between about 12 and 34 percentage
+points, but never reversed it.
+
+The reason is in the rules. A fundamentalist buys only below the value and
+sells only above it. A technical trader's direction is a coin flip, with no
+information behind it.

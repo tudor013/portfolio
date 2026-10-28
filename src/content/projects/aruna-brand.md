@@ -16,8 +16,9 @@ problem: >-
   A new specialty coffee brand had to look like it belonged next to
   established roasters before it had any reputation of its own.
 results: >-
-  TODO(conținut): rezultat de design, nu de vânzări — ce ai observat după
-  lansare. Feedback, recunoaștere, rată de revenire.
+  Design changes were decided by data. Each month we read a report and kept
+  the versions that brought the most clicks and orders on average, comparing
+  them with the statistical methods I learned at university.
 cover:
   src: '../../assets/landing/aruna-3-swan.webp'
   alt: >-
@@ -46,21 +47,18 @@ scenes:
     holdScroll: true
 ---
 
-## Drawing before building
-
-TODO(conținut): arată schițele din Illustrator lângă rezultatul final. E cea
-mai bună dovadă din tot portofoliul că designul a venit de la tine.
-
 ## Background, not decoration
 
 The two scenes below are **backgrounds**. Each one animates as the page
 scrolls, and the shop's real controls (buttons, navigation, the cart) sit
 over them in the site's own code rather than inside the 3D scene.
 
-TODO(conținut): de ce 3D și nu fotografie? Un răspuns onest: fotografia de
-produs cere produs, lumini și timp, iar o scenă se poate re-randa cu alt
-unghi, altă culoare sau alt text în câteva minute. Dacă ăsta a fost motivul,
-spune-l — e un argument de decizie, nu de gust.
+I chose Spline because I became comfortable in it quickly, and it gives a lot
+of freedom once the fundamentals are in place. It is a tool I keep getting
+better at.
 
-TODO(conținut): ce s-a schimbat după ce ai pus scenele? Dacă n-ai o cifră,
-spune ce ai observat.
+## What the scenes changed
+
+They gave the shop the strong first impression that a brand nobody has heard
+of increasingly needs. They went live together with the Christmas marketing
+campaign, and helped carry it.

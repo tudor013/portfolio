@@ -1,12 +1,16 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { shown, shownAll } from '../lib/todo';
 
 interface Props {
   project: CollectionEntry<'projects'>;
 }
 
 const { project } = Astro.props;
-const { title, year, role, stack, results } = project.data;
+const { title, year } = project.data;
+const role = shown(project.data.role);
+const stack = shownAll(project.data.stack);
+const results = shown(project.data.results);
 ---
 
 <li class="card">
@@ -14,9 +18,9 @@ const { title, year, role, stack, results } = project.data;
     <a href={`/projects/${project.id}/`}>{title}</a>
   </h3>
 
-  <p class="result">{results}</p>
+  {results && <p class="result">{results}</p>}
 
-  <p class="role meta">{role}</p>
+  {role && <p class="role meta">{role}</p>}
 
   <div class="foot">
     <ul class="stack meta" aria-label="Tools used">

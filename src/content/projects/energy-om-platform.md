@@ -20,10 +20,9 @@ results: >-
   TODO(conținut): unde e proiectul acum și ce s-a dovedit deja. Fără
   „DEPLOYED_VERIFIED" dacă n-ai văzut-o rulând în producție.
 order: 20
-draft: false
+draft: true
 links: []
+todo:
+  - >-
+    TODO(conținut): studiul de caz. Ai un avantaj aici: proiectul are documentație reală (feature notes, test matrix). Poți arăta cum lucrezi într-o echipă cu reguli, nu doar ce ai scris.
 ---
-
-TODO(conținut): studiul de caz. Ai un avantaj aici: proiectul are documentație
-reală (feature notes, test matrix). Poți arăta cum lucrezi într-o echipă cu
-reguli, nu doar ce ai scris.

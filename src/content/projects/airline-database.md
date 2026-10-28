@@ -16,7 +16,8 @@ problem: >-
   enforce: a seat cannot be sold twice on the same flight, a passenger cannot
   hold two tickets for it, and an employee reports to another employee.
 results: >-
-  TODO(conținut): nota primită, sau ce a mers/nu a mers la verificare.
+  In progress: the schema and its integrity rules are designed; the project
+  has not been graded yet.
 cover:
   src: '../../assets/landing/airline-schema.webp'
   alt: >-
@@ -24,21 +25,25 @@ cover:
 order: 30
 draft: false
 links: []
+todo:
+  - >-
+    (secțiunea „What was hard” e ascunsă până o scrii)
+  - >-
+    TODO(conținut): vezi nota din chat despre exportul SQL — e exact genul de problemă care merită povestită aici.
 ---
 
 ## Constraints that carry the rules
 
-TODO(conținut): explică de ce ai pus fiecare constrângere. Trei merită
-numite, pentru că arată că te-ai gândit la ce poate strica datele:
+Three of the rules are the ones that keep the data honest, because each one
+stops a mistake the tables alone would allow:
 
-- `uq_bilet_loc_zbor` pe (zbor, loc) — același scaun nu poate fi vândut de
-  două ori pe același zbor.
-- `uq_bilet_pas_zbor` pe (zbor, pasager) — același pasager nu poate avea două
-  bilete pe același zbor.
-- `fk_ang_manager` — un angajat trimite spre alt angajat, în aceeași tabelă.
-  Ierarhia e modelată, nu presupusă.
-
-## What was hard
-
-TODO(conținut): vezi nota din chat despre exportul SQL — e exact genul de
-problemă care merită povestită aici.
+- `uq_bilet_loc_zbor` on (flight, seat): a seat can be sold only once on a
+  flight. Without it, two bookings made at the same moment could both end up
+  in seat 12A. The rule lives in the table, so no part of an application can
+  get around it.
+- `uq_bilet_pas_zbor` on (flight, passenger): a passenger can hold only one
+  ticket for a flight, so a retried payment or a double click cannot book the
+  same person twice.
+- `fk_ang_manager`: an employee's manager is another employee, so the key
+  points back into the same table. A manager who does not exist cannot be
+  assigned, and the whole hierarchy can be read with one query.

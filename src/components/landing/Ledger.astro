@@ -8,6 +8,7 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_SLUGS } from '../../content.config';
+import { shown } from '../../lib/todo';
 
 // Drafts are excluded at build time so an unfinished case study cannot ship.
 const published = (await getCollection('projects')).filter((p) => !p.data.draft);
@@ -53,7 +54,7 @@ const groups = CATEGORIES.map((category) => ({
                       decoding="async"
                     />
                   ) : (
-                    <p>{project.data.problem}</p>
+                    <p>{shown(project.data.problem)}</p>
                   )}
                 </div>
               </li>

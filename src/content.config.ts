@@ -77,6 +77,12 @@ const projects = defineCollection({
       )
       .default([]),
 
+    /**
+     * Notes to Tudor about what is still to be written, in Romanian. Never
+     * rendered: the sections they belong to stay off the page until written.
+     */
+    todo: z.array(z.string()).default([]),
+
     /** A still of the work itself, shown beside its row in the ledger. */
     cover: z
       .object({

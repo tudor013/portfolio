@@ -78,24 +78,29 @@ links: []
 
 ## What I decided
 
-TODO(conținut): 3–5 propoziții despre **deciziile** tale, nu despre unelte.
-De ce Supabase și nu altceva? Ce a trebuit să conțină schema ca să suporte și
-comenzi singulare, și abonamente? De ce login cu Google și nu doar email?
+The priority was to have the shop live quickly, and to keep it easy to update
+through the AI agents in my workflow. That is why the backend is Supabase. It
+holds what the shop runs on: customer accounts, subscriptions, the cart and
+the product inventory. I added Google sign-in so that a new customer can
+create an account without filling in a registration form.
 
 ## What the sketches changed
 
-TODO(conținut): ai desenat interfața în Illustrator înainte ca generatorul să
-scrie o linie de cod. Ce ai obținut cu asta pe care nu l-ai fi obținut
-descriind în cuvinte? Asta e partea care te separă de cineva care doar a cerut
-unui AI „fă-mi un magazin de cafea".
+I drew the interface in Illustrator before any code was generated, and the
+AI builder worked from those drawings. That made every request specific. The
+fine details of an interface, such as spacing, alignment and how one element
+sits against the next, lose their point when you try to describe them in
+words. A drawing keeps them.
 
 ## What was hard
 
-TODO(conținut): problema reală — ceva ce nu a mers din prima. Abonamentele
-recurente? Plățile? Stocul? Un angajator citește secțiunea asta primul,
-pentru că aici se vede cum gândești.
+Order tracking. Connecting the shop to the courier's tracking system did not
+work at first. I got it working by following the documentation the courier
+company provides for its integration.
 
 ## What I would change
 
-TODO(conținut): ce ai face altfel acum. Un junior care își critică propriul
-proiect e mai convingător decât unul care îl laudă.
+I would split the work across several AI agents, each one dedicated to a
+single kind of task, and use the agent skills I have discovered since. I
+would also debug more. I have written much more code by hand since then, and
+I now know where to look when something breaks.

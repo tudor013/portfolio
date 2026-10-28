@@ -22,9 +22,7 @@ results: >-
 order: 30
 draft: false
 links: []
+todo:
+  - >-
+    TODO(conținut): studiul de caz. Un detaliu care merită spus: ai generat tu datele, deci știai răspunsul corect înainte de a-l estima — asta face diferența dintre „am rulat o regresie" și „am verificat că regresia dă răspunsul bun".
 ---
-
-TODO(conținut): studiul de caz. Un detaliu care merită spus: ai generat tu
-datele, deci știai răspunsul corect înainte de a-l estima — asta face
-diferența dintre „am rulat o regresie" și „am verificat că regresia dă
-răspunsul bun".

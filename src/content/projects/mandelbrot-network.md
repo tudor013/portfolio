@@ -23,14 +23,13 @@ results: >-
 order: 20
 draft: false
 links: []
+todo:
+  - >-
+    (secțiunea „What the comparison showed” e ascunsă până o scrii)
+  - >-
+    (secțiunea „Why this is a good test” e ascunsă până o scrii)
+  - >-
+    TODO(conținut): un set de date obișnuit nu îți spune dacă modelul a învățat structura sau doar punctele. Aici se vede cu ochiul liber.
+  - >-
+    TODO(conținut): unde a greșit rețeaua? Dacă a ratat exact detaliul de pe frontieră, spune asta — e cel mai interesant rezultat posibil.
 ---
-
-## Why this is a good test
-
-TODO(conținut): un set de date obișnuit nu îți spune dacă modelul a învățat
-structura sau doar punctele. Aici se vede cu ochiul liber.
-
-## What the comparison showed
-
-TODO(conținut): unde a greșit rețeaua? Dacă a ratat exact detaliul de pe
-frontieră, spune asta — e cel mai interesant rezultat posibil.

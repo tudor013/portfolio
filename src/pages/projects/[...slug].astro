@@ -4,6 +4,7 @@ import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import { CATEGORY_LABELS } from '../../content.config';
+import { shown, shownAll } from '../../lib/todo';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SplineScene from '../../components/SplineScene.astro';
 
@@ -26,9 +27,13 @@ type Props = { project: CollectionEntry<'projects'> };
 const { project } = Astro.props;
 const { Content } = await render(project);
 const data = project.data;
+const role = shown(data.role);
+const stack = shownAll(data.stack);
+const problem = shown(data.problem);
+const results = shown(data.results);
 ---
 
-<BaseLayout title={`${data.title} — Tudor-Andrei Ifrim`} description={data.problem}>
+<BaseLayout title={`${data.title} — Tudor-Andrei Ifrim`} description={problem ?? data.title}>
 
   <article class="case">
     <p class="back"><a href="/#work">Back to all the work</a></p>
@@ -46,22 +51,37 @@ const data = project.data;
         <dt class="meta">Year</dt>
         <dd class="figure">{data.year}</dd>
       </div>
-      <div>
-        <dt class="meta">My role</dt>
-        <dd>{data.role}</dd>
-      </div>
-      <div>
-        <dt class="meta">Stack</dt>
-        <dd>{data.stack.join(', ')}</dd>
-      </div>
+      {
+        role && (
+          <div>
+            <dt class="meta">My role</dt>
+            <dd>{role}</dd>
+          </div>
+        )
+      }
+      {
+        stack.length > 0 && (
+          <div>
+            <dt class="meta">Stack</dt>
+            <dd>{stack.join(', ')}</dd>
+          </div>
+        )
+      }
     </dl>
 
     <section class="summary">
-      <h2>The problem</h2>
-      <p>{data.problem}</p>
-
-      <h2>Outcome</h2>
-      <p>{data.results}</p>
+      {problem && (
+        <>
+          <h2>The problem</h2>
+          <p>{problem}</p>
+        </>
+      )}
+      {results && (
+        <>
+          <h2>Outcome</h2>
+          <p>{results}</p>
+        </>
+      )}
     </section>
 
     {

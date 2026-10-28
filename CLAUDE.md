@@ -39,7 +39,11 @@ docs/
 - **Explică pe parcurs.** După fiecare fază, actualizează `docs/ARHITECTURA.md`: ce fișier face ce, cum curg datele, de ce am ales așa. Scris în română, pentru un începător. Din el se generează la final PDF-ul explicativ.
 - **Cod și comentarii în engleză** (repo-ul va fi văzut de angajatori); comentariile explică *de ce*, nu *ce*.
 - **Pași mici.** O fază = un commit sau câteva commituri clare. Nu începe faza următoare fără să-mi arăți rezultatul.
-- **Nu inventa conținut.** Unde lipsesc texte reale, pune placeholder vizibil `TODO(conținut): …`.
+- **Nu inventa conținut.** Unde lipsesc texte reale, pune placeholder `TODO(conținut): …`.
+  Din 28.10.2026 (Tudor trimite linkul angajatorilor) TODO-urile **nu apar pe site-ul publicat**:
+  câmpurile din antet care încep cu `TODO(conținut)` sunt omise (`src/lib/todo.ts`, vizibile doar
+  în `astro dev`), secțiunile nescrise stau în câmpul `todo:` din antet, iar un proiect fără
+  rol și rezultat stă pe `draft: true`.
 - **Folosește skill-ul `frontend-design`** pentru orice decizie vizuală (tipografie, layout, culori, componente).
 
 ## Limba

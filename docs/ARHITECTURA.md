@@ -1332,3 +1332,59 @@ Vercel:
   e că login-ul cu Google l-ai adăugat tu. Asta scria deja în proiect.
 - **Detaliu tehnic.** Site-ul de pe Vercel e o aplicație cu o singură pagină, fără rescrieri de
   rute: `/shop` deschis direct dă 404. Capturile s-au făcut navigând din meniu.
+
+## Faza 20 — Conținutul scris și TODO-urile ascunse
+
+Ai început să trimiți linkul la angajatori. De acum, pe site nu mai apare niciun
+`TODO(conținut)`.
+
+**Ce am scris din răspunsurile tale.** Textele sunt în engleză, cu ce ai spus tu, fără
+adăugiri.
+
+- **Aruna Coffee** (magazinul):
+  - de ce Supabase: viteză și actualizare ușoară prin agenți;
+  - ce conține baza: conturi, abonamente, coș, inventar;
+  - de ce Google: înrolare fără formular;
+  - schițele, tracking-ul comenzilor cu documentația curierului;
+  - ce ai face altfel.
+- **Aruna, brand și interfață:**
+  - rezultatul: rapoarte lunare, se păstra ce aducea mai multe clickuri și comenzi, comparat cu
+    metodele statistice de la facultate;
+  - de ce Spline;
+  - efectul scenelor, lansate odată cu campania de Crăciun.
+  - Secțiunea cu schițele e ascunsă până le găsești.
+- **Baza de date pentru compania aeriană:**
+  - „în lucru, încă nenotat”;
+  - de ce există cele trei constrângeri: scaun vândut o dată, un bilet de pasager pe zbor,
+    ierarhia angajat → manager.
+- **Divizia UI/UX din SiSC**, cum ai cerut: fără rezultate, doar fluxul pe care îl pui în
+  practică între designerii din Figma și echipa de front-end: brief, bibliotecă comună,
+  review, predare în Dev Mode, verificare după construire.
+  - **Atenție:** fluxul l-am propus eu. Citește-l și schimbă ce nu ți se potrivește: într-un
+    interviu trebuie să-l poți susține ca pe al tău.
+- **Simularea NetLogo.** Aici am măsurat, nu am ales o cifră.
+  - Am rulat modelul de pe site (identic cu codul tău `ask fundamentalisti` / `ask tehnici`)
+    de 40 de ori pentru fiecare setare, schimbând câte un parametru pe rând.
+  - Rezultatul contrazice concluzia la care te așteptai: **fundamentaliștii câștigă în 93–100%
+    din rulări la orice setare.** Setările schimbă doar diferența: între ~12 și ~34 de puncte
+    procentuale; la valorile implicite, +22,8% față de −2,6%.
+  - Textul de pe site spune asta deschis: „mă așteptam ca strategia câștigătoare să depindă de
+    setări; în acest model nu depinde”.
+
+**Cum sunt ascunse TODO-urile:**
+- **Câmpurile din antet** (rol, problemă, rezultat, stack) care încep cu `TODO(conținut)` nu se
+  afișează pe site-ul publicat (`src/lib/todo.ts`). În `astro dev` le vezi în continuare.
+- **Secțiunile din text nescrise** au fost mutate în câmpul nou `todo:` din antetul fiecărui
+  proiect, care nu se afișează niciodată. Când scrii o secțiune, o pui înapoi în text.
+- **Două proiecte sunt ascunse** (`draft: true`), pentru că n-aveau nici rol, nici rezultat:
+  - platforma Energy O&M;
+  - site-ul demo cu agenți AI.
+
+  Revin când răspunzi la punctele 15–17 și 21–24.
+- **Comentariul despre imaginea de previzualizare** din `BaseLayout` e acum comentariu Astro,
+  deci nu mai ajunge în HTML.
+
+**Verificare:**
+- `astro check`: 0 erori.
+- Build-ul curat: niciun „TODO” în niciun fișier HTML.
+- Lățimile și consola sunt curate.
