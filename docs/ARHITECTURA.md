@@ -1524,3 +1524,15 @@ Soft Tehnica (proiectul START, cofinanțat din FSE+). L-am citit doar ca sursă.
 - **Verificare pe site-ul construit:** niciun „TODO”, nicio notiță în română, niciun proiect
   ascuns. Singurul proiect cu câmpuri încă de scris e rețeaua Mandelbrot, iar câmpurile acelea
   nu apar pe pagină.
+
+## Faza 28 — Fără ID pe badge, fără iconiță la „Motion”
+
+- **„ID 2028·CSIE” a fost scos** de pe badge, la cererea ta: suna ca învățământ la distanță la
+  CSIE. Lipsește acum de peste tot:
+  - de pe fața cardului 3D, unde a rămas banda albastră și „Tap to turn it over”;
+  - de pe spatele cardului, unde rămân numele și butonul LinkedIn;
+  - de pe cardul HTML din modul fără animații, unde sub rol urmează direct butonul LinkedIn.
+- **Iconița din butonul „Motion”** a fost scoasă. Butonul rămâne doar cu text: „Motion on/off”.
+  Dacă găsim o iconiță potrivită, se pune la loc în `SiteHeader.astro`.
+- **Verificat:** linkul LinkedIn de pe spatele cardului 3D deschide în continuare profilul; la
+  patru lățimi nu apare scroll orizontal, iar `taste-skill lint` dă 0 FAIL.

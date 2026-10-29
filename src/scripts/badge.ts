@@ -55,7 +55,6 @@ async function paintFaces(root: HTMLElement): Promise<Faces> {
   const text = (selector: string) => root.querySelector(selector)?.textContent?.trim() ?? '';
   const name = text('.name');
   const role = text('.role');
-  const id = text('.id');
 
   const card = token(root, '--badge-card');
   const ink = token(root, '--ink');
@@ -103,19 +102,17 @@ async function paintFaces(root: HTMLElement): Promise<Faces> {
     ctx.font = `400 52px ${family}`;
     ctx.fillText(role, FACE_WIDTH / 2, 1004, FACE_WIDTH - 120);
 
-    // The strap's colour printed across the card, as on the DOM card.
+    // The strap's colour printed across the card, like a band on a real ID.
     ctx.fillStyle = strap;
-    ctx.fillRect(80, 1130, FACE_WIDTH - 160, 14);
-    ctx.font = `500 52px ${family}`;
-    ctx.fillText(id, FACE_WIDTH / 2, 1250);
+    ctx.fillRect(80, 1120, FACE_WIDTH - 160, 14);
 
     // Says the card has a back: the LinkedIn button is there.
     ctx.fillStyle = muted;
     ctx.font = `400 40px ${family}`;
-    ctx.fillText('Tap to turn it over', FACE_WIDTH / 2, 1360);
+    ctx.fillText('Tap to turn it over', FACE_WIDTH / 2, 1250);
   }
 
-  // ---- Back: the strap's blue, the name, the ID and the LinkedIn button ---
+  // ---- Back: the strap's blue, the name and the LinkedIn button ---------
   const back = surface(FACE_WIDTH, FACE_HEIGHT);
   {
     const { ctx } = back;
@@ -125,9 +122,7 @@ async function paintFaces(root: HTMLElement): Promise<Faces> {
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = card;
     ctx.font = `600 76px ${family}`;
-    ctx.fillText(name, FACE_WIDTH / 2, 600, FACE_WIDTH - 120);
-    ctx.font = `500 52px ${family}`;
-    ctx.fillText(id, FACE_WIDTH / 2, 690);
+    ctx.fillText(name, FACE_WIDTH / 2, 660, FACE_WIDTH - 120);
 
     // A solid button in the card's white, so it reads as something to press.
     const [x0, y0, x1, y1] = LINK_RECT;

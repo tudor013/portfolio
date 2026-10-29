@@ -31,8 +31,6 @@ const face = await getImage({ src: portrait, width: 640, height: 640, format: 'w
     <p class="name">Tudor-Andrei Ifrim</p>
     <p class="role">Software Developer</p>
 
-    <p class="id figures">ID 2028&middot;CSIE</p>
-
     {/* The same link the 3D card carries on its back. */}
     <a class="linkedin" data-linkedin href="https://www.linkedin.com/in/tudor-ifrim-697b0b26a/" target="_blank" rel="noopener">
       LinkedIn<span aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span>
@@ -177,17 +175,6 @@ const face = await getImage({ src: portrait, width: 640, height: 640, format: 'w
 
   .linkedin:hover {
     background: color-mix(in srgb, var(--badge-strap) 82%, var(--ink));
-  }
-
-  .id {
-    width: 100%;
-    margin-top: var(--space-3);
-    padding-top: var(--space-3);
-    /* The strap's colour printed across the card, like a band on a real ID. */
-    border-top: 3px solid var(--badge-strap);
-    font-size: var(--step-small);
-    font-weight: var(--weight-head);
-    color: var(--badge-strap);
   }
 </style>
 
