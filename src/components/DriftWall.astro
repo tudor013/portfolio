@@ -1,7 +1,8 @@
 ---
 /**
  * The Design page's opening band: React Bits' DriftWall, filled with Tudor's
- * own Aruna Coffee stills (brand, cup, Spline scenes), never stock photos.
+ * own Aruna Coffee stills (brand, cup, Spline scenes) and two other pieces of
+ * his graphic work, never stock photos.
  *
  * The wall is built here, at build time, so it is a finished picture without
  * a script; scripts/drift-wall.ts only sets it drifting. It is decorative:
@@ -18,14 +19,22 @@ import product from '../assets/scenes/aruna-product.png';
 import retro from '../assets/scenes/aruna-retrofuturism.png';
 import retroClose from '../assets/scenes/aruna-retrofuturism-close.webp';
 import retroMid from '../assets/scenes/aruna-retrofuturism-mid.webp';
+import poster from '../assets/landing/poster-silhouettes.webp';
+import quiz from '../assets/landing/quiz-start.webp';
 
 const COLUMNS = 6;
 /** Copies of each column's sequence; the track loops by one copy's height. */
 const COPIES = 2;
 
-const sources = [wordmark, retroClose, swan, product, cup, retroMid, lit, retro];
+const sources = [wordmark, retroClose, swan, poster, product, cup, quiz, retroMid, lit, retro];
+// Portrait pieces are shown whole on the tile rather than cropped to its
+// landscape shape, which would cut the poster's figures in half.
 const pictures = await Promise.all(
-  sources.map((src) => getImage({ src, width: 480, height: 360, fit: 'cover', format: 'webp' })),
+  sources.map(async (src) => {
+    const whole = src.height > src.width;
+    const image = await getImage({ src, width: 480, height: 360, fit: whole ? 'inside' : 'cover', format: 'webp' });
+    return { src: image.src, whole };
+  }),
 );
 
 // Every column runs the whole set, each starting at a different picture, so
@@ -46,6 +55,7 @@ const columns = Array.from({ length: COLUMNS }, (_, c) =>
                 <div class="drift-wall__tile" data-col={c}>
                   <span class="drift-wall__inner">
                     <img
+                      class:list={[picture.whole && 'whole']}
                       src={picture.src}
                       width="240"
                       height="180"
@@ -149,6 +159,10 @@ const columns = Array.from({ length: COLUMNS }, (_, c) =>
     object-fit: cover;
     user-select: none;
     -webkit-user-drag: none;
+  }
+
+  .drift-wall__tile img.whole {
+    object-fit: contain;
   }
 
   .drift-wall__overlay {

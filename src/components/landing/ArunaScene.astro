@@ -1,18 +1,21 @@
 ---
 /**
  * Chapter three, Design: four stills from the Spline scenes Tudor made for
- * Aruna Coffee, crossfading as the page scrolls, each pushing in slowly while
+ * Aruna Coffee, then two more pieces of his graphic work, crossfading as the
+ * page scrolls, each pushing in slowly while
  * it is on screen. This is the page's signature move: the picture changes as
  * its part of the story arrives.
  *
- * Without the held scene (no script, reduced motion, narrow screens) the four
- * stills sit in a grid with their captions: the same content, finished.
+ * Without the held scene (no script, reduced motion, narrow screens) the
+ * pictures sit in a grid: the same content, finished.
  */
 import { Image } from 'astro:assets';
 import wordmark from '../../assets/landing/aruna-1-wordmark.webp';
 import swan from '../../assets/landing/aruna-3-swan.webp';
 import cup from '../../assets/landing/aruna-2-cup.webp';
 import product from '../../assets/landing/aruna-4-product.webp';
+import poster from '../../assets/landing/poster-silhouettes.webp';
+import quiz from '../../assets/landing/quiz-start.webp';
 
 /** The retrofuturist background, published from Spline by Tudor. */
 const SPLINE_URL = 'https://my.spline.design/retrofuturismbganimation-qZwVlCDGNASAGtQbOTX19rfb/';
@@ -21,27 +24,33 @@ const FRAMES = [
   {
     src: wordmark,
     alt: 'The Aruna Coffee wordmark above a small black cup with a cream sleeve, on a white ground.',
-    caption: 'The wordmark and the cup.',
   },
   {
     src: swan,
     alt: 'The cup seen up close: its cream sleeve carries a black swan in a white oval.',
-    caption: 'The swan mark, up close.',
   },
   {
     src: cup,
     alt: 'The cup lying on its side under the line “Cu sau fără zahăr? Indiferent de alegere, Aruna Coffee asigură începutul unei dimineți de care ai nevoie”.',
-    caption: 'The cup turned on its side, under the line it carries.',
   },
   {
     src: product,
     alt: 'A paper cup lit from one side on a dark brown ground, beside the line “Cu sau fără zahăr? Indiferent de alegere, gustul autentic rămâne același.”',
-    caption: 'The lit scene the shop’s copy sits on.',
+  },
+  {
+    src: poster,
+    alt: 'A dark red poster with vertical stripes: two black silhouettes, one leaning over a ledge and one reaching up towards it from below.',
+    whole: true,
+  },
+  {
+    src: quiz,
+    alt: 'The word “QUIZ” in green pixel letters over a halftone dot pattern, with “START” and a play arrow beneath it.',
+    whole: true,
   },
 ];
 ---
 
-<section class="aruna" id="aruna" aria-labelledby="aruna-heading" data-aruna style="--hold: 2">
+<section class="aruna" id="aruna" aria-labelledby="aruna-heading" data-aruna style="--hold: 3">
   <div class="stage">
     <div class="text">
       <div class="copy" data-enter>
@@ -73,6 +82,7 @@ const FRAMES = [
             <figure>
               <div class="picture">
                 <Image
+                  class:list={[frame.whole && 'whole']}
                   src={frame.src}
                   alt={frame.alt}
                   widths={[560, 900, 1300]}
@@ -81,7 +91,6 @@ const FRAMES = [
                   decoding="async"
                 />
               </div>
-              <figcaption>{frame.caption}</figcaption>
             </figure>
           </li>
         ))
@@ -127,7 +136,7 @@ const FRAMES = [
     max-width: none;
   }
 
-  /* Finished composition: two by two, captions under the pictures. */
+  /* Finished composition: the pictures two by two. */
   .frames {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -138,8 +147,6 @@ const FRAMES = [
   }
 
   figure {
-    display: grid;
-    gap: var(--space-3);
     margin: 0;
   }
 
@@ -155,9 +162,10 @@ const FRAMES = [
     object-fit: cover;
   }
 
-  figcaption {
-    color: var(--muted);
-    font-size: var(--step-small);
+  /* Pieces that are not landscape are shown whole, on the surface tone,
+     rather than cropped to the frame. */
+  .picture img.whole {
+    object-fit: contain;
   }
 
   @media (max-width: 40rem) {

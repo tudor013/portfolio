@@ -1536,3 +1536,20 @@ Soft Tehnica (proiectul START, cofinanțat din FSE+). L-am citit doar ca sursă.
   Dacă găsim o iconiță potrivită, se pune la loc în `SiteHeader.astro`.
 - **Verificat:** linkul LinkedIn de pe spatele cardului 3D deschide în continuare profilul; la
   patru lățimi nu apare scroll orizontal, iar `taste-skill lint` dă 0 FAIL.
+
+## Faza 29 — Fără legende sub imaginile de design; două lucrări noi
+
+- **Textul gri de sub fiecare imagine** din „Drawn before it was built” a fost scos. Se vede
+  doar imaginea. Descrierea a rămas doar în `alt`, ca un cititor de ecran să știe ce arată
+  fiecare poză.
+- **Două lucrări noi**, adăugate în ambele locuri, pe scena de pe landing și pe peretele
+  DriftWall de pe pagina Design:
+  - afișul roșu închis cu două siluete (`poster-silhouettes.webp`);
+  - grafica „QUIZ ▶ START” (`quiz-start.webp`).
+
+  Au doar `alt`, care descrie ce se vede, fără afirmații despre proiect.
+- **Lucrările care nu sunt în format orizontal** (afișul) se văd întregi, pe fundalul
+  suprafeței, în loc să fie tăiate pe forma ramei.
+- **Scena are acum șase cadre.** Trecerile dintre ele se calculează pentru orice număr de
+  cadre (`aruna-scene.ts`, între 32% și 84% din parcurs), iar secțiunea a crescut de la 3 la 4
+  ecrane, ca fiecare imagine să stea cam la fel de mult pe ecran.
