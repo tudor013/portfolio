@@ -11,14 +11,10 @@
  * keyboard stops.
  */
 import { getImage } from 'astro:assets';
-import wordmark from '../assets/landing/aruna-1-wordmark.webp';
-import cup from '../assets/landing/aruna-2-cup.webp';
 import swan from '../assets/landing/aruna-3-swan.webp';
 import lit from '../assets/landing/aruna-4-product.webp';
 import product from '../assets/scenes/aruna-product.png';
-import retro from '../assets/scenes/aruna-retrofuturism.png';
 import retroClose from '../assets/scenes/aruna-retrofuturism-close.webp';
-import retroMid from '../assets/scenes/aruna-retrofuturism-mid.webp';
 import poster from '../assets/landing/poster-silhouettes.webp';
 import quiz from '../assets/landing/quiz-start.webp';
 import pasiune from '../assets/landing/poster-pasiune.webp';
@@ -30,17 +26,13 @@ const COPIES = 2;
 // Every piece is landscape or square; the tile crops it to 4:3. `top` keeps
 // the top of a picture in view when the crop would cut a head off.
 const sources = [
-  { src: wordmark },
   { src: retroClose },
   { src: swan },
   { src: poster, top: true },
   { src: product },
-  { src: cup },
   { src: quiz },
   { src: pasiune },
-  { src: retroMid },
   { src: lit },
-  { src: retro },
 ];
 const pictures = await Promise.all(
   sources.map(async ({ src, top }) => {

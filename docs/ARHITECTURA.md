@@ -1579,3 +1579,15 @@ Soft Tehnica (proiectul START, cofinanțat din FSE+). L-am citit doar ca sursă.
   Pe perete sunt acum 11 imagini diferite. Ca niciuna să nu apară de două ori în același timp,
   trebuie cam 17 imagini diferite. Fiecare coloană le parcurge pe toate, deci aceeași imagine
   nu apare de două ori în aceeași coloană; poate apărea însă în două coloane deodată.
+
+## Faza 31 — Două imagini scoase din peretele de pe /design/
+
+La cererea ta am scos din rotația DriftWall cele două imagini Aruna:
+- **„Aruna Coffee” cu paharul mic.** Am scos și cadrul de logo (`aruna-1-wordmark`), și
+  cadrul Spline retrofuturist (`aruna-retrofuturism.png`), pentru că arată aproape la fel.
+- **Paharul culcat sub text.** Am scos și cadrul de pahar (`aruna-2-cup`), și cadrul Spline
+  din mijloc (`aruna-retrofuturism-mid`), din același motiv.
+
+Pe perete rămân 7 imagini: lebăda de aproape (două variante), produsul în lumină (două
+variante), afișul cu siluete, QUIZ și PASIUNE. Pentru că se văd 15–18 plăci deodată, unele
+imagini apar de două ori pe ecran. Scena de pe landing nu s-a schimbat.
