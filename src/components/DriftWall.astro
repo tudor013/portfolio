@@ -1,7 +1,7 @@
 ---
 /**
  * The Design page's opening band: React Bits' DriftWall, filled with Tudor's
- * own Aruna Coffee stills (brand, cup, Spline scenes) and two other pieces of
+ * own Aruna Coffee stills (brand, cup, Spline scenes) and other pieces of
  * his graphic work, never stock photos.
  *
  * The wall is built here, at build time, so it is a finished picture without
@@ -21,19 +21,31 @@ import retroClose from '../assets/scenes/aruna-retrofuturism-close.webp';
 import retroMid from '../assets/scenes/aruna-retrofuturism-mid.webp';
 import poster from '../assets/landing/poster-silhouettes.webp';
 import quiz from '../assets/landing/quiz-start.webp';
+import pasiune from '../assets/landing/poster-pasiune.webp';
 
 const COLUMNS = 6;
 /** Copies of each column's sequence; the track loops by one copy's height. */
 const COPIES = 2;
 
-const sources = [wordmark, retroClose, swan, poster, product, cup, quiz, retroMid, lit, retro];
-// Portrait pieces are shown whole on the tile rather than cropped to its
-// landscape shape, which would cut the poster's figures in half.
+// Every piece is landscape or square; the tile crops it to 4:3. `top` keeps
+// the top of a picture in view when the crop would cut a head off.
+const sources = [
+  { src: wordmark },
+  { src: retroClose },
+  { src: swan },
+  { src: poster, top: true },
+  { src: product },
+  { src: cup },
+  { src: quiz },
+  { src: pasiune },
+  { src: retroMid },
+  { src: lit },
+  { src: retro },
+];
 const pictures = await Promise.all(
-  sources.map(async (src) => {
-    const whole = src.height > src.width;
-    const image = await getImage({ src, width: 480, height: 360, fit: whole ? 'inside' : 'cover', format: 'webp' });
-    return { src: image.src, whole };
+  sources.map(async ({ src, top }) => {
+    const image = await getImage({ src, width: 480, format: 'webp' });
+    return { src: image.src, top: !!top };
   }),
 );
 
@@ -55,7 +67,7 @@ const columns = Array.from({ length: COLUMNS }, (_, c) =>
                 <div class="drift-wall__tile" data-col={c}>
                   <span class="drift-wall__inner">
                     <img
-                      class:list={[picture.whole && 'whole']}
+                      class:list={[picture.top && 'top']}
                       src={picture.src}
                       width="240"
                       height="180"
@@ -161,8 +173,8 @@ const columns = Array.from({ length: COLUMNS }, (_, c) =>
     -webkit-user-drag: none;
   }
 
-  .drift-wall__tile img.whole {
-    object-fit: contain;
+  .drift-wall__tile img.top {
+    object-position: center top;
   }
 
   .drift-wall__overlay {

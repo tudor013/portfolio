@@ -40,12 +40,11 @@ const FRAMES = [
   {
     src: poster,
     alt: 'A dark red poster with vertical stripes: two black silhouettes, one leaning over a ledge and one reaching up towards it from below.',
-    whole: true,
+    top: true,
   },
   {
     src: quiz,
     alt: 'The word “QUIZ” in green pixel letters over a halftone dot pattern, with “START” and a play arrow beneath it.',
-    whole: true,
   },
 ];
 ---
@@ -82,7 +81,7 @@ const FRAMES = [
             <figure>
               <div class="picture">
                 <Image
-                  class:list={[frame.whole && 'whole']}
+                  class:list={[frame.top && 'top']}
                   src={frame.src}
                   alt={frame.alt}
                   widths={[560, 900, 1300]}
@@ -162,11 +161,12 @@ const FRAMES = [
     object-fit: cover;
   }
 
-  /* Pieces that are not landscape are shown whole, on the surface tone,
-     rather than cropped to the frame. */
-  .picture img.whole {
-    object-fit: contain;
+  /* The square poster is cropped to the frame from the top, so the figure
+     leaning over the ledge keeps its head. */
+  .picture img.top {
+    object-position: center top;
   }
+
 
   @media (max-width: 40rem) {
     .text {

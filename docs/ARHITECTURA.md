@@ -1553,3 +1553,29 @@ Soft Tehnica (proiectul START, cofinanțat din FSE+). L-am citit doar ca sursă.
 - **Scena are acum șase cadre.** Trecerile dintre ele se calculează pentru orice număr de
   cadre (`aruna-scene.ts`, între 32% și 84% din parcurs), iar secțiunea a crescut de la 3 la 4
   ecrane, ca fiecare imagine să stea cam la fel de mult pe ecran.
+
+## Faza 30 — Afișele pătrate și afișul „PASIUNE”
+
+- **Afișul cu cele două siluete e acum pătrat (595×595) și nimic nu e întins.** Afișul
+  original (420×595) e lăsat întreg, iar în dreapta am adăugat 175px din fundalul lui: dungile
+  verticale din marginea dreaptă, puse alternativ normal și în oglindă, ca să continue fără
+  cusătură. În stânga n-am adăugat nimic, pentru că formele negre ating marginea și ar fi
+  apărut tăiate.
+- **Afișul „PASIUNE” (mâna cu păpușa)** e și el pătrat (373×373). Literele lui ating ambele
+  margini, deci oglinda le-ar fi dublat. Am pus în lateral o versiune mărită, încețoșată și
+  întunecată a afișului, iar afișul stă întreg în mijloc. E adăugat pe peretele de pe /design/.
+- **Nicio imagine de pe perete nu mai e afișată cu benzi.** Toate sunt orizontale sau pătrate,
+  iar placa le taie la 4:3. La afișul cu siluete, tăietura pornește de sus (`object-position:
+  top`), ca silueta aplecată să-și păstreze capul. Același lucru pe scena de pe landing.
+- **Câte imagini se văd odată pe perete** (le-am numărat pe cele aflate cel puțin pe jumătate
+  în bandă):
+
+  | Ecran | Imagini vizibile |
+  |---|---|
+  | 1920×1080 | 17 |
+  | 1440×900 | 15 |
+  | 1366×768 | 10 |
+
+  Pe perete sunt acum 11 imagini diferite. Ca niciuna să nu apară de două ori în același timp,
+  trebuie cam 17 imagini diferite. Fiecare coloană le parcurge pe toate, deci aceeași imagine
+  nu apare de două ori în aceeași coloană; poate apărea însă în două coloane deodată.
