@@ -1591,3 +1591,12 @@ La cererea ta am scos din rotația DriftWall cele două imagini Aruna:
 Pe perete rămân 7 imagini: lebăda de aproape (două variante), produsul în lumină (două
 variante), afișul cu siluete, QUIZ și PASIUNE. Pentru că se văd 15–18 plăci deodată, unele
 imagini apar de două ori pe ecran. Scena de pe landing nu s-a schimbat.
+
+## Faza 32 — Landing: fără paharul culcat și fără rândul cu sursa
+
+- **Scena „Drawn before it was built”**: am scos cadrul cu paharul culcat sub text
+  (`aruna-2-cup`). Au rămas cinci cadre: logo-ul, lebăda de aproape, produsul în lumină,
+  afișul cu siluete și QUIZ. Trecerile se recalculează singure pentru cinci cadre.
+- **Secțiunea NetLogo („Two kinds of trader”)**: am scos rândul „Follows Chen, Zheng and Tan’s
+  2013 model…”. Linkul spre articol rămâne pe pagina proiectului. Secțiunea încape în
+  continuare într-un ecran la toate rezoluțiile verificate.

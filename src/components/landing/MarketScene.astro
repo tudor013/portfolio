@@ -40,9 +40,6 @@ const CONTROLS = [
       they join in, buy or sell on a coin flip. Scroll to run it, or change the
       market.
     </p>
-    <p class="source">
-      Follows Chen, Zheng and Tan’s 2013 model of asymmetric trading and herding.
-    </p>
   </div>
 
   <div class="panel" data-ui>
@@ -132,8 +129,7 @@ const CONTROLS = [
   }
 
   .head,
-  .panel,
-  .source {
+  .panel {
     width: min(100%, var(--content));
   }
 
@@ -345,11 +341,6 @@ const CONTROLS = [
 
   .go {
     justify-self: start;
-  }
-
-  .source {
-    color: var(--muted);
-    font-size: var(--step-small);
   }
 
   @media (max-width: 60rem) {
