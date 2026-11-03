@@ -109,3 +109,54 @@ export const beat = (progress: number, start: number, end: number): number =>
 
 /** Quint ease-out: quick to start, gentle to land. */
 export const easeOut = (t: number): number => 1 - Math.pow(1 - t, 5);
+
+/**
+ * Plays a scene on a clock when it arrives on screen, instead of tying it to
+ * the scroll. The landing page moves a whole section per scroll (scroll-snap,
+ * global.css), so there is no in-between scroll position for a scene to
+ * follow: it runs from 0 to 1 over `duration` once at least 60% of it is in
+ * view, and starts again from 0 the next time it arrives. Under reduced
+ * motion the scene is drawn finished straight away.
+ */
+export function playOnArrival(element: HTMLElement, render: Render, duration: number): () => void {
+  let raf = 0;
+  let played = false;
+
+  const play = () => {
+    cancelAnimationFrame(raf);
+    if (!motionIsFull()) {
+      render(1);
+      return;
+    }
+    const started = performance.now();
+    const tick = (now: number) => {
+      const t = clamp01((now - started) / duration);
+      render(t);
+      raf = t < 1 ? requestAnimationFrame(tick) : 0;
+    };
+    raf = requestAnimationFrame(tick);
+  };
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.intersectionRatio >= 0.6 && !played) {
+        played = true;
+        play();
+      } else if (entry.intersectionRatio < 0.05 && played) {
+        // Gone: the next arrival plays it again from the start.
+        played = false;
+        cancelAnimationFrame(raf);
+        if (motionIsFull()) render(0);
+      }
+    },
+    { threshold: [0, 0.05, 0.6, 1] },
+  );
+  observer.observe(element);
+  render(motionIsFull() ? 0 : 1);
+  onMotionChange(() => (played ? play() : render(motionIsFull() ? 0 : 1)));
+
+  // Redraws the current state (a resize, a font arriving) without replaying.
+  return () => {
+    if (!raf) render(played || !motionIsFull() ? 1 : 0);
+  };
+}

@@ -86,4 +86,33 @@ import portrait from '../../assets/tudor.png';
     color: var(--muted);
     font-size: var(--step-small);
   }
+
+  /* On a desktop the letter fits one screen: two columns of text under the
+     portrait and the heading, like a page of a magazine. */
+  @media (min-width: 60rem) {
+    .column {
+      display: block;
+      width: min(100%, 60rem);
+      columns: 2;
+      column-gap: var(--space-12);
+    }
+
+    .portrait,
+    h2 {
+      column-span: all;
+    }
+
+    h2 {
+      margin-block: var(--space-4) var(--space-8);
+    }
+
+    .column > p {
+      break-inside: avoid;
+      margin-block: 0 var(--space-6);
+    }
+
+    .sign {
+      margin-top: var(--space-2);
+    }
+  }
 </style>

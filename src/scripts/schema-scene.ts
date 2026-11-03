@@ -1,8 +1,9 @@
 /**
  * Builds the airline schema as the reader scrolls (SchemaScene.astro).
  *
- * The section is 3 screens tall and its stage pins at a third of the way:
- *   0.06 – 0.42  the ten tables arrive, top row first, as the stage slides in
+ * The section is one screen; the drawing builds on a clock when it arrives
+ * (playOnArrival, 3.2 s), in three beats:
+ *   0.06 – 0.42  the ten tables arrive, top row first
  *   0.42 – 0.80  the thirteen foreign keys draw from one table to the other
  *   0.80 – 1.00  the finished schema holds, under its title
  *
@@ -10,7 +11,7 @@
  * is laid out again while scrolling.
  */
 import { TABLES, VIEWBOX, heightOf } from '../data/airline-schema';
-import { addScene, beat, easeOut } from './scenes';
+import { playOnArrival, beat, easeOut } from './scenes';
 import { motionIsFull, onMotionChange } from './motion';
 
 const TABLES_FROM = 0.06;
@@ -110,7 +111,7 @@ export function initSchemaScene(root: HTMLElement): void {
     for (const el of [...tables, ...relations]) el.removeAttribute('style');
   }
 
-  const redraw = addScene(root, render);
+  const redraw = playOnArrival(root, render, 3200);
 
   function sync(): void {
     root.classList.toggle('is-live', canRun.matches && motionIsFull());

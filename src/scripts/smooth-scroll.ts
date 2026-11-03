@@ -35,6 +35,9 @@ export function initSmoothScroll(): void {
   let loading = false;
 
   async function start(): Promise<void> {
+    // The landing page snaps from section to section (global.css); Lenis
+    // would fight the snapping, so it stays off there.
+    if (document.documentElement.classList.contains('landing')) return;
     if (lenis || loading || !motionIsFull() || !finePointer.matches) return;
     loading = true;
     const { default: Lenis } = await import('lenis');

@@ -33,7 +33,7 @@ const description =
   'and an employee to their manager, who is another employee.';
 ---
 
-<section class="schema" id="schema" aria-labelledby="schema-heading" data-schema style="--hold: 2">
+<section class="schema" id="schema" aria-labelledby="schema-heading" data-schema>
   <div class="stage">
     <div class="title-block">
       <div class="intro" data-enter>
@@ -202,17 +202,17 @@ const description =
 
   /* ---- Held: the stage pins and the drawing builds as the page scrolls ---- */
 
+  /* Live, the section is exactly one screen below the header, the stage
+     fills it, and the drawing builds itself on arrival (schema-scene.ts). */
   .schema.is-live {
-    height: calc((var(--hold) + 1) * 100svh);
+    height: calc(100svh - 4rem);
   }
 
   .schema.is-live .stage {
-    position: sticky;
-    top: 0;
-    height: 100svh;
+    position: relative;
+    height: 100%;
     overflow: clip;
-    /* The header stays on top, so the drawing starts below it. */
-    padding: calc(4rem + var(--space-6)) var(--margin) var(--space-8);
+    padding: var(--space-6) var(--margin) var(--space-8);
     grid-template-rows: minmax(0, 1fr);
   }
 

@@ -1,8 +1,7 @@
 ---
 /**
- * Chapter three, Design: four stills from the Spline scenes Tudor made for
- * Aruna Coffee, then two more pieces of his graphic work, crossfading as the
- * page scrolls, each pushing in slowly while
+ * Chapter three, Design: stills from the Spline scenes Tudor made for Aruna
+ * Coffee and two more pieces of his graphic work, crossfading by themselves, each pushing in slowly while
  * it is on screen. This is the page's signature move: the picture changes as
  * its part of the story arrives.
  *
@@ -16,13 +15,10 @@ import product from '../../assets/landing/aruna-4-product.webp';
 import poster from '../../assets/landing/poster-silhouettes.webp';
 import quiz from '../../assets/landing/quiz-start.webp';
 
-/** The retrofuturist background, published from Spline by Tudor. */
-const SPLINE_URL = 'https://my.spline.design/retrofuturismbganimation-qZwVlCDGNASAGtQbOTX19rfb/';
-
 const FRAMES = [
   {
     src: wordmark,
-    alt: 'The Aruna Coffee wordmark above a small black cup with a cream sleeve, on a white ground.',
+    alt: 'The coffee brand’s wordmark above a small black cup with a cream sleeve, on a white ground.',
   },
   {
     src: swan,
@@ -44,30 +40,26 @@ const FRAMES = [
 ];
 ---
 
-<section class="aruna" id="aruna" aria-labelledby="aruna-heading" data-aruna style="--hold: 3">
+<section class="aruna" id="aruna" aria-labelledby="aruna-heading" data-aruna>
   <div class="stage">
     <div class="text">
       <div class="copy" data-enter>
         <h2 id="aruna-heading">Drawn before it was built</h2>
         <p>
-          I designed Aruna Coffee’s brand and drew its interface in Illustrator
-          before any of it was built. The moving scenes behind the shop are my
-          Spline work; the shop’s controls sit on top of them, in code.
-        </p>
-        <p class="result">
-          The business sells over 100 kg of coffee a month through the shop.
+          I designed a coffee brand and drew its interface in Illustrator
+          before any of it was built. I made the moving scenes behind its
+          online shop in Spline; the shop’s controls sit on top of them, in
+          code.
         </p>
       </div>
       <p class="links">
-        {/* The live scene, as Tudor published it. It opens in a new tab rather
-            than loading here: the Spline runtime is several megabytes, and the
-            stills beside this text already show the scene. */}
-        <a class="go" href={SPLINE_URL} target="_blank" rel="noopener">
-          See the scene live in Spline<span class="sr-only"> (opens in a new tab)</span>
-        </a>
         <a class="go" href="/design/">All design work</a>
       </p>
     </div>
+
+    {/* The pictures change by themselves; WCAG 2.2.2 asks for a way to stop
+        anything that moves on its own for more than five seconds. */}
+    <button class="cycle" type="button" data-cycle hidden aria-pressed="false">Pause</button>
 
     <ol class="frames">
       {
@@ -117,10 +109,6 @@ const FRAMES = [
   .copy {
     display: grid;
     gap: var(--space-4);
-  }
-
-  .result {
-    font-weight: var(--weight-strong);
   }
 
   .links {
@@ -173,49 +161,82 @@ const FRAMES = [
     }
   }
 
-  /* ---- Held: one picture at a time, changing as the page scrolls -------- */
+  /* ---- Live: one screen, one picture at a time, changing by itself ------- */
 
   .aruna.is-live {
-    height: calc((var(--hold) + 1) * 100svh);
+    height: calc(100svh - 4rem);
     padding-block: 0;
   }
 
   .aruna.is-live .stage {
-    position: sticky;
-    top: 0;
-    height: 100svh;
+    position: relative;
+    height: 100%;
     overflow: clip;
     grid-template-columns: minmax(0, 6fr) minmax(0, 7fr);
+    grid-template-rows: minmax(0, 1fr) auto;
     align-items: center;
-    padding-block: calc(4rem + var(--space-8)) var(--space-8);
+    row-gap: var(--space-4);
+    padding-block: var(--space-8);
   }
 
   /* The heading needs the width to stay on two lines; the picture gives it. */
   .aruna.is-live .text {
+    grid-row: 1 / -1;
     padding-left: 0;
     max-width: 34rem;
   }
 
   .aruna.is-live .frames {
+    grid-column: 2;
+    grid-row: 1;
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: 'frame';
     /* As large as the screen allows, and never taller than it. */
-    width: min(100%, calc((100svh - 4rem - var(--space-24)) * 4 / 3));
+    width: min(100%, calc((100svh - 4rem - var(--space-24) - 44px) * 4 / 3));
     justify-self: end;
   }
 
   .aruna.is-live li {
     grid-area: frame;
     opacity: 0;
-    will-change: opacity;
+    transition: opacity 900ms var(--ease-in-out);
   }
 
-  .aruna.is-live li:first-child {
+  .aruna.is-live li.is-shown {
     opacity: 1;
   }
 
+  /* Each picture pushes in slowly while it is on screen. */
   .aruna.is-live .picture img {
-    will-change: transform;
+    transition: transform 4200ms linear;
+  }
+
+  .aruna.is-live li.is-shown .picture img {
+    transform: scale(1.06);
+  }
+
+  .cycle {
+    display: none;
+  }
+
+  .aruna.is-live .cycle {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border: 0;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step-small);
+    cursor: pointer;
+  }
+
+  .aruna.is-live .cycle:hover {
+    background: color-mix(in srgb, var(--surface) 92%, var(--ink));
   }
 </style>
 

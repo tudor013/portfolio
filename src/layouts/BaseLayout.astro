@@ -27,7 +27,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en" data-motion="full" data-motion-choice="system" data-theme={theme}>
+<html
+  lang="en"
+  data-motion="full"
+  data-motion-choice="system"
+  data-theme={theme}
+  class:list={[layout === 'full' && 'landing']}
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -84,10 +90,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   import { initMotionToggle } from '../scripts/motion';
   import { initEnter } from '../scripts/enter';
   import { initSmoothScroll } from '../scripts/smooth-scroll';
+  import { initSectionSnap } from '../scripts/section-snap';
 
   initMotionToggle();
   initEnter();
   initSmoothScroll();
+  initSectionSnap();
 </script>
 
 <style>

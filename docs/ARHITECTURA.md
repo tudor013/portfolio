@@ -1600,3 +1600,50 @@ imagini apar de două ori pe ecran. Scena de pe landing nu s-a schimbat.
 - **Secțiunea NetLogo („Two kinds of trader”)**: am scos rândul „Follows Chen, Zheng and Tan’s
   2013 model…”. Linkul spre articol rămâne pe pagina proiectului. Secțiunea încape în
   continuare într-un ecran la toate rezoluțiile verificate.
+
+## Faza 33 — Landing pe secțiuni, imagini care se schimbă singure, fără bara de scroll
+
+**Câte o secțiune pe ecran:**
+- Fiecare secțiune a landing-ului are exact înălțimea ecranului de sub header: hero, schema,
+  cele două ecrane din intro, piața, design, lista de proiecte, scrisoarea și contactul.
+- **Pe desktop, o rotiță sau un gest pe trackpad trece la secțiunea următoare**, lin, și nu
+  rămâne la jumătate.
+  - Tastele (Page Down, săgeți, spațiu) folosesc snap-ul nativ al browserului
+    (`scroll-snap-type: y mandatory` în `global.css`).
+  - Rotița o preia `scripts/section-snap.ts`. O singură treaptă de rotiță (~100px) era prea
+    puțin pentru snap-ul nativ: browserul se întorcea la secțiunea curentă.
+  - Restul gestului (inerția trackpad-ului, o rotiță rapidă) e absorbit, deci nu se poate sări
+    peste o secțiune.
+- Lenis e oprit pe landing, pentru că s-ar bate cu snap-ul.
+- **Am măsurat înălțimile ca nicio secțiune să nu „iasă” în următoarea:**
+
+  | Ecran | Înălțimea fiecărei secțiuni |
+  |---|---|
+  | 1920×1080 | 1016px |
+  | 1440×900 | 836px |
+  | 1536×754 | 690px |
+  | 1366×768 | 704px |
+
+  Pentru asta:
+  - **Lista de proiecte** are pe desktop cele trei direcții una lângă alta. Previzualizarea la
+    hover a ieșit, pentru că avea nevoie de spațiul din dreapta unei singure coloane.
+  - **Scrisoarea** are două coloane de text.
+  - **Pe ferestrele scunde**, secțiunile au mai puțin spațiu sus și jos.
+
+**Scenele rulează singure la sosire,** pentru că nu mai există un scroll intermediar pe care
+să-l urmărească (`playOnArrival` din `scenes.ts`):
+- schema se desenează în 3,2 s;
+- simularea pieței rulează în 3,2 s;
+- când revii la o secțiune, animația pornește din nou.
+
+**Imaginile din „Drawn before it was built” se schimbă singure** la 3,6 s, cât secțiunea e
+pe ecran (`aruna-scene.ts`).
+- Butonul **Pause/Play** le oprește. E cerut de WCAG 2.2.2 pentru orice se mișcă singur mai
+  mult de 5 secunde.
+- În modul fără animații pornesc oprite.
+
+**Textul secțiunii:** fără numele brandului, fără linkul spre scena Spline și fără rândul cu
+100 kg.
+
+**Bara de scroll** e ascunsă pe landing. Pagina se derulează în continuare cu rotița,
+tastele și touch-ul.

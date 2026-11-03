@@ -37,8 +37,8 @@ const CONTROLS = [
     <p>
       My agent-based market from NetLogo, rebuilt here with its original rules.
       Fundamentalists buy below the value and sell above it; the others, when
-      they join in, buy or sell on a coin flip. Scroll to run it, or change the
-      market.
+      they join in, buy or sell on a coin flip. It runs as you arrive; change
+      the market and run it again.
     </p>
   </div>
 
@@ -114,7 +114,7 @@ const CONTROLS = [
      controls in two columns, and the chart taking whatever height is left. */
   .market {
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-4);
     /* Centred in the screen it occupies. */
     justify-items: center;
     padding-block: var(--space-8);
@@ -341,6 +341,21 @@ const CONTROLS = [
 
   .go {
     justify-self: start;
+  }
+
+  @media (min-width: 60rem) and (max-height: 50rem) {
+    .market {
+      padding-block: var(--space-6);
+    }
+
+    .plot {
+      grid-template-rows: auto minmax(12rem, 1fr) auto;
+      padding-block: var(--space-4);
+    }
+
+    .side {
+      padding-block: var(--space-4);
+    }
   }
 
   @media (max-width: 60rem) {

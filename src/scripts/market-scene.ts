@@ -1,15 +1,11 @@
 /**
- * The live market (MarketScene.astro): runs the model, draws it on a canvas,
- * and lets the scroll decide how far into the run the chart has got.
- *
- * Time is mapped to scroll so that the run starts as the panel's top edge
- * enters the screen and reaches day 500 as the whole panel comes into view;
- * from then on the full run stays drawn and the controls can be used on it.
- * "Run with new news" plays a fresh run on a clock instead, for anyone who
- * would rather watch than scroll.
+ * The live market (MarketScene.astro): runs the model and draws it on a
+ * canvas. The run plays on a clock when the section arrives on screen
+ * (playOnArrival); from then on the full run stays drawn and the controls
+ * can be used on it. "Run with new news" plays a fresh run the same way.
  */
 import { DAYS, DEFAULTS, runMarket, type MarketRun, type MarketSettings } from './market-model';
-import { addScene } from './scenes';
+import { playOnArrival } from './scenes';
 import { motionIsFull, onMotionChange } from './motion';
 
 const PLAY_MS = 3200;
@@ -32,7 +28,6 @@ export function initMarketScene(root: HTMLElement): void {
   let run: MarketRun = runMarket(settings, seed);
   /** How much of the run is drawn, 0–1. */
   let shown = 1;
-  let scrolled = 1;
   let playing = 0;
 
   // Colours come from the tokens, so the chart cannot drift from the page.
@@ -119,25 +114,25 @@ export function initMarketScene(root: HTMLElement): void {
     draw();
   }
 
-  // ---- Scroll: time follows the panel coming into view --------------------
+  // ---- Arrival: the run plays when the section comes on screen -----------
 
-  addScene(panel, (progress) => {
-    scrolled = progress;
-    if (!motionIsFull()) return;
-    if (playing) return;
-    shown = progress;
-    draw();
-  });
+  playOnArrival(
+    root,
+    (progress) => {
+      if (playing) return;
+      shown = progress;
+      draw();
+    },
+    PLAY_MS,
+  );
 
   onMotionChange(() => {
     if (!motionIsFull()) {
       cancelAnimationFrame(playing);
       playing = 0;
       shown = 1;
-    } else {
-      shown = scrolled;
+      draw();
     }
-    draw();
   });
 
   // ---- Controls ------------------------------------------------------------
@@ -172,7 +167,7 @@ export function initMarketScene(root: HTMLElement): void {
       return;
     }
 
-    // Played on a clock, then handed back to the scroll.
+    // Played on a clock, then left finished.
     cancelAnimationFrame(playing);
     const started = performance.now();
     const tick = (now: number) => {
@@ -182,7 +177,7 @@ export function initMarketScene(root: HTMLElement): void {
       if (t < 1) playing = requestAnimationFrame(tick);
       else {
         playing = 0;
-        shown = scrolled;
+        shown = 1;
         draw();
       }
     };

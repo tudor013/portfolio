@@ -214,6 +214,14 @@ a:hover {
   padding-block: var(--space-16);
 }
 
+/* A short desktop window (a 1080p screen scaled to 125%, a laptop) gives
+   each section less air, so it still fits one screen. */
+@media (min-width: 60rem) and (max-height: 50rem) {
+  .screen {
+    padding-block: var(--space-8);
+  }
+}
+
 .centred {
   width: min(100%, var(--content));
   margin-inline: auto;
@@ -286,5 +294,41 @@ html[data-motion='reduced'] *::after {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ---- The landing page moves one section per scroll (Tudor's rule) ---------
+
+   Every section of the landing page is one screen below the header, and on
+   a desktop the browser snaps from one to the next: a wheel turn, a trackpad
+   swipe, Page Down or the arrow keys land on the next section, smoothly, and
+   never stop halfway with the next one peeking in. Native scroll snapping
+   rather than a script, so the keyboard, the scrollbar-less trackpad and
+   find-in-page keep working. A section taller than the screen (a phone, a
+   very short window) can still be scrolled through before the next snap.
+
+   The scrollbar is hidden on the landing page only; the page still scrolls
+   with the wheel, the keys and touch. */
+html.landing {
+  scrollbar-width: none;
+}
+
+html.landing::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 60rem) and (min-height: 36rem) {
+  html.landing {
+    scroll-snap-type: y mandatory;
+  }
+
+  html.landing main > section:not(.intro),
+  html.landing main > .intro > .screen {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  html.landing body > footer {
+    scroll-snap-align: end;
   }
 }

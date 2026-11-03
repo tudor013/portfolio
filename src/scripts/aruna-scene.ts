@@ -1,66 +1,81 @@
 /**
- * The design stills, crossfading with the scroll (ArunaScene.astro).
+ * The design stills, changing by themselves (ArunaScene.astro).
  *
- * The section pins as it arrives and its frames hand over at points spread
- * evenly between FIRST and LAST, however many frames there are. Each
- * crossfade takes 6% of the ride, and each picture pushes in by 6% over the
- * time it is on screen, so there is always something moving under the
- * reader's hand, slowly, like light in a room.
+ * On a wide screen the section is one screen with one picture at a time; a
+ * new one fades in every few seconds while the section is on screen, and
+ * each pushes in slowly while it is shown (CSS). The cycle runs in full
+ * motion mode and stops when the section leaves the screen or the tab is
+ * hidden. The Pause button stops it for good (WCAG 2.2.2); in reduced motion
+ * it starts paused, and Play still steps through the pictures.
+ *
+ * Without a script, or on a narrow screen, the pictures sit in a grid.
  */
-import { addScene, beat } from './scenes';
 import { motionIsFull, onMotionChange } from './motion';
 
-const FIRST = 0.32;
-const LAST = 0.84;
-const FADE = 0.06;
-const PUSH = 0.06;
+const EVERY_MS = 3600;
 
 export function initArunaScene(root: HTMLElement): void {
   const canRun = window.matchMedia('(min-width: 60rem)');
   const frames = [...root.querySelectorAll<HTMLElement>('[data-frame]')];
-  const pictures = frames.map((frame) => frame.querySelector<HTMLImageElement>('img'));
-  const HANDOVERS = frames
-    .slice(1)
-    .map((_, i) => (frames.length > 2 ? FIRST + (i * (LAST - FIRST)) / (frames.length - 2) : FIRST));
+  const button = root.querySelector<HTMLButtonElement>('[data-cycle]')!;
 
-  // The window of the ride each frame is on screen for, fades included.
-  const windows = frames.map((_, i) => ({
-    from: i === 0 ? 0 : HANDOVERS[i - 1],
-    to: i === frames.length - 1 ? 1 : HANDOVERS[i] + FADE,
-  }));
+  let current = 0;
+  let timer = 0;
+  let visible = false;
+  let paused = !motionIsFull();
 
-  function render(progress: number): void {
-    if (!root.classList.contains('is-live')) return;
+  const show = (index: number) => {
+    current = (index + frames.length) % frames.length;
+    frames.forEach((frame, i) => frame.classList.toggle('is-shown', i === current));
+  };
 
-    frames.forEach((frame, i) => {
-      const fadeIn = i === 0 ? 1 : beat(progress, HANDOVERS[i - 1], HANDOVERS[i - 1] + FADE);
-      const fadeOut = i === frames.length - 1 ? 0 : beat(progress, HANDOVERS[i], HANDOVERS[i] + FADE);
-      // Only the incoming frame fades; the outgoing one stays opaque beneath
-      // it until it is covered, so the two never show the ground between them.
-      frame.style.opacity = String(fadeOut >= 1 ? 0 : fadeIn);
+  const stop = () => {
+    window.clearInterval(timer);
+    timer = 0;
+  };
 
-      const { from, to } = windows[i];
-      const push = beat(progress, from, to);
-      const picture = pictures[i];
-      if (picture) picture.style.transform = `scale(${1 + push * PUSH})`;
-    });
-  }
+  const start = () => {
+    stop();
+    if (paused || !visible || document.hidden || !root.classList.contains('is-live')) return;
+    timer = window.setInterval(() => show(current + 1), EVERY_MS);
+  };
 
-  function rest(): void {
-    for (const frame of frames) frame.removeAttribute('style');
-    for (const picture of pictures) picture?.style.removeProperty('transform');
-  }
+  const label = () => {
+    button.textContent = paused ? 'Play' : 'Pause';
+    button.setAttribute('aria-pressed', String(paused));
+  };
 
-  const redraw = addScene(root, render);
+  button.addEventListener('click', () => {
+    paused = !paused;
+    if (!paused) show(current + 1);
+    label();
+    start();
+  });
+
+  new IntersectionObserver(
+    ([entry]) => {
+      visible = entry.isIntersecting;
+      start();
+    },
+    { threshold: 0.4 },
+  ).observe(root);
+  document.addEventListener('visibilitychange', start);
 
   function sync(): void {
-    const live = canRun.matches && motionIsFull();
+    const live = canRun.matches;
     root.classList.toggle('is-live', live);
-    if (!live) rest();
-    redraw();
+    button.hidden = !live;
+    if (live) show(current);
+    else for (const frame of frames) frame.classList.remove('is-shown');
+    start();
   }
 
   canRun.addEventListener('change', sync);
-  onMotionChange(sync);
+  onMotionChange(() => {
+    paused = !motionIsFull();
+    label();
+    sync();
+  });
+  label();
   sync();
 }
