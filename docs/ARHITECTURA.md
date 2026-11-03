@@ -1647,3 +1647,18 @@ pe ecran (`aruna-scene.ts`).
 
 **Bara de scroll** e ascunsă pe landing. Pagina se derulează în continuare cu rotița,
 tastele și touch-ul.
+
+## Faza 34 — Tranziția dintre secțiuni, desenată de noi; imaginile la 3 secunde
+
+- **Trecerea la secțiunea următoare** nu mai folosește scroll-ul „smooth” al browserului,
+  care la tine sărea instant (unele browsere fac asta când pagina are snap).
+  `section-snap.ts` desenează acum alunecarea cadru cu cadru:
+  - durează 0,9 s;
+  - pornește încet, accelerează și încetinește la sosire;
+  - cât timp alunecă, snap-ul browserului e oprit și pornește la loc la final.
+- **Tastele** (Page Down, Page Up, săgețile, spațiul) folosesc aceeași alunecare. Nu le
+  preiau când ești într-un control, de exemplu pe sliderele pieței.
+- **În modul fără animații** trecerea rămâne o tăietură directă.
+- **Măsurat la 1440×900** (poziția paginii în timp, după o treaptă de rotiță):
+  0 → 20 → 83 → 251 → 534 → 761 → 836px, în aproximativ o secundă.
+- **Imaginile din secțiunea de design** se schimbă acum la 3 s în loc de 3,6 s.

@@ -12,7 +12,7 @@
  */
 import { motionIsFull, onMotionChange } from './motion';
 
-const EVERY_MS = 3600;
+const EVERY_MS = 3000;
 
 export function initArunaScene(root: HTMLElement): void {
   const canRun = window.matchMedia('(min-width: 60rem)');
