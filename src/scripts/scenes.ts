@@ -21,6 +21,7 @@
  */
 
 import { motionIsFull, onMotionChange } from './motion';
+import { afterGlide } from './glide';
 
 export type Render = (progress: number) => void;
 
@@ -141,7 +142,8 @@ export function playOnArrival(element: HTMLElement, render: Render, duration: nu
     ([entry]) => {
       if (entry.intersectionRatio >= 0.6 && !played) {
         played = true;
-        play();
+        // Waits for the glide to the section to land before it plays.
+        afterGlide(play);
       } else if (entry.intersectionRatio < 0.05 && played) {
         // Gone: the next arrival plays it again from the start.
         played = false;

@@ -1,6 +1,7 @@
 /**
  * Section entrances: the parts of a section ([data-enter] > *) arrive in
- * reading order the first time the section comes into view. The staggering
+ * reading order the first time the section comes into view, or, on the
+ * landing page, once the glide to that section has landed. The staggering
  * itself is CSS (global.css); this only decides when.
  *
  * Content is never hidden before this runs. The hiding rule is keyed to the
@@ -9,6 +10,7 @@
  * are marked as arrived first, so nothing the reader is looking at blinks out.
  */
 import { motionIsFull, onMotionChange } from './motion';
+import { afterGlide } from './glide';
 
 export function initEnter(): void {
   if (!('IntersectionObserver' in window)) return;
@@ -20,8 +22,11 @@ export function initEnter(): void {
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
-        entry.target.classList.add('is-in');
-        observer.unobserve(entry.target);
+        const group = entry.target;
+        observer.unobserve(group);
+        // On the landing page a section glides in still and comes alive once
+        // it has landed (glide.ts); elsewhere this runs at once.
+        afterGlide(() => group.classList.add('is-in'));
       }
     },
     // Fires when the group's top is about 90% of the way down the screen.

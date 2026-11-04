@@ -16,6 +16,7 @@
  * straight cut.
  */
 import { motionIsFull } from './motion';
+import { setGliding } from './glide';
 
 const QUIET_MS = 160;
 const GLIDE_MS = 900;
@@ -69,6 +70,7 @@ export function initSectionSnap(): void {
     }
     root.style.scrollSnapType = 'none';
     root.style.scrollBehavior = 'auto';
+    setGliding(true);
     const started = performance.now();
     lockedUntil = started + GLIDE_MS;
     const step = (now: number) => {
@@ -79,6 +81,8 @@ export function initSectionSnap(): void {
         raf = 0;
         root.style.removeProperty('scroll-snap-type');
         root.style.removeProperty('scroll-behavior');
+        // Landed: entrances and scenes waiting for the arrival start now.
+        setGliding(false);
       }
     };
     raf = requestAnimationFrame(step);

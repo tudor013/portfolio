@@ -1662,3 +1662,19 @@ tastele și touch-ul.
 - **Măsurat la 1440×900** (poziția paginii în timp, după o treaptă de rotiță):
   0 → 20 → 83 → 251 → 534 → 761 → 836px, în aproximativ o secundă.
 - **Imaginile din secțiunea de design** se schimbă acum la 3 s în loc de 3,6 s.
+
+## Faza 35 — Animațiile pornesc după ce pagina ajunge pe secțiune
+
+- **Ce vedeai tu:** pe site-ul live rula încă versiunea de dinainte de faza 34, cea în care
+  derularea sărea instant. Deploy-ul ultimului commit nu ajunsese pe Cloudflare. Push-ul de
+  acum declanșează un build nou.
+- **Ce s-a schimbat:** secțiunea alunecă întâi pe ecran, nemișcată, și abia după ce ajunge
+  apar textele și pornesc scenele.
+  - Un modul mic, `scripts/glide.ts`, știe dacă pagina e în mijlocul unei alunecări.
+  - `section-snap.ts` îl anunță la pornire și la sosire.
+  - Animațiile de apariție (`enter.ts`) și scenele care pornesc la sosire (`playOnArrival`:
+    schema, piața) așteaptă sosirea.
+- **Măsurat la 1440×900**, trecerea de la schemă la intro: pagina coboară 836 → 1038 → 1552 →
+  1672px, iar textul apare abia când ajunge la 1672.
+- **Curățenie:** două capturi de ecran ajunseseră din greșeală în rădăcina repo-ului. Le-am
+  scos.
